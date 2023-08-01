@@ -1,7 +1,7 @@
 # Makefile for Flask project
 
 # Define the main Python file (change this if your main file has a different name)
-MAIN_FILE := run.py
+MAIN_FILE := app.py
 
 # Python interpreter
 PYTHON := python3
@@ -17,7 +17,7 @@ TESTS_DIR := tests
 .PHONY: run
 run: venv
 	@echo "Running the Flask app..."
-	@. $(VENV_NAME)/bin/activate; $(PYTHON) $(MAIN_FILE)
+	@. $(VENV_NAME)/bin/activate; $(PYTHON) $(APP_DIR)/$(MAIN_FILE)
 
 .PHONY: test
 test: venv
