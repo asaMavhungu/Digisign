@@ -10,7 +10,7 @@ PYTHON := python3
 VENV_NAME := .venv
 
 # Directories
-APP_DIR := app
+APP_DIR := project
 TESTS_DIR := tests
 
 # Targets and Commands
