@@ -1,16 +1,39 @@
-VENV = .venv
-PYTHON = $(VENV)/bin/python3
-PIP = $(VENV)/bin/pip
+# Makefile for Flask project
 
-#run: $(VENV)/bin/activate
-#	$(PYTHON) app.py
+# Define the main Python file (change this if your main file has a different name)
+MAIN_FILE := run.py
 
+# Python interpreter
+PYTHON := python3
 
-$(VENV)/bin/activate: requirements.txt
-	python3 -m venv $(VENV)
-	$(PIP) install -r requirements.txt
+# Name of the virtual environment directory
+VENV_NAME := .venv
 
+# Directories
+APP_DIR := app
+TESTS_DIR := tests
 
+# Targets and Commands
+.PHONY: run
+run: venv
+	@echo "Running the Flask app..."
+	@. $(VENV_NAME)/bin/activate; $(PYTHON) $(MAIN_FILE)
+
+.PHONY: test
+test: venv
+	@echo "Running tests..."
+	@. $(VENV_NAME)/bin/activate; $(PYTHON) -m pytest $(TESTS_DIR)
+
+venv: $(VENV_NAME)/bin/activate
+
+$(VENV_NAME)/bin/activate: requirements.txt
+	@echo "Setting up virtual environment..."
+	@$(PYTHON) -m venv $(VENV_NAME)
+	@. $(VENV_NAME)/bin/activate; pip install -r requirements.txt
+	@echo "Virtual environment setup complete."
+
+.PHONY: clean
 clean:
-	rm -rf __pycache__
-	rm -rf $(VENV)
+	@echo "Cleaning up..."
+	@rm -rf $(VENV_NAME)
+	@echo "Cleanup complete."
