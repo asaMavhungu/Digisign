@@ -1,12 +1,13 @@
 # test_app.py
 import pytest
+from flask.testing import FlaskClient
 from project.app import app  # Import the Flask app instance from app.py
 
 # Define a pytest fixture called "client"
 @pytest.fixture
 def client():
 	app.config['TESTING'] = True  # Set TESTING configuration to True to enable testing mode
-	client = app.test_client()    # Create a test client for the Flask app
+	client: FlaskClient = app.test_client()    # Create a test client for the Flask app
 	yield client                  # Yield the test client to the test function
 								 # (code below 'yield' will be executed after the test function)
 
