@@ -12,6 +12,10 @@ def hello() -> str:
 def home() -> str:
 	return render_template("index.html")
 
+@app.route("/sit")
+def computerScience() -> str:
+	return render_template("cs.html")
+
 
 if __name__ == '__main__':
 	# Run the application on localhost and port 5000
