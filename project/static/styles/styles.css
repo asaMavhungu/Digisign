@@ -10,19 +10,19 @@ body .container .slider-wrapper {
   max-width: 48rem;
   margin: 0 auto;
 }
-body .container .slider-wrapper .slider {
+body .container .slider-wrapper .slide {
   display: flex;
   aspect-ratio: 16/9;
-  overflow-x: hidden;
+  overflow-x: auto;
   scroll-snap-type: x mandatory;
   scroll-behavior: smooth;
   box-shadow: 0 1.5rem 3rem -0.75rem hsla(0, 0%, 0%, 0.25);
   border-radius: 0.5rem;
 }
-body .container .slider-wrapper .slider img {
+body .container .slider-wrapper .slide img {
   flex: 1 0 100%;
   scroll-snap-align: start;
-  object-fit: cover;
+  object-fit: scale-down;
 }
 body .container .slider-wrapper .slider-nav {
   display: flex;
