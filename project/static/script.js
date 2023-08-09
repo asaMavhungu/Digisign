@@ -7,4 +7,5 @@ document.addEventListener("DOMContentLoaded", function() {
     // Add the 'carousel-fade' class to enable the crossfade effect
     wrap: true // Prevent wrapping at the end of slides
   });
+  // TODO: Redo slideshow
 });
