@@ -14,8 +14,8 @@
 			<button
 				class="navbar-toggler"
 				type="button"
-				data-toggle="collapse"
-				data-target="#navbar"
+				data-bs-toggle="collapse"
+				data-bs-target="#navbar"
 			>
 				<span class="navbar-toggler-icon"></span>
 			</button>
@@ -32,17 +32,15 @@
 		{% with messages = get_flashed_messages(with_categories=true) %}
 			{% if messages %}
 				{% for category, message in messages %}
-				{% if category == "error"%}
-					<div class="alert alert-danger alerter-dismissable fade show" role="alert">
+				{% if category == "error" %}
+					<div class="alert alert-danger alert-dismissible fade show" role="alert">
 						{{ message }}
-						<button type="button" class="close" data-dismiss="alert">
-							<span aria-hidden="true">&times;</span>
-						</button>
+						<button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
 					</div>
 				{% else %}
-					<div class="alert alert-success alerter-dismissable fade show" role="alert">
+					<div class="alert alert-success alter-dismissable fade show" role="alert">
 						{{ message }}
-						<button type="button" class="close" data-dismiss="alert">
+						<button type="button" class="close" data-bs-dismiss="alert">
 							<span aria-hidden="true">&times;</span>
 						</button>
 					</div>
