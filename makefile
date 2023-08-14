@@ -1,39 +1,31 @@
-# Makefile for Flask project
+# Makefile for Python Project
 
-# Define the main Python file (change this if your main file has a different name)
-MAIN_FILE := app.py
+# Variables
+VENV_NAME = .venv
+PYTHON = $(VENV_NAME)/bin/python
+PIP = $(VENV_NAME)/bin/pip
 
-# Python interpreter
-PYTHON := python3
+# Targets and Rules
+.PHONY: setup install run test clean
 
-# Name of the virtual environment directory
-VENV_NAME := .venv
+# Set up the virtual environment
+setup:
+	python3 -m venv $(VENV_NAME)
+	$(PIP) install --upgrade pip
 
-# Directories
-APP_DIR := project
-TESTS_DIR := tests
+# Install project dependencies
+install: setup
+	$(PIP) install -r requirements.txt
 
-# Targets and Commands
-.PHONY: run
-run: venv
-	@echo "Running the Flask app..."
-	@. $(VENV_NAME)/bin/activate; $(PYTHON) $(APP_DIR)/$(MAIN_FILE)
+# Run your Python script
+run: install
+	$(PYTHON) path/to/your_script.py
 
-.PHONY: test
-test: venv
-	@echo "Running tests..."
-	@. $(VENV_NAME)/bin/activate; $(PYTHON) -m pytest $(TESTS_DIR)
+# Run tests
+test: install
+	$(PYTHON) -m unittest discover tests
 
-venv: $(VENV_NAME)/bin/activate
-
-$(VENV_NAME)/bin/activate: requirements.txt
-	@echo "Setting up virtual environment..."
-	@$(PYTHON) -m venv $(VENV_NAME)
-	@. $(VENV_NAME)/bin/activate; pip install -r requirements.txt
-	@echo "Virtual environment setup complete."
-
-.PHONY: clean
+# Clean up generated files and virtual environment
 clean:
-	@echo "Cleaning up..."
-	@rm -rf $(VENV_NAME)
-	@echo "Cleanup complete."
+	rm -rf $(VENV_NAME)
+	find . -type f -name "*.pyc" -delete
