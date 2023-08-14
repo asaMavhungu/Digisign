@@ -19,7 +19,7 @@ install: setup
 
 # Run your Python script
 run: install
-	$(PYTHON) path/to/your_script.py
+	$(PYTHON) main.py
 
 # Run tests
 test: install
