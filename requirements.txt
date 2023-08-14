@@ -1,2 +1,4 @@
 flask
+flask-SQLAlchemy
 pytest
+flask_login
