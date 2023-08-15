@@ -1,7 +1,9 @@
 # test_app.py
 import pytest
 from flask.testing import FlaskClient
-from project.app import app  # Import the Flask app instance from app.py
+from project import create_app  # Import the Flask app instance from app.py
+
+app = create_app()
 
 # Define a pytest fixture called "client"
 @pytest.fixture

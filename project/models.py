@@ -14,3 +14,12 @@ class User(db.Model, UserMixin):
 	password = db.Column(db.String(150))
 	firstName = db.Column(db.String(150))
 	notes = db.relationship('Note')
+	slides = db.relationship('Slide')
+
+class Slide(db.Model):
+	id = db.Column(db.Integer, primary_key=True)
+	image_source = db.Column(db.String(256))
+	image_title = db.Column(db.String(256))
+	image_info = db.Column(db.String(256))
+	date = db.Column(db.DateTime(timezone=True), default=func.now())
+	user_id = db.Column(db.Integer, db.ForeignKey('user.id'))

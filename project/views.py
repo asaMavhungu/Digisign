@@ -39,3 +39,15 @@ def delete_note():
 			db.session.commit()
 	
 	return jsonify({})
+
+@views.route('/delete-slide', methods=['POST'])
+def delete_slide():
+	slide = json.loads(request.data)
+	slideId = slide['noteId']
+	note = Note.query.get(slideId)
+	if slide:
+		if slide.user_id == current_user.id: #if the deleter is the owner # type: ignore
+			db.session.delete(slide)
+			db.session.commit()
+	
+	return jsonify({})

@@ -5,16 +5,22 @@
 
 <h1 align="centre">Notes</h1>
 <ul class="list-group list-group-flush" id="notes">
-	{% for note in user.notes %}
-		<li class="list-group-item">{{ note.data }}</li> 
+	{% for slide in user.slides %}
+		<li class="list-group-item">
+			{{ slide.image_title }}
+			<button type="button" class="btn-close float-end" aria-label="Close" onclick="deleteNote({{note.id}})"></button>
+		</li> 
 	{% endfor %}
 </ul>
 <form method="POST">
 
-	<textarea name="note" id="note" class="form-control"></textarea>
-	<div align="center">
-		<button type="submit" class="btn btn-primary">Add Note</button>
-	</div>
+    <input type="text" name="imgTitle" id="imgTitle" class="form-control" placeholder="Image Title">
+    <input type="text" name="imgParagraph" id="imgParagraph" class="form-control" placeholder="Image Paragraph">
+    <textarea name="img_source" id="img_source" class="form-control" placeholder="Source"></textarea>
+    
+    <div align="center">
+        <button type="submit" class="btn btn-primary">Add Image</button>
+    </div>
 
 </form>
 

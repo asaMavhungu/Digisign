@@ -82,6 +82,14 @@
 						window.location.href = "/slides";
 					});
 			}
+			function deleteSlide(slideId) {
+				fetch("/delete-slide", {
+					method: "POST",
+					body: JSON.stringify({ slideId: slideId }),
+					}).then((_res) => {
+						window.location.href = "/slides";
+					});
+			}
 			</script>
 		{% endblock %}
 	</body>
