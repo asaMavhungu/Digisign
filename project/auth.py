@@ -8,6 +8,22 @@ auth = Blueprint('auth', __name__)
 
 @auth.route('/login', methods=['GET', 'POST'])
 def login():
+	if request.method == 'POST':
+		email = request.form.get('email')
+		password = request.form.get('password')
+
+		user = User.query.filter_by(email=email).first()
+
+		if user:
+			if check_password_hash(user.password, password): # type: ignore
+				flash('Logged in successfully', category='success')
+				return redirect(url_for('views.home'))
+			else:
+				flash('Incorrect password, try again', category='error')
+		else:
+			flash('Email does not exist.', category='error')
+
+
 	data = request.form
 	print(data)
 	return render_template("login.html")
@@ -24,7 +40,11 @@ def sign_up():
 		password1: Optional[str] = request.form.get('password1')
 		password2: Optional[str] = request.form.get('password2')
 
-		if len(email) < 4: # type: ignore
+		user = User.query.filter_by(email=email).first()
+
+		if user:
+			flash('Email already exists', category='error')
+		elif len(email) < 4: # type: ignore
 			flash("Email must be greater than 3 characters", category='error')
 		elif len(firstName) < 2: # type: ignore
 			flash("Firstname must be greater than 2 characters", category='error')
