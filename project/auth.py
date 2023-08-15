@@ -28,7 +28,7 @@ def login():
 
 	data = request.form
 	print(data)
-	return render_template("login.html")
+	return render_template("login.html", user=current_user)
 
 @auth.route('/logout')
 @login_required
@@ -66,4 +66,4 @@ def sign_up():
 
 	data = request.form
 	print(data)
-	return render_template("sign_up.html")
+	return render_template("sign_up.html", user=current_user)
