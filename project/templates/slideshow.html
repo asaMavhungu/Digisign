@@ -3,17 +3,20 @@
 
 {% block content %} 
 
-<h1 align="centre">Notes</h1>
-<ul class="list-group list-group-flush" id="notes">
-	{% for note in user.notes %}
-		<li class="list-group-item">{{ note.data }}</li> 
+<h1 align="centre">Slides</h1>
+<ul class="list-group list-group-flush" id="slides">
+	{% for slide in user.slides %}
+	<li class="list-group-item">
+		{{ slide.data }}
+		<button type="button" class="btn-close float-end" aria-label="Close" onclick="deleteSlide({{slide.id}})"></button>
+	  </li>
 	{% endfor %}
 </ul>
 <form method="POST">
 
-	<textarea name="note" id="note" class="form-control"></textarea>
+	<textarea name="slide" id="slide" class="form-control"></textarea>
 	<div align="center">
-		<button type="submit" class="btn btn-primary">Add Note</button>
+		<button type="submit" class="btn btn-primary">Add Slide</button>
 	</div>
 
 </form>
