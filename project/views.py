@@ -39,3 +39,8 @@ def delete_note():
 			db.session.commit()
 	
 	return jsonify({})
+
+@views.route('/weather', methods=['GET', 'POST'])
+def weather():
+	 
+	return render_template("weather.html", user = current_user)
