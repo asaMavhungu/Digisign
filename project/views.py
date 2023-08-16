@@ -44,3 +44,9 @@ def delete_slide():
 		return redirect(url_for('views.home'))
 	except:
 		return 'There was a problem deleting the slide'
+	
+
+@views.route('/weather', methods=['GET', 'POST'])
+def weather():
+	 
+	return render_template("weather.html", user = current_user)
