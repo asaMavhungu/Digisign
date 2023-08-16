@@ -8,7 +8,7 @@
 	{% for slide in user.slides %}
 	<li class="list-group-item">
 		{{ slide.data }}
-		<button type="button" class="btn-close float-end" aria-label="Close" onclick="deleteSlide({{slide.id}})"></button>
+		<a href="{{ url_for('views.delete_slide', id=slide.id) }}" class="btn-close float-end" aria-label="Close"></a>
 	  </li>
 	{% endfor %}
 </ul>
