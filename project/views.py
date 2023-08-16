@@ -28,14 +28,19 @@ def slides():
 	return render_template("slideshow.html", user=current_user)
 
 
-@views.route('/delete-slide/<int:id>', methods=['GET'])
+@views.route('/delete-slide', methods=['POST'])
 @login_required
-def delete_slide(id):
-	slide = Slide.query.get_or_404(id)
+def delete_slide():
+	slide_id = request.form.get('id')  # Get the value of the 'id' field from the form data
+	
+	if slide_id is None:
+		return 'No slide ID provided'
+
+	slide = Slide.query.get_or_404(slide_id)
 
 	try:
 		db.session.delete(slide)
 		db.session.commit()
-		return redirect((url_for('views.home')))
+		return redirect(url_for('views.home'))
 	except:
 		return 'There was a problem deleting the slide'
