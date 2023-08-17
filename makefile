@@ -23,7 +23,7 @@ run: install
 
 # Run tests
 test: install
-	$(PYTHON) -m unittest discover tests
+	$(PYTHON) -m pytest
 
 # Clean up generated files and virtual environment
 clean:
