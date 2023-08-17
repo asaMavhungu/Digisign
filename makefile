@@ -23,7 +23,7 @@ run: install
 
 # Run tests
 test: install
-	$(PYTHON) -m pytest
+	$(PYTHON) -m pytest -v
 
 # Clean up generated files and virtual environment
 clean:
