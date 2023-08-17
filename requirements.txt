@@ -1,4 +1,4 @@
-flask_loginblinker==1.6.2
+blinker==1.6.2
 click==8.1.6
 exceptiongroup==1.1.3
 Flask==2.3.2
