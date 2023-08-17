@@ -57,7 +57,8 @@ def sign_up():
 		elif len(password1) < 2: # type: ignore
 			flash("Password must be greater than 6 characters", category='error')
 		else:
-			new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='sha256')) # type: ignore
+			# UserWarning: The 'sha256' password method is deprecated and will be removed in Werkzeug 3.0. Migrate to the 'scrypt' method.
+			new_user = User(email=email, firstName=firstName, password=generate_password_hash(password1, method='scrypt')) # type: ignore
 			db.session.add(new_user)
 			db.session.commit()
 			flash("Account created", category='success')
