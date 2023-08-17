@@ -1,10 +1,46 @@
 from flask import Blueprint, render_template, request, flash, jsonify, redirect, url_for
 from flask_login import login_required, current_user
-from .models import Slide, VideoSlide
+from .models import Slide, VideoSlide, User, Department, Device, Admin
 from . import db
 import json
 
 views = Blueprint('views', __name__)
+
+class SlideManager:
+    @staticmethod
+    def get_slide_by_id(slide_id):
+        return Slide.query.get(slide_id)
+
+    @staticmethod
+    def get_user_slides(user_id):
+        return User.query.get(user_id).slides
+
+class DepartmentManager:
+    @staticmethod
+    def get_department_by_id(department_id):
+        return Department.query.get(department_id)
+
+    @staticmethod
+    def get_department_admins(department_id):
+        return Department.query.get(department_id).admins
+
+class DeviceManager:
+    @staticmethod
+    def get_device_by_id(device_id):
+        return Device.query.get(device_id)
+
+    @staticmethod
+    def get_active_devices():
+        return Device.query.filter_by(status='Active').all()
+
+class AdminManager:
+    @staticmethod
+    def get_admin_by_id(admin_id):
+        return Admin.query.get(admin_id)
+
+    @staticmethod
+    def get_admin_departments(admin_id):
+        return Admin.query.get(admin_id).departments
 
 def get_time_interval(slide):
 	# Present the slide for the calculated time interval
