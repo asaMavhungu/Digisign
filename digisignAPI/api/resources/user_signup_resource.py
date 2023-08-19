@@ -11,7 +11,7 @@ user_put_args.add_argument("username", type=str, help="Username is required", re
 user_put_args.add_argument("email", type=str, help="Email is required", required=True)
 user_put_args.add_argument("password", type=str, help="Password is required", required=True)
 
-class UserResource(Resource):
+class UserSignupResource(Resource):
     
     def __init__(self, mongo):
         """
