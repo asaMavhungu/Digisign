@@ -60,7 +60,10 @@ class User:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: A user document from the database with the specified user ID or None if not found.
 		"""
-		return mongo.db.users.find_one({'_id': ObjectId(user_id)})
+		user_data = mongo.db.users.find_one({'_id': ObjectId(user_id)})
+		if user_data:
+			return User.from_dict(user_data)
+		return None
 
 	def save(self, mongo):
 		"""
