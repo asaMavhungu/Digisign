@@ -1,7 +1,7 @@
 
 # main.py
-from api.resources.user_resource import UserResource
-from api import app, mongo
+from api import createApp
 
 if __name__ == "__main__":
+	app, mongo = createApp()
 	app.run(debug=True)
