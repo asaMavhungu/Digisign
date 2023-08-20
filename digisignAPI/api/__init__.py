@@ -9,8 +9,10 @@ from flask_pymongo import PyMongo
 
 from flask import request
 from flask_restful import Resource, reqparse
+from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
 from api.models.User import User  # Import your User class
+from datetime import timedelta  # Import timedelta from datetime
 bcrypt = Bcrypt()
 
 
@@ -22,6 +24,13 @@ from pymongo import MongoClient
 def createApp():
 
 	app = Flask(__name__)
+
+	# Initialize JWTManager with your Flask app
+	jwt = JWTManager(app)
+
+	app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'  # Replace with your secret key
+	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Set token expiration time
+
 
 	# Connect to MongoDB Atlas cluster
 	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
@@ -41,8 +50,11 @@ def createApp():
 
 
 	# Import and add your UserResource here
-	from .resources.user_resource import UserResource
-	api.add_resource(UserResource, '/user', '/user/<string:user_id>', '/user/login', resource_class_args=(mongo,))
+	from .resources.user_signup_resource import UserSignupResource
+	api.add_resource(UserSignupResource, '/user', '/user/<string:user_id>', resource_class_args=(mongo,))
+
+	from .resources.user_login_resource import UserLoginResource
+	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
 
 	return app, mongo
 
