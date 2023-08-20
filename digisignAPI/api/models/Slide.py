@@ -62,8 +62,6 @@ class Slide:
 			'author_id': self.author_id,
 			'departments': self.departments
 		}
-		if self._id:
-			slide_dict['_id'] = self._id
 		return slide_dict
 
 	@staticmethod
