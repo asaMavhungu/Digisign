@@ -56,6 +56,14 @@ def createApp():
 	from .resources.user_login_resource import UserLoginResource
 	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
 
+	from .resources.slide_resource import SlideResource
+	api.add_resource(SlideResource, '/slides', resource_class_args=(mongo,))
+
+	from .resources.department_resource import DepartmentResource
+	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
+
+
+
 	return app, mongo
 
 app, mongo = createApp()
