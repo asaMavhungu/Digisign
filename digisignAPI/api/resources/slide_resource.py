@@ -19,6 +19,16 @@ class SlideResource(Resource):
 	def __init__(self, mongo):
 		self.mongo = mongo
 
+	def get(self, slide_id):
+		slide = Slide.find_by_id(slide_id, self.mongo)
+		print(type(slide))
+		#user = User.from_dict(userDict)
+		if slide:
+			print(slide.to_dict())
+			return slide.to_dict(), 200
+			#return user.to_dict()
+		return {"message": "Slide not found"}, 404
+
 	def post(self):
 		args = slide_parser.parse_args()
 		title = args['title']
