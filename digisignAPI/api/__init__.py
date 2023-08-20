@@ -66,7 +66,3 @@ def createApp():
 
 	return app, mongo
 
-app, mongo = createApp()
-
-def getApp():
-	return app, mongo
