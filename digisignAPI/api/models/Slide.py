@@ -78,6 +78,20 @@ class Slide:
 			return Slide.from_dict(slide_data)
 		return None
 
+	@staticmethod
+	def find_by_title(title, mongo):
+		"""
+		Finds slides by their title in the database.
+
+		:param title: The title of the slide to search for.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: A list of instances of the Slide class matching the title or an empty list if not found.
+		"""
+		slide_data = mongo.db.slides.find_one({'title': title})
+		if slide_data:
+			return Slide.from_dict(slide_data)
+		return None
+
 	def save(self, mongo):
 		"""
 		Saves the slide instance to the database.
