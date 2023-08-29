@@ -46,14 +46,14 @@ class UserSignupResource(Resource):
 		user_id = user.save(self.mongo)
 		return {"message": "User created", "user_id": user_id}, 201
 
-	def get(self, user_id):
+	def get(self, username):
 		"""
 		Endpoint for retrieving user information by user ID.
 
 		:param user_id: The unique identifier of the user.
 		:return: JSON response with user information or a "User not found" message.
 		"""
-		user = User.find_by_id(user_id, self.mongo)
+		user = User.find_by_username(username, self.mongo)
 		if user:
 			return user.to_dict()
 		return {"message": "User not found"}, 404
