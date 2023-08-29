@@ -21,14 +21,13 @@ class UserLoginResource(Resource):
         password = args["password"]
 
         # Find the user by username
-        user_dict = User.find_by_username(username, self.mongo)
+        user = User.find_by_username(username, self.mongo)
 
-        if user_dict:
+        if user:
             # Verify the password
-            stored_password_hash = user_dict.get('password_hash')
-            if bcrypt.check_password_hash(stored_password_hash, password):
+            if user.verify_password(password):
                 # Create a JWT token
-                access_token = create_access_token(identity=str(user_dict['_id']))
+                access_token = create_access_token(identity=username)
 
                 return {"message": "Login successful", "access_token": access_token}, 200
             else:
