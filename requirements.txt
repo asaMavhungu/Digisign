@@ -2,3 +2,7 @@ flask
 flask-SQLAlchemy
 pytest
 flask_login
+flask-restful
+flask_pymongo
+Flask-JWT-Extended
+Flask-Bcrypt
