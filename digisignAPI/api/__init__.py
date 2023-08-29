@@ -51,7 +51,7 @@ def createApp():
 
 	# Import and add your UserResource here
 	from .resources.user_signup_resource import UserSignupResource
-	api.add_resource(UserSignupResource, '/user', '/user/<string:user_id>', resource_class_args=(mongo,))
+	api.add_resource(UserSignupResource, '/user', '/user/<string:username>', resource_class_args=(mongo,))
 
 	from .resources.user_login_resource import UserLoginResource
 	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
