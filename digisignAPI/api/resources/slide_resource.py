@@ -19,9 +19,9 @@ class SlideResource(Resource):
 	def __init__(self, mongo):
 		self.mongo = mongo
 
-	def get(self, slide_id):
-		slide = Slide.find_by_id(slide_id, self.mongo)
-		print(type(slide))
+	def get(self, slide_title):
+		slide = Slide.find_by_title(slide_title, self.mongo)
+		#print(type(slide))
 		#user = User.from_dict(userDict)
 		if slide:
 			print(slide.to_dict())
