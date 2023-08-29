@@ -57,7 +57,7 @@ def createApp():
 	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
 
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/slides', '/slides/<string:slide_id>', resource_class_args=(mongo,))
+	api.add_resource(SlideResource, '/slides', '/slides/<string:slide_title>', resource_class_args=(mongo,))
 
 	from .resources.department_resource import DepartmentResource
 	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
