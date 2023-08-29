@@ -1,5 +1,8 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from flask_bcrypt import Bcrypt
+
+
 
 class User:
 	def __init__(self, username, email, password_hash=None):
@@ -49,7 +52,11 @@ class User:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: A user document from the database with the specified username or None if not found.
 		"""
-		return mongo.db.users.find_one({'username': username})
+		user_data = mongo.db.users.find_one({'username': username})
+		#print(user_data)
+		if user_data:
+			return User.from_dict(user_data)
+		return None
 
 	@staticmethod
 	def find_by_id(user_id, mongo):
@@ -65,6 +72,18 @@ class User:
 			return User.from_dict(user_data)
 		return None
 
+	def verify_password(self, password):
+		"""
+		Verify the user's password.
+
+		:param password: The password to verify.
+		:return: True if the password is correct, False otherwise.
+		"""
+		bcrypt = Bcrypt()
+		if self.password_hash:
+			return bcrypt.check_password_hash(self.password_hash, password)
+		return False
+	
 	def save(self, mongo):
 		"""
 		Saves the user instance to the database.
