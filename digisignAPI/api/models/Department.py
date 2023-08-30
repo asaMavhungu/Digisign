@@ -69,6 +69,20 @@ class Department:
 			return Department.from_dict(department_data)
 		return None
 
+	@staticmethod
+	def find_by_name(department_name, mongo):
+		"""
+		Finds a department by its name in the database.
+
+		:param department_name: The name of the department to search for.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: An instance of the Department class or None if not found.
+		"""
+		department_data = mongo.db.departments.find_one({'name': department_name})
+		if department_data:
+			return Department.from_dict(department_data)
+		return None
+
 	def save(self, mongo):
 		"""
 		Saves the department instance to the database.
