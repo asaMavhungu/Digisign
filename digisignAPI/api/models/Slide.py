@@ -16,22 +16,26 @@ class Slide:
 		self.author_id = author_id
 		self.departments = []  # List to store associated department ObjectIds
 
-	def add_department(self, department_id):
+	def add_department(self, department_name):
 		"""
 		Add a department ObjectId to the slide's list of associated departments.
 
 		:param department_id: The ObjectId of the department to be associated with the slide.
 		"""
-		self.departments.append(department_id)
+		if department_name not in self.departments:
+			self.departments.append(department_name)
 
-	def remove_department(self, department_id):
+	def remove_department(self, department_name):
 		"""
 		Remove a department ObjectId from the slide's list of associated departments.
 
 		:param department_id: The ObjectId of the department to be disassociated from the slide.
 		"""
-		if department_id in self.departments:
-			self.departments.remove(department_id)
+		if department_name in self.departments:
+			self.departments.remove(department_name)
+
+	def clear_departments(self):
+		self.departments = []
 
 	@classmethod
 	def from_dict(cls, slide_dict):
