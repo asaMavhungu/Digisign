@@ -10,10 +10,16 @@ from api.models.Department import Department
 #department_parser.add_argument('name', type=str, required=True, help='Name of the department')
 
 slide_parser = reqparse.RequestParser()
-slide_parser.add_argument('title', type=str, required=False, help='Title of the slide')
-slide_parser.add_argument('content', type=str, required=False, help='Content of the slide')
-slide_parser.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
+slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
+slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
+slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
+
+slide_parser_patch = reqparse.RequestParser()
+slide_parser_patch.add_argument('title', type=str, required=False, help='Title of the slide')
+slide_parser_patch.add_argument('content', type=str, required=False, help='Content of the slide')
+slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
+slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 
 class SlideResource(Resource):
@@ -60,7 +66,7 @@ class SlideResource(Resource):
 		return {'message': 'Slide created', 'slide_id': slide_id}, 201
 
 	def patch(self, slide_title):
-		args = slide_parser.parse_args()	
+		args = slide_parser_patch.parse_args()	
 
 		# Find the slide by slide_id
 		slide = Slide.find_by_title(slide_title, self.mongo)
@@ -105,7 +111,7 @@ class SlideResource(Resource):
 		author_id = args['author_id']
 		departments = args.get('departments', [])
 
-		print(departments) # this shows ['c', 'o', 'm', 'p', 'u', 't', 'e', 'r', ' ', 's', 'c', 'i', 'e', 'n', 'c', 'e']
+		print(departments)
 
 		slide = Slide.find_by_title(slide_title, self.mongo)
 
