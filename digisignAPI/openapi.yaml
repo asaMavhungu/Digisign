@@ -4,7 +4,7 @@ info:
   description: API for managing users, slides, and departments
   version: 1.0.0
 servers:
-  - url: http://localhost:5000
+  - url: http://localhost:5000  # Update with your API's base URL
     description: Local Development Server
 paths:
   /user:
@@ -38,6 +38,26 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+  /login: 
+    post:
+      summary: Authenticate and log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '401':
+          description: Unauthorized (invalid password)
         '404':
           description: User not found
   /slides:
@@ -141,6 +161,23 @@ components:
         email:
           type: string
           format: email
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UserLoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        access_token:
+          type: string
     SlideRequest:
       type: object
       properties:
@@ -184,3 +221,4 @@ components:
           type: array
           items:
             type: string
+
