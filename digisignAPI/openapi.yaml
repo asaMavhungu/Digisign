@@ -4,7 +4,7 @@ info:
   description: API for managing users, slides, and departments
   version: 1.0.0
 servers:
-  - url: http://localhost:5000  # Update with your API's base URL
+  - url: http://localhost:5000
     description: Local Development Server
 paths:
   /user:
@@ -87,7 +87,7 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SlideUpdateRequest'
+              $ref: '#/components/schemas/SlidePatchRequest'
       responses:
         '200':
           description: Slide updated successfully
@@ -171,12 +171,14 @@ components:
           type: array
           items:
             type: string
-    SlideUpdateRequest:
+    SlidePatchRequest:
       type: object
       properties:
         title:
           type: string
         content:
+          type: string
+        author_id:
           type: string
         departments:
           type: array
