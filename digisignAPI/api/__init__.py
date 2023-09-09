@@ -56,8 +56,17 @@ def createApp():
 	from .resources.user_login_resource import UserLoginResource
 	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
 
+	
+	
+
+	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/slides', '/slides/<string:slide_title>', resource_class_args=(mongo,))
+	api.add_resource(SlideResource, '/slides/<string:slide_title>', resource_class_args=(mongo,))
+
+	# Register SlideList with endpoint /slides
+	from .resources.slide_list_resource import SlideList 
+	api.add_resource(SlideList, '/slides', resource_class_args=(mongo,))
+
 
 	from .resources.department_resource import DepartmentResource
 	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
