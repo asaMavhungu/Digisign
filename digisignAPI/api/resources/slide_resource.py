@@ -26,48 +26,6 @@ slide_fields = {
 	'departments': fields.List(fields.String),
 }
 
-class SlideList(Resource):
-	"""
-	Resource class for managing collections of slides.
-	"""
-	def __init__(self, mongo):
-		self.mongo = mongo
-
-	@marshal_with(slide_fields)
-	def get(self):
-		"""
-		Get a list of all slides.
-		"""
-		pass
-
-	@marshal_with(slide_fields)
-	def post(self):
-		"""
-		Create a new slide.
-		"""
-		args = slide_parser.parse_args()
-		title = args['title']
-		content = args['content']
-		author_id = args['author_id']
-		departments = args.get('departments', [])
-
-		if Slide.find_by_title(title, self.mongo):
-			return {"message": f"Slide titled [{title}] already exists"}, 400
-
-		slide = Slide(title, content, author_id)
-
-		for department_name in departments:
-			department = Department.find_by_name(department_name, self.mongo)
-
-			if department:
-				slide.add_department(department.name)
-			else:
-				return {"message": f"Department [{department_name}] not found"}, 404
-
-		slide_id = slide.save(self.mongo)
-
-		return {'message': 'Slide created', 'slide_id': slide_id}, 201
-
 class SlideResource(Resource):
 	"""
 	Resource class for managing individual slides.
@@ -154,3 +112,21 @@ class SlideResource(Resource):
 		slide.save(self.mongo)
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
+	
+	def delete(self, slide_title):
+		"""
+		Delete a slide by its title.
+
+		Args:
+			slide_title (str): The title of the slide to delete.
+
+		Returns:
+			dict: A message indicating the result of the deletion.
+		"""
+		slide = Slide.find_by_title(slide_title, self.mongo)
+		if slide:
+			# Delete the slide from the database
+			self.mongo.db.slides.delete_one({'_id': slide._id})
+			return {"message": f"Slide '{slide_title}' deleted"}, 200
+		else:
+			return {"message": "Slide not found"}, 404
