@@ -4,6 +4,7 @@ from bson.objectid import ObjectId
 from api.models.Slide import Slide
 from api.models.Department import Department
 
+# Request parsers for slide data
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
 slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
@@ -16,6 +17,7 @@ slide_parser_patch.add_argument('content', type=str, required=False, help='Conte
 slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
 slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
+# Define the fields for marshaling slide data in responses
 slide_fields = {
 	'_id': fields.String(attribute='_id'),
 	'title': fields.String,
@@ -24,19 +26,25 @@ slide_fields = {
 	'departments': fields.List(fields.String),
 }
 
-class SlideResource(Resource):
+class SlideList(Resource):
+	"""
+	Resource class for managing collections of slides.
+	"""
 	def __init__(self, mongo):
 		self.mongo = mongo
 
 	@marshal_with(slide_fields)
-	def get(self, slide_title):
-		slide = Slide.find_by_title(slide_title, self.mongo)
-		if slide:
-			return slide, 200
-		return {"message": "Slide not found"}, 404
+	def get(self):
+		"""
+		Get a list of all slides.
+		"""
+		pass
 
 	@marshal_with(slide_fields)
 	def post(self):
+		"""
+		Create a new slide.
+		"""
 		args = slide_parser.parse_args()
 		title = args['title']
 		content = args['content']
@@ -60,8 +68,28 @@ class SlideResource(Resource):
 
 		return {'message': 'Slide created', 'slide_id': slide_id}, 201
 
+class SlideResource(Resource):
+	"""
+	Resource class for managing individual slides.
+	"""
+	def __init__(self, mongo):
+		self.mongo = mongo
+
+	@marshal_with(slide_fields)
+	def get(self, slide_title):
+		"""
+		Get details of a specific slide by title.
+		"""
+		slide = Slide.find_by_title(slide_title, self.mongo)
+		if slide:
+			return slide, 200
+		return {"message": "Slide not found"}, 404
+
 	@marshal_with(slide_fields)
 	def patch(self, slide_title):
+		"""
+		Update a specific slide by title (partial update).
+		"""
 		args = slide_parser_patch.parse_args()
 		slide = Slide.find_by_title(slide_title, self.mongo)
 
@@ -95,6 +123,9 @@ class SlideResource(Resource):
 
 	@marshal_with(slide_fields)
 	def put(self, slide_title):
+		"""
+		Update a specific slide by title (full update).
+		"""
 		args = slide_parser.parse_args()
 		title = args['title']
 		content = args['content']
