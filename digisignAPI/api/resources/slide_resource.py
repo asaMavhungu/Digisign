@@ -8,12 +8,14 @@ from api.models.Department import Department
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
 slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
+slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 slide_parser_patch = reqparse.RequestParser()
 slide_parser_patch.add_argument('title', type=str, required=False, help='Title of the slide')
 slide_parser_patch.add_argument('content', type=str, required=False, help='Content of the slide')
+slide_parser_patch.add_argument('content_type', type=str, required=False, help='Type of content of the slide') 
 slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
 slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
@@ -22,6 +24,7 @@ slide_fields = {
 	'_id': fields.String(attribute='_id'),
 	'title': fields.String,
 	'content': fields.String,
+	'content_type': fields.String,
 	'author_id': fields.String,
 	'departments': fields.List(fields.String),
 }
@@ -33,17 +36,15 @@ class SlideResource(Resource):
 	def __init__(self, mongo):
 		self.mongo = mongo
 
-	@marshal_with(slide_fields)
 	def get(self, slide_title):
 		"""
 		Get details of a specific slide by title.
 		"""
 		slide = Slide.find_by_title(slide_title, self.mongo)
 		if slide:
-			return slide, 200
+			return slide.to_marshal_representation(), 200
 		return {"message": "Slide not found"}, 404
 
-	@marshal_with(slide_fields)
 	def patch(self, slide_title):
 		"""
 		Update a specific slide by title (partial update).
@@ -79,7 +80,6 @@ class SlideResource(Resource):
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
 
-	@marshal_with(slide_fields)
 	def put(self, slide_title):
 		"""
 		Update a specific slide by title (full update).
@@ -87,6 +87,7 @@ class SlideResource(Resource):
 		args = slide_parser.parse_args()
 		title = args['title']
 		content = args['content']
+		content_type = args['content_type']
 		author_id = args['author_id']
 		departments = args.get('departments', [])
 
@@ -97,6 +98,7 @@ class SlideResource(Resource):
 
 		slide.title = title
 		slide.content = content
+		slide.content_type = content_type
 		slide.author_id = author_id
 
 		slide.clear_departments()
