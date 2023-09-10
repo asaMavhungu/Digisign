@@ -15,7 +15,7 @@ department_fields = {
     'devices': fields.List(fields.String),
 }
 
-class DepartmentList(Resource):
+class DepartmentListResource(Resource):
     """
     Resource class for managing collections of departments.
     """
