@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Slide import Slide
 from api.models.Department import Department
+from api.models.Device import Device
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
@@ -10,6 +11,7 @@ slide_parser.add_argument('title', type=str, required=True, help='Title of the s
 slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
 slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
+slide_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 # Define the fields for marshaling slide data in responses
@@ -19,6 +21,7 @@ slide_fields = {
 	'content': fields.String,
 	'content_type': fields.String,
 	'author_id': fields.String,
+	'devices': fields.List(fields.String),
 	'departments': fields.List(fields.String),
 }
 
@@ -49,12 +52,21 @@ class SlideList(Resource):
 		content = args['content']
 		content_type = args['content_type']
 		author_id = args['author_id']
+		devices = args.get('devices', [])
 		departments = args.get('departments', [])
 
 		if Slide.find_by_title(title, self.mongo):
 			return {"message": f"Slide titled [{title}] already exists"}, 400
 
 		slide = Slide(title, content, content_type, author_id)
+
+		for device in devices:
+			device = Device.find_by_name(device, self.mongo)
+
+			if device:
+				slide.add_device(device.name)
+			else:
+				return {"message": f"Device [{device}] not found"}, 404
 
 		for department_name in departments:
 			department = Department.find_by_name(department_name, self.mongo)
