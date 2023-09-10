@@ -78,8 +78,13 @@ def createApp():
 
 
 
+	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
-	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
+	api.add_resource(DepartmentResource, '/departments/<string:department_id>', resource_class_args=(mongo,))
+
+	# Register DepartmentListResource with endpoint /departments
+	from .resources.department_list_resource import DepartmentListResource
+	api.add_resource(DepartmentListResource, '/departments', resource_class_args=(mongo,))
 
 
 
