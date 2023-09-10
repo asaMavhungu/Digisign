@@ -58,6 +58,18 @@ class DeviceGroup:
 			'slides': self.slides  # Include associated slide ObjectIds
 		}
 		return device_group_dict
+	
+	def to_marshal_representation(self):
+		"""
+		Convert the Device Group object to a marshal-like representation.
+		"""
+		return {
+			'_id': self._id,
+			'name': self.name,
+			'description': self.description,
+			'slides': self.slides,
+		}
+
 
 	@staticmethod
 	def find_by_id(device_group_id, mongo):
