@@ -11,7 +11,7 @@ user_login_args = reqparse.RequestParser()
 user_login_args.add_argument("username", type=str, help="Username is required", required=True)
 user_login_args.add_argument("password", type=str, help="Password is required", required=True)
 
-class UserLoginResource(Resource):
+class UserResource(Resource):
     def __init__(self, mongo):
         self.mongo = mongo
 
