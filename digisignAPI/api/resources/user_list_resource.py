@@ -1,73 +1,77 @@
-# api/resources/user_resource.py
 from flask import request
-from flask_restful import Resource, reqparse
-from flask_bcrypt import Bcrypt
-from api.models.User import User  # Import your User class
-from flask import current_app as app
-bcrypt = Bcrypt()
+from flask_restful import Resource, reqparse, marshal_with, fields
+from bson.objectid import ObjectId
+from api.models.User import User
 
-user_put_args = reqparse.RequestParser()
-user_put_args.add_argument("username", type=str, help="Username is required", required=True)
-user_put_args.add_argument("email", type=str, help="Email is required", required=True)
-user_put_args.add_argument("password", type=str, help="Password is required", required=True)
+# Request parser for user data
+user_parser = reqparse.RequestParser()
+user_parser.add_argument('username', type=str, required=True, help='Username of the user')
+user_parser.add_argument('email', type=str, required=True, help='Email of the user')
+user_parser.add_argument('password_hash', type=str, required=True, help='Password hash of the user')
+
+# Define the fields for marshaling user data in responses
+user_fields = {
+	'_id': fields.String(attribute='_id'),
+	'username': fields.String,
+	'email': fields.String,
+	'password_hash': fields.String,
+}
 
 class UserListResource(Resource):
-	
+	"""
+	Resource class for managing collections of users.
+	"""
 	def __init__(self, mongo):
-		"""
-		Constructor for the UserResource class.
-
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		"""
 		self.mongo = mongo
+
+	@marshal_with(user_fields)
+	def get(self):
+		"""
+		Get a list of all users.
+		Returns:
+			List[User]: A list of all users.
+		"""
+		users_data = self.mongo.db.users.find()
+		users = [User.from_dict(user_data) for user_data in users_data]
+		return users, 200
 
 	def post(self):
 		"""
-		Endpoint for creating a new user.
-
-		Parses user input, checks for username uniqueness, hashes the password,
-		and saves the user to the database.
-
-		:return: JSON response with the result of the user creation.
+		Create a new user.
 		"""
-		args = user_put_args.parse_args()
-		username = args["username"]
-		email = args["email"]
-		password = args["password"]
+		args = user_parser.parse_args()
+		username = args['username']
+		email = args['email']
+		password_hash = args['password_hash']
 
-		# Check if the username is already taken
 		if User.find_by_username(username, self.mongo):
-			return {"message": "Username already exists"}, 400
-
-		# Hash the password before saving it
-		password_hash = bcrypt.generate_password_hash(password).decode('utf-8')
+			return {"message": f"User with username [{username}] already exists"}, 400
 
 		user = User(username, email, password_hash)
 		user_id = user.save(self.mongo)
-		return {"message": "User created", "user_id": user_id}, 201
 
-	def get(self, username):
+		return {'message': 'User created', 'user_id': user_id}, 201
+
+	def delete(self):
 		"""
-		Endpoint for retrieving user information by user ID.
+		Delete multiple users.
 
-		:param user_id: The unique identifier of the user.
-		:return: JSON response with user information or a "User not found" message.
+		Returns:
+			dict: A message indicating the result of the deletion.
 		"""
-		user = User.find_by_username(username, self.mongo)
-		if user:
-			return user.to_dict()
-		return {"message": "User not found"}, 404
-	
-	"""
-	def login():
-		args = user_put_args.parse_args()
-		username = args["username"]
-		password = args["password"]
-		
-		user = User.find_by_username(username, mongo)
+		data = request.get_json()
+		if not data:
+			return {"message": "No data provided in the request body"}, 400
 
-		if user and bcrypt.check_password_hash(user["password_hash"], password):
-			return {"message": "Login successful", "user_id": str(user["_id"])}, 200
-		else:
-			return {"message": "Invalid credentials"}, 401
-	"""
+		usernames = data.get("usernames", [])
+		if not usernames:
+			return {"message": "No usernames provided in the request"}, 400
+
+		deleted_count = 0
+		for username in usernames:
+			user = User.find_by_username(username, self.mongo)
+			if user:
+				self.mongo.db.users.delete_one({'_id': user._id})
+				deleted_count += 1
+
+		return {"message": f"{deleted_count} users deleted"}, 200
