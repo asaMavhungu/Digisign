@@ -53,3 +53,41 @@ export default {
 };
 </script>
 
+<!--
+<script> 
+import Slideshow from "./components/Slideshow.vue";
+import ImageSlide from "./components/ImageSlide.vue";
+import axios from "axios"; // Import Axios
+
+export default {
+  components: {
+    Slideshow,
+    ImageSlide,
+  },
+  data() {
+    return {
+      slides: [],
+    };
+  },
+  mounted() {
+    // Make an API request to fetch JSON data
+    axios.get("YOUR_API_URL_HERE")
+      .then((response) => {
+        // Assuming the JSON response has an array of URLs
+        const imageUrlArray = response.data.urls;
+
+        // Transform the URLs into slide objects
+        this.slides = imageUrlArray.map((url) => ({
+          component: "ImageSlide",
+          data: {
+            imageUrl: url,
+          },
+        }));
+      })
+      .catch((error) => {
+        console.error("Error fetching data from the API:", error);
+      });
+  },
+};
+</script>
+-->
