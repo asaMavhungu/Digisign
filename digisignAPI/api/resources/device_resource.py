@@ -66,7 +66,6 @@ class DeviceResource(Resource):
 
 			if slide:
 				device.add_slide(slide.title)
-				slide.add_device(device.name)
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
@@ -76,7 +75,7 @@ class DeviceResource(Resource):
 
 	def patch(self, device_name):
 		"""
-		Update an existing device.
+		Partially update an existing device.
 
 		Args:
 			device_name (str): The name of the device to update.
@@ -92,15 +91,14 @@ class DeviceResource(Resource):
 			return {"message": "Device not found"}, 404
 
 		if 'slides' in args:
-			args = device_parser.parse_args()
 			new_slides = args.get('slides', [])
+			device.slides = []  # Clear existing slides
 
 			for slide_title in new_slides:
 				slide = Slide.find_by_title(slide_title, self.mongo)
 
 				if slide:
 					device.add_slide(slide.title)
-					slide.add_device(device.name)
 				else:
 					return {"message": f"Slide '{slide_title}' not found"}, 404
 
@@ -112,7 +110,7 @@ class DeviceResource(Resource):
 
 		device.save(self.mongo)
 
-		return {'message': 'Device updated', 'device_name': device_name}, 200
+		return {'message': 'Device partially updated', 'device_name': device_name}, 200
 	
 	def put(self, device_name):
 		"""
@@ -143,7 +141,6 @@ class DeviceResource(Resource):
 
 			if slide:
 				new_device.add_slide(slide.title)
-				slide.add_device(new_device.name)
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
