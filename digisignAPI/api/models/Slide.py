@@ -16,7 +16,6 @@ class Slide:
 		self.content_type = content_type
 		self.author_id = author_id
 		self.departments = []  # List to store associated department names
-		self.devices = []  # List to store associated device group names
 
 	def add_department(self, department_name):
 		"""
@@ -39,45 +38,6 @@ class Slide:
 	def clear_departments(self):
 		self.departments = []
 
-	def add_device(self, device_name):
-		"""
-		Add a device ObjectId to the slide's list of associated devices.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_name not in self.devices:
-			self.device_groups.append(device_name)
-
-	def remove_device(self, device_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_name in self.device_groups:
-			self.device_groups.remove(device_name)
-
-	def add_device_group(self, device_group_name):
-		"""
-		Add a device group ObjectId to the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_group_name not in self.device_groups:
-			self.device_groups.append(device_group_name)
-
-	def remove_device_group(self, device_group_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_group_name in self.device_groups:
-			self.device_groups.remove(device_group_name)
-
-	def clear_device_groups(self):
-		self.device_groups = []
-
 	@classmethod
 	def from_dict(cls, slide_dict):
 		"""
@@ -94,7 +54,6 @@ class Slide:
 		)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
-		slide.device_groups = slide_dict.get('device_groups', []) # does this
 		return slide
 
 	def to_dict(self):
@@ -109,10 +68,9 @@ class Slide:
 			'content_type': self.content_type,
 			'author_id': self.author_id,
 			'departments': self.departments,
-			'device_groups': self.device_groups
 		}
 		return slide_dict
-	
+
 	def to_marshal_representation(self):
 		"""
 		Convert the Slide object to a marshal-like representation.
