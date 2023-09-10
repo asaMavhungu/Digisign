@@ -43,7 +43,7 @@ class DeviceGroupResource(Resource):
 			return device_group, 200
 		return {"message": "Device group not found"}, 404
 
-	@marshal_with(device_group_fields)
+	#@marshal_with(device_group_fields)
 	def post(self):
 		"""
 		Create a new device group.
@@ -74,7 +74,7 @@ class DeviceGroupResource(Resource):
 
 		return {'message': 'Device group created', 'device_group_id': device_group_id}, 201
 
-	@marshal_with(device_group_fields)
+	#@marshal_with(device_group_fields)
 	def patch(self, device_group_name):
 		"""
 		Update an existing device group.
