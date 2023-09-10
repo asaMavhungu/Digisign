@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Slide import Slide
 from api.models.Department import Department
+from api.models.Device import Device
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
