@@ -67,6 +67,16 @@ def createApp():
 	from .resources.slide_list_resource import SlideList 
 	api.add_resource(SlideList, '/slides', resource_class_args=(mongo,))
 
+	# Register DeviceResource with endpoint /devices/<string:device_name>
+	from .resources.device_resource import DeviceResource
+	api.add_resource(DeviceResource, '/devices/<string:device_name>', resource_class_args=(mongo,))
+
+	# Register DeviceListResource with endpoint /devices
+	from .resources.device_list_resource import DeviceListResource
+	api.add_resource(DeviceListResource, '/devices', resource_class_args=(mongo,))
+
+
+
 
 	from .resources.department_resource import DepartmentResource
 	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
