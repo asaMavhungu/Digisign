@@ -1,3 +1,4 @@
+from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 
 class Department:
@@ -9,24 +10,40 @@ class Department:
 		"""
 		self._id = None  # MongoDB ObjectId (optional)
 		self.name = name
-		self.slides = []  # List to store associated slide ObjectIds
+		self.slides = []  # List to store associated slides
+		self.devices = []  # List to store associated devices
 
-	def add_slide(self, slide_id):
+	def add_slide(self, slide_name):
 		"""
-		Add a slide ObjectId to the department's list of associated slides.
+		Add a slide to the department.
 
-		:param slide_id: The ObjectId of the slide to be associated with the department.
+		:param slide: The Slide name to associate with the department.
 		"""
-		self.slides.append(slide_id)
+		self.slides.append(slide_name)
 
-	def remove_slide(self, slide_id):
+	def remove_slide(self, slide_name):
 		"""
-		Remove a slide ObjectId from the department's list of associated slides.
+		Remove a slide from the department.
 
-		:param slide_id: The ObjectId of the slide to be disassociated from the department.
+		:param slide: The Slide name to disassociate from the department.
 		"""
-		if slide_id in self.slides:
-			self.slides.remove(slide_id)
+		self.slides.remove(slide_name)
+
+	def add_device(self, device_name):
+		"""
+		Add a device to the department.
+
+		:param device: The Device name to associate with the department.
+		"""
+		self.devices.append(device_name)
+
+	def remove_device(self, device_name):
+		"""
+		Remove a device from the department.
+
+		:param device: The Device name to disassociate from the department.
+		"""
+		self.devices.remove(device_name)
 
 	@classmethod
 	def from_dict(cls, department_dict):
@@ -36,9 +53,12 @@ class Department:
 		:param department_dict: A dictionary containing department data.
 		:return: An instance of the Department class.
 		"""
-		department = cls(department_dict['name'])
+		department = cls(
+			name=department_dict['name']
+		)
 		department._id = department_dict.get('_id')  # Optional ObjectId
 		department.slides = department_dict.get('slides', [])
+		department.devices = department_dict.get('devices', [])
 		return department
 
 	def to_dict(self):
@@ -49,10 +69,9 @@ class Department:
 		"""
 		department_dict = {
 			'name': self.name,
-			'slides': self.slides
+			'slides': self.slides,  # Include associated slide ObjectIds
+			'devices': self.devices  # Include associated device ObjectIds
 		}
-		if self._id:
-			department_dict['_id'] = self._id
 		return department_dict
 
 	@staticmethod
@@ -99,5 +118,13 @@ class Department:
 			# Insert a new department document
 			result = mongo.db.departments.insert_one(department_data)
 			self._id = result.inserted_id
-			return str(result.inserted_id)
+		return str(self._id)
 
+	def delete(self, mongo):
+		"""
+		Deletes the department from the database.
+
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		"""
+		if self._id:
+			mongo.db.departments.delete_one({'_id': self._id})
