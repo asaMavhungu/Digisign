@@ -21,6 +21,9 @@ from pymongo.server_api import ServerApi
 
 from pymongo import MongoClient
 
+# TODO: check if all endpoint work as expected
+# TODO: Redo the api spec
+
 def createApp():
 
 	app = Flask(__name__)
