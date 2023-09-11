@@ -1,5 +1,7 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from .ImageSlide import ImageSlide
+from .VideoSlide import VideoSlide
 
 class Slide:
 	def __init__(self, title, content, content_type, author_id):
@@ -44,14 +46,20 @@ class Slide:
 		Creates a Slide instance from a dictionary.
 
 		:param slide_dict: A dictionary containing slide data.
-		:return: An instance of the Slide class.
+		:return: An instance of the Slide or VideoSlide class, depending on content_type.
 		"""
-		slide = cls(
-			title=slide_dict['title'],
-			content=slide_dict['content'],
-			content_type=slide_dict['content_type'],
-			author_id=slide_dict['author_id']
-		)
+		if slide_dict['content_type'] == 'image':
+			slide =  ImageSlide.from_dict(slide_dict)
+		elif slide_dict['content_type'] == 'video':
+			slide =  VideoSlide.from_dict(slide_dict)
+
+		else:
+			slide = cls(
+				title=slide_dict['title'],
+				content=slide_dict['content'],
+				content_type=slide_dict['content_type'],
+				author_id=slide_dict['author_id']
+			)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
 		return slide
