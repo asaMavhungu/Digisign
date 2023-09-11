@@ -49,15 +49,14 @@ def createApp():
 	api = Api(app)
 
 
-	# Import and add your UserResource here
-	from .resources.user_signup_resource import UserSignupResource
-	api.add_resource(UserSignupResource, '/user', '/user/<string:username>', resource_class_args=(mongo,))
+	# User login and stuff
+	from .resources.user_resource import UserResource
+	api.add_resource(UserResource, '/user', '/user/<string:username>', resource_class_args=(mongo,))
 
-	from .resources.user_login_resource import UserLoginResource
-	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
+	# User reg and stuff
+	from .resources.user_list_resource import UserListResource
+	api.add_resource(UserListResource, '/users', resource_class_args=(mongo,))
 
-	
-	
 
 	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
@@ -74,9 +73,6 @@ def createApp():
 	# Register DeviceListResource with endpoint /devices
 	from .resources.device_list_resource import DeviceListResource
 	api.add_resource(DeviceListResource, '/devices', resource_class_args=(mongo,))
-
-
-
 
 	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
