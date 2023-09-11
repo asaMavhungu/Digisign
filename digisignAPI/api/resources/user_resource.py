@@ -28,6 +28,11 @@ class UserResource(Resource):
 		return {"message": "User not found"}, 404
 
 	def post(self):
+		"""
+		User login endpoint.
+
+		:return: JSON response with a JWT access token if login is successful or an error message.
+		"""
 		args = user_parser.parse_args()
 		username = args["username"]
 		password = args["password"]
