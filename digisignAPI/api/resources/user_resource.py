@@ -7,9 +7,9 @@ from flask import current_app as app
 
 bcrypt = Bcrypt()
 
-user_login_args = reqparse.RequestParser()
-user_login_args.add_argument("username", type=str, help="Username is required", required=True)
-user_login_args.add_argument("password", type=str, help="Password is required", required=True)
+user_parser = reqparse.RequestParser()
+user_parser.add_argument("email", type=str, help="Email address")
+user_parser.add_argument("password", type=str, help="Password")
 
 class UserResource(Resource):
 	def __init__(self, mongo):
@@ -17,9 +17,9 @@ class UserResource(Resource):
 
 	def get(self, username):
 		"""
-		Endpoint for retrieving user information by user ID.
+		Endpoint for retrieving user information by username.
 
-		:param user_id: The unique identifier of the user.
+		:param username: The username of the user.
 		:return: JSON response with user information or a "User not found" message.
 		"""
 		user = User.find_by_username(username, self.mongo)
@@ -28,7 +28,7 @@ class UserResource(Resource):
 		return {"message": "User not found"}, 404
 
 	def post(self):
-		args = user_login_args.parse_args()
+		args = user_parser.parse_args()
 		username = args["username"]
 		password = args["password"]
 
@@ -46,6 +46,67 @@ class UserResource(Resource):
 				return {"message": "Invalid password"}, 401
 		else:
 			return {"message": "User not found"}, 404
+
+	@jwt_required()  # Requires authentication
+	def patch(self, username):
+		"""
+		Partially update user information.
+
+		:param username: The username of the user to update.
+		:return: JSON response with the updated user information or an error message.
+		"""
+		current_username = get_jwt_identity()
+		if current_username != username:
+			return {"message": "You can only update your own user information"}, 403
+
+		args = user_parser.parse_args()
+		email = args.get("email")
+		password = args.get("password")
+
+		user = User.find_by_username(username, self.mongo)
+		if not user:
+			return {"message": "User not found"}, 404
+
+		if email:
+			user.email = email
+		if password:
+			# Hash and update the password
+			user.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+		# Save the updated user
+		user.save(self.mongo)
+
+		return {"message": "User information updated successfully", **user.to_dict()}, 200
+
+	@jwt_required()  # Requires authentication
+	def put(self, username):
+		"""
+		Fully update user information.
+
+		:param username: The username of the user to update.
+		:return: JSON response with the updated user information or an error message.
+		"""
+		current_username = get_jwt_identity()
+		if current_username != username:
+			return {"message": "You can only update your own user information"}, 403
+
+		args = user_parser.parse_args()
+		email = args.get("email")
+		password = args.get("password")
+
+		user = User.find_by_username(username, self.mongo)
+		if not user:
+			return {"message": "User not found"}, 404
+
+		user.email = email
+		if password:
+			# Hash and update the password
+			user.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
+
+		# Save the updated user
+		user.save(self.mongo)
+
+		return {"message": "User information updated successfully", **user.to_dict()}, 200
 
 # Example protected resource that requires a valid JWT token
 class ProtectedResource(Resource):
