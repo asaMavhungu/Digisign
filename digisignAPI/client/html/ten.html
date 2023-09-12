@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Sample Page</title>
+</head>
+<body>
+	<button id="getDataButton">Get Data from API</button>
+	<div id="responseData"></div>
+
+	<script>
+		// Event listener for the button click
+		document.getElementById('getDataButton').addEventListener('click', function() {
+			// Send a GET request to your Flask API endpoint
+			fetch('/api/devices')  // Replace with the actual endpoint
+				.then(response => response.json())
+				.then(data => {
+					// Process the response data
+					document.getElementById('responseData').textContent = JSON.stringify(data);
+				})
+				.catch(error => {
+					console.error('Error:', error);
+				});
+		});
+	</script>
+</body>
+</html>
