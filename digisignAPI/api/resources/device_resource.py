@@ -1,7 +1,8 @@
 from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
-from api.models.Device import Device  # Updated import
+from api.models.Device import Device
 from api.models.Slide import Slide
+from api.models.SlideFactory import SlideFactory
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -62,7 +63,8 @@ class DeviceResource(Resource):
 		device = Device(name, description)
 
 		for slide_title in slides:
-			slide = Slide.find_by_title(slide_title, self.mongo)
+			slide_dict = Slide.find_by_title(slide_title, self.mongo)
+			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
 				device.add_slide(slide.title)
@@ -95,7 +97,8 @@ class DeviceResource(Resource):
 			device.slides = []  # Clear existing slides
 
 			for slide_title in new_slides:
-				slide = Slide.find_by_title(slide_title, self.mongo)
+				slide_dict = Slide.find_by_title(slide_title, self.mongo)
+				slide = SlideFactory.slide_from_dict(slide_dict)
 
 				if slide:
 					device.add_slide(slide.title)
@@ -137,7 +140,8 @@ class DeviceResource(Resource):
 		new_device = Device(name, description)
 
 		for slide_title in slides:
-			slide = Slide.find_by_title(slide_title, self.mongo)
+			slide_dict = Slide.find_by_title(slide_title, self.mongo)
+			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
 				new_device.add_slide(slide.title)

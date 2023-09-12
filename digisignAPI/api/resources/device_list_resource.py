@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from api.models.Device import Device  # Updated import
 from api.models.Slide import Slide
 from api.models.Department import Department
+from api.models.SlideFactory import SlideFactory
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -17,7 +18,7 @@ device_parser_patch.add_argument('slides', type=list, location='json', help='Sli
 
 # Fields to marshal device data in responses
 device_fields = {
-	'_id': fields.String(attribute='_id'),
+	#'_id': fields.String(attribute='_id'),
 	'name': fields.String,
 	'description': fields.String,
 	'slides': fields.List(fields.String),
@@ -61,7 +62,8 @@ class DeviceListResource(Resource):
 
 	
 		for slide_title in slides:
-			slide = Slide.find_by_title(slide_title, self.mongo)
+			slide_dict = Slide.find_by_title(slide_title, self.mongo)
+			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
 				device.add_slide(slide.title)

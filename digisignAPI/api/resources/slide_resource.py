@@ -2,7 +2,9 @@ from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Slide import Slide
+from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
+from api.models.SlideFactory import SlideFactory
 from api.models.Device import Device
 
 # Request parsers for slide data
@@ -41,9 +43,9 @@ class SlideResource(Resource):
 		"""
 		Get details of a specific slide by title.
 		"""
-		slide = Slide.find_by_title(slide_title, self.mongo)
-		if slide:
-			return slide.to_marshal_representation(), 200
+		slide_dict = Slide.find_by_title(slide_title, self.mongo)
+		if slide_dict:
+			return slide_dict, 200
 		return {"message": "Slide not found"}, 404
 
 	def patch(self, slide_title):
@@ -51,7 +53,9 @@ class SlideResource(Resource):
 		Update a specific slide by title (partial update).
 		"""
 		args = slide_parser_patch.parse_args()
-		slide = Slide.find_by_title(slide_title, self.mongo)
+		slide_dict = Slide.find_by_title(slide_title, self.mongo)
+		slide = SlideFactory.slide_from_dict(slide_dict)
+
 
 		if not slide:
 			return {"message": "Slide not found"}, 404
@@ -92,7 +96,8 @@ class SlideResource(Resource):
 		author_id = args['author_id']
 		departments = args.get('departments', [])
 
-		slide = Slide.find_by_title(slide_title, self.mongo)
+		slide_dict = Slide.find_by_title(slide_title, self.mongo)
+		slide = SlideFactory.slide_from_dict(slide_dict)
 
 		if not slide:
 			return {"message": "Slide not found"}, 404
@@ -126,7 +131,8 @@ class SlideResource(Resource):
 		Returns:
 			dict: A message indicating the result of the deletion.
 		"""
-		slide = Slide.find_by_title(slide_title, self.mongo)
+		slide_dict = Slide.find_by_title(slide_title, self.mongo)
+		slide = SlideFactory.slide_from_dict(slide_dict)
 		if slide:
 			# Delete the slide from the database
 			self.mongo.db.slides.delete_one({'_id': slide._id})
