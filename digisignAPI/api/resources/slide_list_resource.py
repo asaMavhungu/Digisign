@@ -70,6 +70,8 @@ class SlideList(Resource):
 
 				if department:
 					slide.add_department(department.name)
+					department.add_slide(slide.title)
+					department.save(self.mongo)
 				else:
 					return {"message": f"Department [{department_name}] not found"}, 404
 
