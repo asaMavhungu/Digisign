@@ -1,4 +1,5 @@
-from models.Slide import Slide
+from .Slide import Slide
+from bson.objectid import ObjectId
 	
 class ImageSlide(Slide):
 	def __init__(self, title, content, author_id, image_url):
@@ -35,3 +36,31 @@ class ImageSlide(Slide):
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
 		return slide
+	
+	@staticmethod
+	def find_by_id(slide_id, mongo):
+		"""
+		Finds a slide by its unique slide ID (ObjectId) in the database.
+
+		:param slide_id: The unique identifier of the slide.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: An instance of the Slide class or None if not found.
+		"""
+		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
+		if slide_data:
+			return ImageSlide.from_dict(slide_data)
+		return None
+	
+	@staticmethod
+	def find_by_title(title, mongo):
+		"""
+		Finds slides by their title in the database.
+
+		:param title: The title of the slide to search for.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: A list of instances of the Slide class matching the title or an empty list if not found.
+		"""
+		slide_data = mongo.db.slides.find_one({'title': title})
+		if slide_data:
+			return ImageSlide.from_dict(slide_data)
+		return None

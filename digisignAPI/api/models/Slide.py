@@ -1,7 +1,6 @@
 from flask_pymongo import PyMongo
+from pymongo.collection import Collection
 from bson.objectid import ObjectId
-from .ImageSlide import ImageSlide
-from .VideoSlide import VideoSlide
 
 class Slide:
 	def __init__(self, title, content, content_type, author_id):
@@ -48,18 +47,12 @@ class Slide:
 		:param slide_dict: A dictionary containing slide data.
 		:return: An instance of the Slide or VideoSlide class, depending on content_type.
 		"""
-		if slide_dict['content_type'] == 'image':
-			slide =  ImageSlide.from_dict(slide_dict)
-		elif slide_dict['content_type'] == 'video':
-			slide =  VideoSlide.from_dict(slide_dict)
-
-		else:
-			slide = cls(
-				title=slide_dict['title'],
-				content=slide_dict['content'],
-				content_type=slide_dict['content_type'],
-				author_id=slide_dict['author_id']
-			)
+		slide = cls(
+			title=slide_dict['title'],
+			content=slide_dict['content'],
+			content_type=slide_dict['content_type'],
+			author_id=slide_dict['author_id']
+		)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
 		return slide
@@ -93,7 +86,7 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_id(slide_id, mongo):
+	def find_by_id(slide_id: str, mongo: Collection) -> (dict | None):
 		"""
 		Finds a slide by its unique slide ID (ObjectId) in the database.
 
@@ -103,11 +96,12 @@ class Slide:
 		"""
 		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
 		if slide_data:
-			return Slide.from_dict(slide_data)
+			return slide_data
 		return None
 
 	@staticmethod
-	def find_by_title(title, mongo):
+	def find_by_title(title: str, mongo: Collection) -> (dict | None):
+		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
 
@@ -117,7 +111,7 @@ class Slide:
 		"""
 		slide_data = mongo.db.slides.find_one({'title': title})
 		if slide_data:
-			return Slide.from_dict(slide_data)
+			return slide_data
 		return None
 
 	def save(self, mongo):
