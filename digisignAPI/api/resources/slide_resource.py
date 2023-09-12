@@ -61,7 +61,7 @@ class SlideResource(Resource):
 			return {"message": "Slide not found"}, 404
 
 		if 'departments' in args:
-			args = slide_parser.parse_args()
+			args = slide_parser_patch.parse_args()
 			new_departments = args.get('departments', [])
 
 			if not isinstance(new_departments, list):
