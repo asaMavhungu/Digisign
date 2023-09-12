@@ -72,6 +72,8 @@ class SlideResource(Resource):
 
 				if department:
 					slide.add_department(department.name)
+					department.add_slide(slide.title)
+					department.save(self.mongo)
 				else:
 					return {"message": f"Department [{department_name}] not found"}, 404
 
@@ -82,6 +84,7 @@ class SlideResource(Resource):
 			slide.title = args['title']
 
 		slide.save(self.mongo)
+		
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
 
@@ -114,6 +117,8 @@ class SlideResource(Resource):
 
 			if department:
 				slide.add_department(department.name)
+				department.add_slide(slide.title)
+				department.save(self.mongo)
 			else:
 				return {"message": f"Department [{department_name}] not found"}, 404
 

@@ -78,7 +78,7 @@ def createApi(module_name):
 
 	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
-	api.add_resource(DepartmentResource, '/api/departments/<string:department_id>', resource_class_args=(mongo,))
+	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>', resource_class_args=(mongo,))
 
 	# Register DepartmentListResource with endpoint /departments
 	from .resources.department_list_resource import DepartmentListResource

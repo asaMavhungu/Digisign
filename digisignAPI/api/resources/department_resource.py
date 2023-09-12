@@ -23,21 +23,21 @@ class DepartmentResource(Resource):
 		self.mongo = mongo
 
 	@marshal_with(department_fields)
-	def get(self, department_id):
+	def get(self, department_name):
 		"""
 		Get details of a specific department by ID.
 		"""
-		department = Department.find_by_id(department_id, self.mongo)
+		department = Department.find_by_name(department_name, self.mongo)
 		if department:
 			return department.to_dict(), 200
 		return {"message": "Department not found"}, 404
 
-	def patch(self, department_id):
+	def patch(self, department_name):
 		"""
 		Update a specific department by ID (partial update).
 		"""
 		args = department_parser.parse_args()
-		department = Department.find_by_id(department_id, self.mongo)
+		department = Department.find_by_name(department_name, self.mongo)
 
 		if not department:
 			return {"message": "Department not found"}, 404
@@ -45,18 +45,18 @@ class DepartmentResource(Resource):
 		if 'name' in args:
 			department.name = args['name']
 
-		department.save(self.mongo)
+		department_id = department.save(self.mongo)
 
 		return {'message': 'Department updated', 'department_id': department_id}, 200
 
-	def put(self, department_id):
+	def put(self, department_name):
 		"""
 		Update a specific department by ID (full update).
 		"""
 		args = department_parser.parse_args()
 		name = args['name']
 
-		department = Department.find_by_id(department_id, self.mongo)
+		department = Department.find_by_id(department_name, self.mongo)
 
 		if not department:
 			return {"message": "Department not found"}, 404
@@ -64,7 +64,7 @@ class DepartmentResource(Resource):
 		department.name = name
 		department.save(self.mongo)
 
-		return {'message': 'Department updated', 'department_id': department_id}, 200
+		return {'message': 'Department updated', 'department_id': department_name}, 200
 
 	def delete(self, department_id):
 		"""

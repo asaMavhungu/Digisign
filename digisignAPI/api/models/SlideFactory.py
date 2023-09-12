@@ -29,6 +29,8 @@ class SlideFactory:
 		:param slide_dict: A dictionary containing slide data.
 		:return: An instance of the appropriate slide class.
 		"""
+		if not slide_dict:
+			return None
 		content_type = slide_dict.get('content_type', 'generic')
 		if content_type == 'image':
 			return ImageSlide.from_dict(slide_dict)
