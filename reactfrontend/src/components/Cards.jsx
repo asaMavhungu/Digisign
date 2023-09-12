@@ -1,19 +1,22 @@
 import React from 'react'
-import CardItem from './CardItem'
+import "./Cards.css"
 
-function Cards() {
+export const Cards = ({
+    imgSrc,
+    imgAlt,
+    title,
+    //description,
+    buttonText,
+    link,
+}) => {
   return (
-    <div className='cards'>
-      <h1>Login</h1>
-      <div className="cards__containter">
-        <div className="cards__wrapper">
-            <ul className="cards__items">
-                <CardItem />
-            </ul>
-        </div>
-      </div>
+    <div className='card-container'>
+        {imgSrc && imgAlt && <img src={imgSrc} 
+        alt={imgAlt} className='card-img'
+        style={{width: "300px", height: "auto"}}
+        />}
+        {title && <h1 className='card-title'>{title}</h1>}
+        {buttonText && link && <a href= {link} className='card-btn'>{buttonText}</a>}
     </div>
   )
 }
-
-export default Cards
