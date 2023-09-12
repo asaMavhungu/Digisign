@@ -9,3 +9,7 @@ def home():
 @views.route('/devices', methods=['GET'])
 def devices():
 	return send_file("html/ten.html")
+
+@views.route('/test', methods=['GET'])
+def test():
+	return send_file("html/carousel.html")
