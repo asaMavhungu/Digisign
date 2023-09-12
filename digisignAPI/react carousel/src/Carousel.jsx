@@ -4,6 +4,7 @@ import './Carousel.css'; // Import the CSS file
 function Carousel({ items }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [autoplayInterval, setAutoplayInterval] = useState(null);
+  const [responseData, setResponseData] = useState(null);
   const autoplayDelay = 5000; // 5 seconds
 
   useEffect(() => {
@@ -46,8 +47,33 @@ function Carousel({ items }) {
     setCurrentIndex(index);
   };
 
+  const handleGetDataClick = () => {
+    // Send a GET request to your API endpoint
+    fetch('/api/devices') // Replace with the actual endpoint
+      .then((response) => response.json())
+      .then((data) => {
+        // Process the response data and update state
+        setResponseData(data);
+      })
+      .catch((error) => {
+        console.error('Error:', error);
+      });
+  };
+
   return (
     <div className="carousel-container">
+
+      <button id="getDataButton" onClick={handleGetDataClick}>
+        Get Data from API
+      </button>
+      <div id="responseData">
+        {responseData ? (
+          <pre>{JSON.stringify(responseData, null, 2)}</pre>
+        ) : (
+          'No data available'
+        )}
+      </div>
+
       <div className="carousel-slide" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
         {items.map((item, index) => (
           <div key={index} className="carousel-item">
