@@ -1,7 +1,6 @@
-
-# main.py
-from api import createApp
+from client import createApp
 
 if __name__ == "__main__":
-	app, mongo = createApp()
+	app = createApp()
+
 	app.run(debug=True)
