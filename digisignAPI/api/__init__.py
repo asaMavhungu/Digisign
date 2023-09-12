@@ -26,7 +26,7 @@ from pymongo import MongoClient
 
 def createApi(module_name):
 
-	app = Flask(module_name)
+	app = Flask(module_name, static_folder='assets')
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 
