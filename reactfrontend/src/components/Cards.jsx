@@ -1,5 +1,6 @@
 import React from 'react'
 import "./Cards.css"
+import{ Link } from 'react-router-dom'
 
 export const Cards = ({
     imgSrc,
@@ -16,7 +17,7 @@ export const Cards = ({
         style={{width: "300px", height: "auto"}}
         />}
         {title && <h1 className='card-title'>{title}</h1>}
-        {buttonText && link && <a href= {link} className='card-btn'>{buttonText}</a>}
+        {buttonText && link && (<Link to = {link} className='card-btn'>{buttonText}</Link>)}
     </div>
   )
 }
