@@ -1,9 +1,11 @@
 import React from 'react'
+import './SigninPage.css'
+
 
 function SigninPage() {
   return (
-    <div>
-      Hello
+    <div className='SigninPage'>
+      Sign In
     </div>
   )
 }
