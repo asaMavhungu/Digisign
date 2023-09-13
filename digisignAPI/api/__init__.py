@@ -34,19 +34,18 @@ def createApi(module_name):
 	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Set token expiration time
 
 
-	# Connect to MongoDB Atlas cluster
-	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
-	client = MongoClient(uri)
+	# Set your MongoDB Atlas URI without the 'apikey' parameter
+	app.config['MONGO_URI'] = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
 
-	# Check if the connection is successful
-	try:
-		client.admin.command('ping')
-		print("Connected to MongoDB Atlas cluster!")
-	except Exception as e:
-		print(e)
+	# Modify the MongoDB URI options to include the API key
+	app.config['MONGO_URI_OPTIONS'] = {
+		'authSource': 'admin',
+		'authMechanism': 'SCRAM-SHA-256',
+		'authMechanismProperties': {
+			'API_KEY': '888c8ac9-40b4-4128-8a3e-8a30784e8c42'
+		}
+	}
 
-	# Initialize PyMongo with the app
-	app.config['MONGO_URI'] = uri
 	mongo = PyMongo(app)
 	api = Api(app)
 
