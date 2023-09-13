@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client'
 import App from './App.jsx'
 import './index.css'
 import SigninPage from './pages/SigninPage.jsx'
+import SlidesPage from './pages/SlidesPage.jsx'
 
 import {
   createBrowserRouter,
@@ -19,6 +20,11 @@ const router = createBrowserRouter([
   {
     path: "SigninPage",
     element: <SigninPage/>,
+  },
+
+  {
+    path: "SlidesPage",
+    element: <SlidesPage/>,
   },
 ]);
 
