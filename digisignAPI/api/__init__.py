@@ -21,33 +21,22 @@ from pymongo.server_api import ServerApi
 
 from pymongo import MongoClient
 
+from database import createMongoDatabase
+
+
 # TODO: check if all endpoint work as expected
 # TODO: Redo the api spec
 
 def createApi(module_name):
 
-	app = Flask(module_name, static_folder='assets')
+	app, mongo = createMongoDatabase(module_name)
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 
 	app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'  # Replace with your secret key
 	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Set token expiration time
 
-
-	# Connect to MongoDB Atlas cluster
-	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
-	client = MongoClient(uri)
-
-	# Check if the connection is successful
-	try:
-		client.admin.command('ping')
-		print("Connected to MongoDB Atlas cluster!")
-	except Exception as e:
-		print(e)
-
-	# Initialize PyMongo with the app
-	app.config['MONGO_URI'] = uri
-	mongo = PyMongo(app)
+# TODO use mongoClient class to handle database
 	api = Api(app)
 
 
