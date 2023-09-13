@@ -1,6 +1,6 @@
-from flask_pymongo import PyMongo
-from pymongo.collection import Collection
 from bson.objectid import ObjectId
+from database.DatabaseTable import DatabaseTable
+
 
 class Slide:
 	def __init__(self, title, content, content_type, author_id):
@@ -86,48 +86,48 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_id(slide_id: str, mongo: Collection) -> (dict | None):
+	def find_by_id(slide_id: str, slides_table: DatabaseTable) -> (dict | None):
 		"""
 		Finds a slide by its unique slide ID (ObjectId) in the database.
 
 		:param slide_id: The unique identifier of the slide.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Slide class or None if not found.
+		:param client: An instance of SlideClient used for database operations.
+		:return: slide dict
 		"""
-		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
-		if slide_data:
-			return slide_data
-		return None
+		return slides_table.find_by_id(slide_id)
 
 	@staticmethod
-	def find_by_title(title: str, mongo: Collection) -> (dict | None):
+	def find_by_title(title: str, slides_table: DatabaseTable) -> (dict | None):
 		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
 
 		:param title: The title of the slide to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A list of instances of the Slide class matching the title or an empty list if not found.
+		:param client: An instance of SlideClient used for database operations.
+		:return: slide dict
 		"""
-		slide_data = mongo.db.slides.find_one({'title': title})
-		if slide_data:
-			return slide_data
-		return None
+		return slides_table.find_by_title(title)
 
-	def save(self, mongo):
+	def save(self, slides_table: DatabaseTable):
 		"""
 		Saves the slide instance to the database.
 
-		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:param slides_table: The table to update.
 		:return: The unique identifier (_id) of the inserted or updated slide document.
 		"""
 		slide_data = self.to_dict()
 		if self._id:
-			# Update the existing slide document
-			mongo.db.slides.update_one({'_id': self._id}, {'$set': slide_data})
-			return self._id
+			return slides_table.update_one(self._id, slide_data)
 		else:
-			# Insert a new slide document
-			result = mongo.db.slides.insert_one(slide_data)
-			self._id = result.inserted_id
-			return str(result.inserted_id)
+			return slides_table.insert_one(slide_data)
+		
+	
+	@staticmethod
+	def getAll(slides_table: DatabaseTable):
+		"""
+		Get all the slides in the db
+		"""
+		return slides_table.getData()
+	
+	def delete_me(self, slides_table: DatabaseTable):
+		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER

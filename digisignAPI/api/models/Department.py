@@ -1,5 +1,6 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from database.DatabaseTable import DatabaseTable
 
 class Department:
 	def __init__(self, name):
@@ -75,7 +76,7 @@ class Department:
 		return department_dict
 
 	@staticmethod
-	def find_by_id(department_id, mongo):
+	def find_by_id(department_id, department_table: DatabaseTable):
 		"""
 		Finds a department by its unique department ID (ObjectId) in the database.
 
@@ -83,13 +84,10 @@ class Department:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Department class or None if not found.
 		"""
-		department_data = mongo.db.departments.find_one({'_id': ObjectId(department_id)})
-		if department_data:
-			return Department.from_dict(department_data)
-		return None
+		return department_table.find_by_id(department_id)
 
 	@staticmethod
-	def find_by_name(department_name, mongo):
+	def find_by_name(department_name: str, department_table: DatabaseTable):
 		"""
 		Finds a department by its name in the database.
 
@@ -97,12 +95,9 @@ class Department:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Department class or None if not found.
 		"""
-		department_data = mongo.db.departments.find_one({'name': department_name})
-		if department_data:
-			return Department.from_dict(department_data)
-		return None
+		return department_table.find_by_title(department_name)
 
-	def save(self, mongo):
+	def save(self, department_table: DatabaseTable):
 		"""
 		Saves the department instance to the database.
 
@@ -112,19 +107,17 @@ class Department:
 		department_data = self.to_dict()
 		if self._id:
 			# Update the existing department document
-			mongo.db.departments.update_one({'_id': self._id}, {'$set': department_data})
-			return self._id
+			return department_table.update_one(self._id, department_data)
 		else:
 			# Insert a new department document
-			result = mongo.db.departments.insert_one(department_data)
-			self._id = result.inserted_id
-		return str(self._id)
+			return department_table.insert_one(department_data)
 
-	def delete(self, mongo):
+	@staticmethod
+	def getAll(slides_table: DatabaseTable):
 		"""
-		Deletes the department from the database.
-
-		:param mongo: An instance of Flask-PyMongo used for database operations.
+		Get all the slides in the db
 		"""
-		if self._id:
-			mongo.db.departments.delete_one({'_id': self._id})
+		return slides_table.getData()
+	
+	def delete_me(self, slides_table: DatabaseTable):
+		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER

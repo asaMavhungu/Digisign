@@ -26,16 +26,7 @@ from flask import Flask
 from pymongo import MongoClient
 from flask_pymongo import PyMongo
 
-class MongoDBClient:
-	def __init__(self, uri):
-		self.client = MongoClient(uri)
-		self.db = self.client.get_database()
-
-	def get_user(self, user_id):
-		return self.db.users.find_one({'_id': user_id})
-
-	def create_user(self, user_data):
-		return self.db.users.insert_one(user_data).inserted_id
+from database.MongoDBClient import MongoDBClient
 
 	# Add more methods for other database operations
 
@@ -46,20 +37,10 @@ def createMongoDatabase(module_name):
 	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
 	client = MongoClient(uri)
 
-	# Check if the connection is successful
-	try:
-		client.admin.command('ping')
-		print("Connected to MongoDB Atlas cluster!")
-	except Exception as e:
-		print(e)
-
-	# Initialize PyMongo with the app
-	app.config['MONGO_URI'] = uri
-	mongo = PyMongo(app)
 
 	# TODO use the mongo client class to encapsulate database interactions
-	mongo_client = MongoDBClient(uri)
-	return app, mongo
+	db_client = MongoDBClient(uri)
+	return app, db_client
 
 def createDatabaseSQL():
 	

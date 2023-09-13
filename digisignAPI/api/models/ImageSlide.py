@@ -1,5 +1,6 @@
 from .Slide import Slide
 from bson.objectid import ObjectId
+from database.DatabaseTable import DatabaseTable
 	
 class ImageSlide(Slide):
 	def __init__(self, title, content, author_id, image_url):
@@ -38,29 +39,37 @@ class ImageSlide(Slide):
 		return slide
 	
 	@staticmethod
-	def find_by_id(slide_id, mongo):
+	def find_by_id(slide_id: str, slides_table: DatabaseTable) -> (dict | None):
 		"""
 		Finds a slide by its unique slide ID (ObjectId) in the database.
 
 		:param slide_id: The unique identifier of the slide.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Slide class or None if not found.
+		:param client: An instance of SlideClient used for database operations.
+		:return: slide dict
 		"""
-		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
-		if slide_data:
-			return ImageSlide.from_dict(slide_data)
-		return None
-	
+		return slides_table.find_by_id(slide_id)
+
 	@staticmethod
-	def find_by_title(title, mongo):
+	def find_by_title(title: str, slides_table: DatabaseTable) -> (dict | None):
+		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
 
 		:param title: The title of the slide to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A list of instances of the Slide class matching the title or an empty list if not found.
+		:param client: An instance of SlideClient used for database operations.
+		:return: slide dict
 		"""
-		slide_data = mongo.db.slides.find_one({'title': title})
-		if slide_data:
-			return ImageSlide.from_dict(slide_data)
-		return None
+		return slides_table.find_by_title(title)
+
+	def save(self, slides_table: DatabaseTable):
+		"""
+		Saves the slide instance to the database.
+
+		:param slides_table: The table to update.
+		:return: The unique identifier (_id) of the inserted or updated slide document.
+		"""
+		slide_data = self.to_dict()
+		if self._id:
+			return slides_table.update_one(self._id, slide_data)
+		else:
+			return slides_table.insert_one(slide_data)

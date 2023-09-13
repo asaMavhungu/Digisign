@@ -4,6 +4,8 @@ from api.models.Device import Device  # Updated import
 from api.models.Slide import Slide
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
+from database.MongoDBClient import MongoDBClient
+from database.DatabaseTable import DatabaseTable
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -25,8 +27,9 @@ device_fields = {
 }
 
 class DeviceListResource(Resource):
-	def __init__(self, mongo):
-		self.mongo = mongo
+	def __init__(self, dbClient: MongoDBClient):
+		self.device_table: DatabaseTable = dbClient.DeviceTable
+		self.slide_table: DatabaseTable = dbClient.SlidesTable
 
 	@marshal_with(device_fields)
 	def get(self):
@@ -37,7 +40,7 @@ class DeviceListResource(Resource):
 			list: A list of all devices.
 			int: HTTP status code.
 		"""
-		devices_data = self.mongo.db.devices.find()  # Updated collection name
+		devices_data = Department.getAll(self.device_table)
 		devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
 		return devices, 200
 
@@ -55,14 +58,14 @@ class DeviceListResource(Resource):
 		description = args['description']
 		slides = args.get('slides', [])
 
-		if Device.find_by_name(name, self.mongo):
+		if Device.find_by_name(name, self.device_table):
 			return {"message": f"Device named '{name}' already exists"}, 400
 
 		device = Device(name, description)
 
 	
 		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title, self.mongo)
+			slide_dict = Slide.find_by_title(slide_title, self.slide_table)
 			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
@@ -70,7 +73,7 @@ class DeviceListResource(Resource):
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
-		device_id = device.save(self.mongo)
+		device_id = device.save(self.device_table)
 
 		return {'message': 'Device created', 'device_id': device_id}, 201
 
@@ -92,10 +95,11 @@ class DeviceListResource(Resource):
 		not_found_devices = []
 
 		for device_name in device_names:
-			device = Device.find_by_name(device_name, self.mongo)
+			device_data = Device.find_by_name(device_name, self.device_table)
 
-			if device:
-				device.delete(self.mongo)
+			if device_data:
+				device = Device.from_dict(device_data)
+				device.delete_me(self.device_table)
 				deleted_devices.append(device_name)
 			else:
 				not_found_devices.append(device_name)

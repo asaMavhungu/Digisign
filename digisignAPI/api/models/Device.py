@@ -1,5 +1,6 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from database.DatabaseTable import DatabaseTable
 
 class Device:
 	def __init__(self, name, description):
@@ -72,7 +73,7 @@ class Device:
 
 
 	@staticmethod
-	def find_by_id(device_id, mongo):
+	def find_by_id(device_id, device_table: DatabaseTable):
 		"""
 		Finds a device by its unique device ID (ObjectId) in the database.
 
@@ -80,13 +81,10 @@ class Device:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Device class or None if not found.
 		"""
-		device_data = mongo.db.devices.find_one({'_id': ObjectId(device_id)})
-		if device_data:
-			return Device.from_dict(device_data)
-		return None
+		return device_table.find_by_id(device_id)
 
 	@staticmethod
-	def find_by_name(name, mongo):
+	def find_by_name(device_name, device_table: DatabaseTable):
 		"""
 		Finds devices by their name in the database.
 
@@ -94,12 +92,9 @@ class Device:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: A list of instances of the Device class matching the name or an empty list if not found.
 		"""
-		device_data = mongo.db.devices.find_one({'name': name})
-		if device_data:
-			return Device.from_dict(device_data)
-		return None
+		return device_table.find_by_title(device_name)
 
-	def save(self, mongo):
+	def save(self, device_table: DatabaseTable):
 		"""
 		Saves the device instance to the database.
 
@@ -109,13 +104,10 @@ class Device:
 		device_data = self.to_dict()
 		if self._id:
 			# Update the existing device document
-			mongo.db.devices.update_one({'_id': self._id}, {'$set': device_data})
-			return self._id
+			return device_table.update_one(self._id, device_data)
 		else:
 			# Insert a new device document
-			result = mongo.db.devices.insert_one(device_data)
-			self._id = result.inserted_id
-		return str(self._id)
+			return device_table.insert_one(device_data)
 	
 	def delete(self, mongo):
 		"""
@@ -125,3 +117,6 @@ class Device:
 		"""
 		if self._id:
 			mongo.db.devices.delete_one({'_id': self._id})
+
+	def delete_me(self, device_table: DatabaseTable):
+		device_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER
