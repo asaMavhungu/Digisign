@@ -1,4 +1,5 @@
 from flask_pymongo import PyMongo
+from pymongo.collection import Collection
 from bson.objectid import ObjectId
 
 class Slide:
@@ -16,7 +17,6 @@ class Slide:
 		self.content_type = content_type
 		self.author_id = author_id
 		self.departments = []  # List to store associated department names
-		self.devices = []  # List to store associated device group names
 
 	def add_department(self, department_name):
 		"""
@@ -39,52 +39,13 @@ class Slide:
 	def clear_departments(self):
 		self.departments = []
 
-	def add_device(self, device_name):
-		"""
-		Add a device ObjectId to the slide's list of associated devices.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_name not in self.devices:
-			self.device_groups.append(device_name)
-
-	def remove_device(self, device_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_name in self.device_groups:
-			self.device_groups.remove(device_name)
-
-	def add_device_group(self, device_group_name):
-		"""
-		Add a device group ObjectId to the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_group_name not in self.device_groups:
-			self.device_groups.append(device_group_name)
-
-	def remove_device_group(self, device_group_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_group_name in self.device_groups:
-			self.device_groups.remove(device_group_name)
-
-	def clear_device_groups(self):
-		self.device_groups = []
-
 	@classmethod
 	def from_dict(cls, slide_dict):
 		"""
 		Creates a Slide instance from a dictionary.
 
 		:param slide_dict: A dictionary containing slide data.
-		:return: An instance of the Slide class.
+		:return: An instance of the Slide or VideoSlide class, depending on content_type.
 		"""
 		slide = cls(
 			title=slide_dict['title'],
@@ -94,7 +55,6 @@ class Slide:
 		)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
-		slide.device_groups = slide_dict.get('device_groups', []) # does this
 		return slide
 
 	def to_dict(self):
@@ -109,10 +69,9 @@ class Slide:
 			'content_type': self.content_type,
 			'author_id': self.author_id,
 			'departments': self.departments,
-			'device_groups': self.device_groups
 		}
 		return slide_dict
-	
+
 	def to_marshal_representation(self):
 		"""
 		Convert the Slide object to a marshal-like representation.
@@ -127,7 +86,7 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_id(slide_id, mongo):
+	def find_by_id(slide_id: str, mongo: Collection) -> (dict | None):
 		"""
 		Finds a slide by its unique slide ID (ObjectId) in the database.
 
@@ -137,11 +96,12 @@ class Slide:
 		"""
 		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
 		if slide_data:
-			return Slide.from_dict(slide_data)
+			return slide_data
 		return None
 
 	@staticmethod
-	def find_by_title(title, mongo):
+	def find_by_title(title: str, mongo: Collection) -> (dict | None):
+		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
 
@@ -151,7 +111,7 @@ class Slide:
 		"""
 		slide_data = mongo.db.slides.find_one({'title': title})
 		if slide_data:
-			return Slide.from_dict(slide_data)
+			return slide_data
 		return None
 
 	def save(self, mongo):

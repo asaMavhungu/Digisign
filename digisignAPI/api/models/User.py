@@ -2,8 +2,6 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from flask_bcrypt import Bcrypt
 
-
-
 class User:
 	def __init__(self, username, email, password_hash=None):
 		"""
@@ -13,6 +11,7 @@ class User:
 		:param email: The email address of the user.
 		:param password_hash: The hashed password of the user (default is None).
 		"""
+		self._id = None  # MongoDB ObjectId (optional)
 		self.username = username
 		self.email = email
 		self.password_hash = password_hash  # You may want to store hashed passwords
@@ -25,11 +24,13 @@ class User:
 		:param user_dict: A dictionary containing user data.
 		:return: An instance of the User class.
 		"""
-		return cls(
+		user = cls(
 			username=user_dict.get('username'),
 			email=user_dict.get('email'),
 			password_hash=user_dict.get('password_hash')
 		)
+		user._id = user_dict.get('_id')  # Optional ObjectId
+		return user
 
 	def to_dict(self):
 		"""
@@ -37,11 +38,13 @@ class User:
 
 		:return: A dictionary representation of the user instance.
 		"""
-		return {
+		user_dict = {
+			'_id': self._id,
 			'username': self.username,
 			'email': self.email,
 			'password_hash': self.password_hash
 		}
+		return user_dict
 
 	@staticmethod
 	def find_by_username(username, mongo):
@@ -53,7 +56,6 @@ class User:
 		:return: A user document from the database with the specified username or None if not found.
 		"""
 		user_data = mongo.db.users.find_one({'username': username})
-		#print(user_data)
 		if user_data:
 			return User.from_dict(user_data)
 		return None
@@ -83,7 +85,7 @@ class User:
 		if self.password_hash:
 			return bcrypt.check_password_hash(self.password_hash, password)
 		return False
-	
+
 	def save(self, mongo):
 		"""
 		Saves the user instance to the database.
@@ -93,4 +95,5 @@ class User:
 		"""
 		user_data = self.to_dict()
 		result = mongo.db.users.insert_one(user_data)
-		return str(result.inserted_id)
+		self._id = result.inserted_id  # Set the _id attribute to the inserted ObjectId
+		return str(self._id)
