@@ -6,8 +6,7 @@ from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from api.models.Device import Device
-from database.MongoDBClient import MongoDBClient
-from database.DatabaseTable import DatabaseTable
+from database.DatabaseClient import DatabaseClient
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
@@ -38,16 +37,15 @@ class SlideResource(Resource):
 	"""
 	Resource class for managing individual slides.
 	"""
-	def __init__(self, dbClient: MongoDBClient):
-		self.slide_table: DatabaseTable = dbClient.SlidesTable
-		self.department_table: DatabaseTable = dbClient.DepartmentTable
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 
 	def get(self, slide_title):
 		"""
 		Get details of a specific slide by title.
 		"""
-		slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+		slide_dict = Slide.find_by_title(slide_title, self.db_client)
 		if slide_dict:
 			return slide_dict, 200
 		return {"message": "Slide not found"}, 404
@@ -57,7 +55,7 @@ class SlideResource(Resource):
 		Update a specific slide by title (partial update).
 		"""
 		args = slide_parser_patch.parse_args()
-		slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+		slide_dict = Slide.find_by_title(slide_title, self.db_client)
 		slide = SlideFactory.slide_from_dict(slide_dict)
 
 
@@ -72,13 +70,13 @@ class SlideResource(Resource):
 				return {"message": "Invalid 'departments' format, expected a list"}, 400
 
 			for department_name in new_departments:
-				department_data = Department.find_by_name(department_name, self.department_table)
+				department_data = Department.find_by_name(department_name, self.db_client)
 
 				if department_data:
 					department = Department.from_dict(department_data)
 					slide.add_department(department.name)
 					department.add_slide(slide.title)
-					department.save(self.department_table)
+					department.save(self.db_client)
 				else:
 					return {"message": f"Department [{department_name}] not found"}, 404
 
@@ -88,7 +86,7 @@ class SlideResource(Resource):
 		if 'title' in args and args['title']:
 			slide.title = args['title']
 
-		slide.save(self.slide_table)
+		slide.save(self.db_client)
 		
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
@@ -104,7 +102,7 @@ class SlideResource(Resource):
 		author_id = args['author_id']
 		departments = args.get('departments', [])
 
-		slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+		slide_dict = Slide.find_by_title(slide_title, self.db_client)
 		slide = SlideFactory.slide_from_dict(slide_dict)
 
 		if not slide:
@@ -118,17 +116,17 @@ class SlideResource(Resource):
 		slide.clear_departments()
 
 		for department_name in departments:
-			department_data = Department.find_by_name(department_name, self.department_table)
+			department_data = Department.find_by_name(department_name, self.db_client)
 
 			if department_data:
 				department = Department.from_dict(department_data)
 				slide.add_department(department.name)
 				department.add_slide(slide.title)
-				department.save(self.department_table)
+				department.save(self.db_client)
 			else:
 				return {"message": f"Department [{department_name}] not found"}, 404
 
-		slide.save(self.slide_table)
+		slide.save(self.db_client)
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
 	
@@ -142,10 +140,10 @@ class SlideResource(Resource):
 		Returns:
 			dict: A message indicating the result of the deletion.
 		"""
-		slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+		slide_dict = Slide.find_by_title(slide_title, self.db_client)
 		slide = SlideFactory.slide_from_dict(slide_dict)
 		if slide:
-			slide.delete_me(self.slide_table) 
+			slide.delete_me(self.db_client)
 			return {"message": f"Slide '{slide_title}' deleted"}, 200
 		else:
 			return {"message": "Slide not found"}, 404

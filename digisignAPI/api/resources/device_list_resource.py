@@ -4,8 +4,8 @@ from api.models.Device import Device  # Updated import
 from api.models.Slide import Slide
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
-from database.MongoDBClient import MongoDBClient
-from database.DatabaseTable import DatabaseTable
+
+from database.DatabaseClient import DatabaseClient
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -27,9 +27,8 @@ device_fields = {
 }
 
 class DeviceListResource(Resource):
-	def __init__(self, dbClient: MongoDBClient):
-		self.device_table: DatabaseTable = dbClient.DeviceTable
-		self.slide_table: DatabaseTable = dbClient.SlidesTable
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 	@marshal_with(device_fields)
 	def get(self):
@@ -40,9 +39,12 @@ class DeviceListResource(Resource):
 			list: A list of all devices.
 			int: HTTP status code.
 		"""
-		devices_data = Department.getAll(self.device_table)
-		devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
-		return devices, 200
+		devices_data = Device.getAll(self.db_client)
+		if devices_data is not None:
+			devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
+			return devices, 200
+		else:
+			return {"message": "Departments not found"}, 404	
 
 	#@marshal_with(device_fields)
 	def post(self):
@@ -58,14 +60,14 @@ class DeviceListResource(Resource):
 		description = args['description']
 		slides = args.get('slides', [])
 
-		if Device.find_by_name(name, self.device_table):
+		if Device.find_by_name(name, self.db_client):
 			return {"message": f"Device named '{name}' already exists"}, 400
 
 		device = Device(name, description)
 
 	
 		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+			slide_dict = Slide.find_by_title(slide_title, self.db_client)
 			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
@@ -73,7 +75,7 @@ class DeviceListResource(Resource):
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
-		device_id = device.save(self.device_table)
+		device_id = device.save(self.db_client)
 
 		return {'message': 'Device created', 'device_id': device_id}, 201
 
@@ -95,11 +97,11 @@ class DeviceListResource(Resource):
 		not_found_devices = []
 
 		for device_name in device_names:
-			device_data = Device.find_by_name(device_name, self.device_table)
+			device_data = Device.find_by_name(device_name, self.db_client)
 
 			if device_data:
 				device = Device.from_dict(device_data)
-				device.delete_me(self.device_table)
+				device.delete_me(self.db_client)
 				deleted_devices.append(device_name)
 			else:
 				not_found_devices.append(device_name)

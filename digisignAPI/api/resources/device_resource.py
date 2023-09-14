@@ -3,8 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from api.models.Device import Device
 from api.models.Slide import Slide
 from api.models.SlideFactory import SlideFactory
-from database.MongoDBClient import MongoDBClient
-from database.DatabaseTable import DatabaseTable
+from database.DatabaseClient import DatabaseClient
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -26,9 +25,8 @@ device_fields = {
 }
 
 class DeviceResource(Resource):
-	def __init__(self, dbClient: MongoDBClient):
-		self.device_table: DatabaseTable = dbClient.DeviceTable
-		self.slide_table: DatabaseTable = dbClient.SlidesTable
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 	#@marshal_with(device_fields)
 	def get(self, device_name):
@@ -42,7 +40,10 @@ class DeviceResource(Resource):
 			dict: The device information.
 			int: HTTP status code.
 		"""
-		device_data = Device.find_by_name(device_name, self.device_table)
+		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+		device_data = Device.find_by_name(device_name, self.db_client)
+		print(device_data)
+		print("========================")
 		if device_data:
 			return device_data, 200
 		return {"message": "Device not found"}, 404
@@ -60,13 +61,13 @@ class DeviceResource(Resource):
 		description = args['description']
 		slides = args.get('slides', [])
 
-		if Device.find_by_name(name, self.device_table):
+		if Device.find_by_name(name, self.db_client):
 			return {"message": f"Device named '{name}' already exists"}, 400
 
 		device = Device(name, description)
 
 		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+			slide_dict = Slide.find_by_title(slide_title, self.db_client)
 			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
@@ -74,7 +75,7 @@ class DeviceResource(Resource):
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
-		device_id = device.save(self.device_table)
+		device_id = device.save(self.db_client)
 
 		return {'message': 'Device created', 'device_id': device_id}, 201
 
@@ -90,7 +91,7 @@ class DeviceResource(Resource):
 			int: HTTP status code.
 		"""
 		args = device_parser_patch.parse_args()
-		device_data = Device.find_by_name(device_name, self.device_table)
+		device_data = Device.find_by_name(device_name, self.db_client)
 
 
 		if not device_data:
@@ -103,7 +104,7 @@ class DeviceResource(Resource):
 			device.slides = []  # Clear existing slides
 
 			for slide_title in new_slides:
-				slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+				slide_dict = Slide.find_by_title(slide_title, self.db_client)
 				slide = SlideFactory.slide_from_dict(slide_dict)
 
 				if slide:
@@ -117,7 +118,7 @@ class DeviceResource(Resource):
 		if 'name' in args and args['name']:
 			device.name = args['name']
 
-		device.save(self.device_table)
+		device.save(self.db_client)
 
 		return {'message': 'Device partially updated', 'device_name': device_name}, 200
 	
@@ -137,7 +138,7 @@ class DeviceResource(Resource):
 		description = args['description']
 		slides = args.get('slides', [])
 
-		existing_device = Device.find_by_name(device_name, self.device_table)
+		existing_device = Device.find_by_name(device_name, self.db_client)
 
 		if not existing_device:
 			return {"message": "Device not found"}, 404
@@ -146,7 +147,7 @@ class DeviceResource(Resource):
 		new_device = Device(name, description)
 
 		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title, self.slide_table)
+			slide_dict = Slide.find_by_title(slide_title, self.db_client)
 			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
@@ -154,7 +155,7 @@ class DeviceResource(Resource):
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
-		device_id = new_device.save(self.device_table)
+		device_id = new_device.save(self.db_client)
 
 		return {'message': 'Device replaced', 'device_id': device_id}, 200
 
@@ -170,12 +171,12 @@ class DeviceResource(Resource):
 			dict: A message confirming the deletion.
 			int: HTTP status code.
 		"""
-		device_data = Device.find_by_name(device_name, self.device_table)
+		device_data = Device.find_by_name(device_name, self.db_client)
 		device = Device.from_dict(device_data)
 
 		if device:
 			# Delete the device from the database
-			device.delete_me(self.device_table)
+			device.delete_me(self.db_client)
 			return {"message": f"Device '{device_name}' deleted"}, 200
 		else:
 			return {"message": "Device not found"}, 404

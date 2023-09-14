@@ -1,6 +1,7 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-from database.DatabaseTable import DatabaseTable
+from database.DatabaseClient import DatabaseClient
+
 
 class Department:
 	def __init__(self, name):
@@ -76,18 +77,7 @@ class Department:
 		return department_dict
 
 	@staticmethod
-	def find_by_id(department_id, department_table: DatabaseTable):
-		"""
-		Finds a department by its unique department ID (ObjectId) in the database.
-
-		:param department_id: The unique identifier of the department.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Department class or None if not found.
-		"""
-		return department_table.find_by_id(department_id)
-
-	@staticmethod
-	def find_by_name(department_name: str, department_table: DatabaseTable):
+	def find_by_name(department_name: str, database_client: DatabaseClient):
 		"""
 		Finds a department by its name in the database.
 
@@ -95,9 +85,9 @@ class Department:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Department class or None if not found.
 		"""
-		return department_table.find_by_title(department_name)
+		return database_client.get_one('departments', 'name', department_name)
 
-	def save(self, department_table: DatabaseTable):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the department instance to the database.
 
@@ -107,17 +97,18 @@ class Department:
 		department_data = self.to_dict()
 		if self._id:
 			# Update the existing department document
-			return department_table.update_one(self._id, department_data)
+			return database_client.update_entry('departments', 'name', self.name, department_data)
 		else:
 			# Insert a new department document
-			return department_table.insert_one(department_data)
+			return database_client.insert_entry('departments', department_data)
 
 	@staticmethod
-	def getAll(slides_table: DatabaseTable):
+	def getAll(database_client: DatabaseClient):
 		"""
 		Get all the slides in the db
 		"""
-		return slides_table.getData()
+		print("CHECK 2")
+		return database_client.get_table('departments')
 	
-	def delete_me(self, slides_table: DatabaseTable):
+	def delete_me(self, database_client: DatabaseClient):
 		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER

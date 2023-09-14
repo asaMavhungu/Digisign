@@ -1,10 +1,14 @@
 
 
 from flask import Flask
-from pymongo import MongoClient
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-from api.models.Department import Department
+from flask import Flask, jsonify
+from pymongo.database import Database
+from pymongo.database import Database
+from pymongo.collection import Collection
+from bson import ObjectId
+
 
 
 class MongoDatabase:
@@ -13,12 +17,12 @@ class MongoDatabase:
 		pass
 
 	@staticmethod
-	def get_table(conn: MongoClient, table_name: str):
+	def get_table(conn: PyMongo, table_name: str):
 		"""
 		Retrieve all documents from a specified collection.
 
 		Args:
-			conn (MongoClient): A MongoClient instance for connecting to the MongoDB server.
+			conn (PyMongo instance)
 			table_name (str): The name of the collection (table) to retrieve documents from.
 
 		Returns:
@@ -34,24 +38,23 @@ class MongoDatabase:
 			>>> for document in cursor:
 			>>>     print(document)
 		"""
-		tables = conn.db.list_collection_names()
+		# TODO Type checking turned off because of NONE
+		tables = conn.db.list_collection_names() # type: ignore
 		if table_name in tables:
-			collection = conn.db[table_name.lower()]
+			collection = conn.db[table_name.lower()] # type: ignore
 			cursor = collection.find()
 			return cursor
-		else:
-			# Table not found
-			raise CollectionNotFoundError(f"Collection '{table_name}' not found.")
-		
+
 	@staticmethod
-	def get_one(conn: MongoClient, table_name: str, entry_name: str):
+	def get_one(conn: PyMongo, table_name: str, field_name: str, field_value: str):
 		"""
-		Retrieve a single document from a specified collection based on its entry_name.
+		Retrieve a single document from a specified collection based on a custom field and its value.
 
 		Args:
-			conn (MongoClient): A MongoClient instance for connecting to the MongoDB server.
+			conn (PyMongo): A PyMongo instance for connecting to the MongoDB server.
 			table_name (str): The name of the collection (table) to retrieve the document from.
-			entry_name (str): The identifier or name of the entry/document to retrieve.
+			field_name (str): The name of the field to search for.
+			field_value (str): The value of the field to search for.
 
 		Returns:
 			dict or None: A dictionary representing the retrieved document if found, or None if not found.
@@ -60,31 +63,37 @@ class MongoDatabase:
 			CollectionNotFoundError: If the specified collection does not exist.
 
 		Example:
-			To retrieve a specific document named "example_slide" from the "slides" collection:
-			>>> slide = getOne(my_connection, "slides", "example_slide")
+			To retrieve a specific document with a custom field "name" equal to "example_slide" from the "slides" collection:
+			>>> slide = get_one(my_connection, "slides", "name", "example_slide")
 			>>> if slide:
 			>>>     print(slide)
 			>>> else:
 			>>>     print("Slide not found.")
-
-			Note:
-				- The method converts the `table_name` to lowercase to ensure case-insensitive matching.
-				- If the `table_name` matches known collections, it retrieves the document.
-				- The `type: ignore` comment is used to suppress type hint errors related to the return value of find_one.
 		"""
-		tables = conn.db.list_collection_names()
+		# TODO Type checking turned off because of NONE
+		# Ensure table_name is lowercase for case-insensitive matching
+		table_name = table_name.lower()
+
+		tables = conn.db.list_collection_names() # type: ignore
+
 		if table_name in tables:
-			collection = conn.db[table_name.lower()]
-			#TODO the type ignore is to remove the type error. want to remove ambiguity of the 'UNKNOWN' type return by find_one
-			doc: dict = collection.find_one(entry_name) # type: ignore 
-			return doc
-		else:
-			# Table not found
-			raise CollectionNotFoundError(f"Collection '{table_name}' not found.")
-		
+
+			# Access the database and the specified collection
+			db = conn.db
+			collection = conn.db[table_name.lower()] # type: ignore 
+
+			# Construct the query to find the document based on the custom field
+			query = {field_name: field_value}
+
+			# Retrieve the document using find_one
+			document = collection.find_one(query)
+			if document and "_id" in document:
+				document["_id"] = str(document["_id"])
+				print("*****************================================****************")
+			return document
 
 	@staticmethod
-	def insert_entry(conn: MongoClient, table_name: str, entry_data: dict):
+	def insert_entry(conn: PyMongo, table_name: str, entry_data: dict):
 		"""
 		Insert a new document into a specified collection.
 
@@ -106,17 +115,17 @@ class MongoDatabase:
 			>>> print(f"Inserted document ID: {entry_id}")
 		"""
 		# Check if the requested table_name exists
-		tables = conn.db.list_collection_names()
+		# TODO Type checking turned off because of NONE
+		tables = conn.db.list_collection_names() # type: ignore
 		if table_name in tables:
-			collection = conn.db[table_name.lower()]
+			collection = conn.db[table_name.lower()] # type: ignore
 			result = collection.insert_one(entry_data)
 			return str(result.inserted_id)
-		else:
-			# If the table_name doesn't match any known collection, raise the exception
-			raise CollectionNotFoundError(f"Collection '{table_name}' not found.")
+
+
 
 	@staticmethod
-	def update_entry(conn: MongoClient, table_name: str, entry_name: str, update_data: dict):
+	def update_entry(conn: PyMongo, table_name: str, field_name: str, field_value: str, update_data: dict):
 		"""
 		Update an existing document in a specified collection.
 
@@ -139,20 +148,21 @@ class MongoDatabase:
 			>>> print(f"Updated document ID: {entry_id}")
 		"""
 		# Check if the requested table_name exists
-		tables = conn.db.list_collection_names()
+		# TODO Type checking turned off because of NONE
+		tables = conn.db.list_collection_names() # type: ignore
 		if table_name in tables:
-			collection = conn.db[table_name.lower()]
-			result = collection.update_one({'_id': entry_name}, {'$set': update_data})
-			if result.modified_count > 0:
-				return entry_name
-			else:
-				return None  # Document with the specified entry_name not found
-		else:
-			# If the table_name doesn't match any known collection, raise the exception
-			raise CollectionNotFoundError(f"Collection '{table_name}' not found.")
+			collection = conn.db[table_name.lower()] # type: ignore
+			query = {field_name: field_value}
+			document = collection.find_one(query)
+			if document:
+				result = collection.update_one(query, {'$set': update_data})
+				if result.modified_count > 0:
+					return True
+				else:
+					return False
 
 	@staticmethod
-	def delete_entry(conn: MongoClient, table_name: str, entry_name: str):
+	def delete_entry(conn: PyMongo, table_name: str, field_name: str, field_value: str):
 		"""
 		Delete an existing document from a specified collection.
 
@@ -176,21 +186,17 @@ class MongoDatabase:
 			>>>     print("Document not found or could not be deleted.")
 		"""
 		# Check if the requested table_name exists
-		tables = conn.db.list_collection_names()
+		# TODO Type checking turned off because of NONE
+		tables = conn.db.list_collection_names() # type: ignore
 		if table_name in tables:
-			collection = conn.db[table_name.lower()]
-			result = collection.delete_one({'_id': entry_name})
+			collection = conn.db[table_name.lower()] # type: ignore
+			query = {field_name: field_value}
+			result = collection.delete_one(query)
 			if result.deleted_count > 0:
 				return True
 			else:
 				return False  # Document with the specified entry_name not found
-		else:
-			# If the table_name doesn't match any known collection, raise the exception
-			raise CollectionNotFoundError(f"Collection '{table_name}' not found.")
 		
 
 
-class CollectionNotFoundError(Exception):
-	"""Just for the Exception thing"""
-	#TODO FIX exception handling
-	pass
+

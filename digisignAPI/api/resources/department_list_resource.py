@@ -2,8 +2,9 @@ from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
-from database.MongoDBClient import MongoDBClient
-from database.DatabaseTable import DatabaseTable
+
+from database.DatabaseClient import DatabaseClient
+
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
 department_parser.add_argument('name', type=str, required=True, help='Name of the department')
@@ -20,8 +21,8 @@ class DepartmentListResource(Resource):
 	"""
 	Resource class for managing collections of departments.
 	"""
-	def __init__(self, dbClient: MongoDBClient):
-		self.department_table: DatabaseTable = dbClient.DepartmentTable
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 	@marshal_with(department_fields)
 	def get(self):
@@ -30,9 +31,13 @@ class DepartmentListResource(Resource):
 		Returns:
 			List[Department]: A list of all departments.
 		"""
-		departments_data = Department.getAll(self.department_table)
-		departments = [Department.from_dict(department_data).to_dict() for department_data in departments_data]
-		return departments, 200
+		print("CHECK 1")
+		departments_data = Department.getAll(self.db_client)
+		if departments_data is not None:
+			departments = [Department.from_dict(department_data).to_dict() for department_data in departments_data]
+			return departments, 200
+		else:
+			return {"message": "Departments not found"}, 404	
 
 	def post(self):
 		"""
@@ -41,11 +46,11 @@ class DepartmentListResource(Resource):
 		args = department_parser.parse_args()
 		name = args['name']
 
-		if Department.find_by_name(name, self.department_table):
+		if Department.find_by_name(name, self.db_client):
 			return {"message": f"Department named '{name}' already exists"}, 400
 
 		department = Department(name)
 
-		department_id = department.save(self.department_table)
+		department_id = department.save(self.db_client)
 
 		return {'message': 'Department created', 'department_id': department_id}, 201

@@ -2,8 +2,8 @@ from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
-from database.MongoDBClient import MongoDBClient
-from database.DatabaseTable import DatabaseTable
+
+from database.DatabaseClient import DatabaseClient
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
@@ -21,17 +21,15 @@ class DepartmentResource(Resource):
 	"""
 	Resource class for managing individual departments.
 	"""
-	def __init__(self, dbClient: MongoDBClient):
-		self.slide_table: DatabaseTable = dbClient.SlidesTable
-		self.department_table: DatabaseTable = dbClient.DepartmentTable
-
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 	@marshal_with(department_fields)
 	def get(self, department_name):
 		"""
 		Get details of a specific department by ID.
 		"""
-		department_dict = Department.find_by_name(department_name, self.department_table)
+		department_dict = Department.find_by_name(department_name, self.db_client)
 		if department_dict:
 			return department_dict, 200
 		return {"message": "Department not found"}, 404
@@ -41,7 +39,7 @@ class DepartmentResource(Resource):
 		Update a specific department by ID (partial update).
 		"""
 		args = department_parser.parse_args()
-		department_dict = Department.find_by_name(department_name, self.department_table)
+		department_dict = Department.find_by_name(department_name, self.db_client)
 		department = Department.from_dict(department_dict)
 
 		if not department:
@@ -50,7 +48,7 @@ class DepartmentResource(Resource):
 		if 'name' in args:
 			department.name = args['name']
 
-		department_id = department.save(self.department_table)
+		department_id = department.save(self.db_client)
 
 		return {'message': 'Department updated', 'department_id': department_id}, 200
 
@@ -61,14 +59,14 @@ class DepartmentResource(Resource):
 		args = department_parser.parse_args()
 		name = args['name']
 
-		department_dict = Department.find_by_name(department_name, self.department_table)
+		department_dict = Department.find_by_name(department_name, self.db_client)
 		department = Department.from_dict(department_dict)
 
 		if not department:
 			return {"message": "Department not found"}, 404
 
 		department.name = name
-		department.save(self.department_table)
+		department.save(self.db_client)
 
 		return {'message': 'Department updated', 'department_id': department_name}, 200
 
@@ -82,11 +80,11 @@ class DepartmentResource(Resource):
 		Returns:
 			dict: A message indicating the result of the deletion.
 		"""
-		department_dict = Department.find_by_name(department_name, self.department_table)
+		department_dict = Department.find_by_name(department_name, self.db_client)
 		department = Department.from_dict(department_dict)
 		if department:
 			# Delete the department from the database
-			department.delete_me(self.department_table)
+			department.delete_me(self.db_client)
 			return {"message": f"Department '{department_name}' deleted"}, 200
 		else:
 			return {"message": "Department not found"}, 404

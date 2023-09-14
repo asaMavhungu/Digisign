@@ -23,7 +23,7 @@ from pymongo import MongoClient
 
 from database import createMongoDatabase
 
-from database import MongoDBClient
+from database import DatabaseClient
 
 
 # TODO: check if all endpoint work as expected
@@ -34,7 +34,7 @@ def createApi(module_name):
 	a, m  = createMongoDatabase(module_name)
 
 	app : Flask = a
-	mongo_client:MongoDBClient = m
+	db_client:DatabaseClient = m
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 
@@ -56,29 +56,29 @@ def createApi(module_name):
 
 	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/api/slides/<string:slide_title>', resource_class_args=(mongo_client,))
+	api.add_resource(SlideResource, '/api/slides/<string:slide_title>', resource_class_args=(db_client,))
 
 	# Register SlideList with endpoint /slides
 	from .resources.slide_list_resource import SlideList 
-	api.add_resource(SlideList, '/api/slides', resource_class_args=(mongo_client,))
+	api.add_resource(SlideList, '/api/slides', resource_class_args=(db_client,))
 
 	# Register DeviceResource with endpoint /devices/<string:device_name>
 	from .resources.device_resource import DeviceResource
-	api.add_resource(DeviceResource, '/api/devices/<string:device_name>', resource_class_args=(mongo_client,))
+	api.add_resource(DeviceResource, '/api/devices/<string:device_name>', resource_class_args=(db_client,))
 
 	# Register DeviceListResource with endpoint /devices
 	from .resources.device_list_resource import DeviceListResource
-	api.add_resource(DeviceListResource, '/api/devices', resource_class_args=(mongo_client,))
+	api.add_resource(DeviceListResource, '/api/devices', resource_class_args=(db_client,))
 
 	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
-	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>', resource_class_args=(mongo_client,))
+	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>', resource_class_args=(db_client,))
 
 	# Register DepartmentListResource with endpoint /departments
 	from .resources.department_list_resource import DepartmentListResource
-	api.add_resource(DepartmentListResource, '/api/departments', resource_class_args=(mongo_client,))
+	api.add_resource(DepartmentListResource, '/api/departments', resource_class_args=(db_client,))
 
 
 
-	return app, mongo_client
+	return app, db_client
 

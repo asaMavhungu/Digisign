@@ -1,7 +1,7 @@
 from flask_pymongo import PyMongo
 
 # api/__init__.py
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from flask_restful import Api, Resource, reqparse, abort
 
 from flask import Flask
@@ -26,7 +26,7 @@ from flask import Flask
 from pymongo import MongoClient
 from flask_pymongo import PyMongo
 
-from database.MongoDBClient import MongoDBClient
+from database.DatabaseClient import DatabaseClient
 
 	# Add more methods for other database operations
 
@@ -34,12 +34,20 @@ def createMongoDatabase(module_name):
 	app = Flask(module_name)
 
 	# Connect to MongoDB Atlas cluster
-	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
-	client = MongoClient(uri)
+	app.config['MONGO_URI'] = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
+	mongo = PyMongo(app)
 
+	"""
+	TEST if the mongo app works. PASSED
+		slides_collection = mongo.db.slides
+		slides = list(slides_collection.find())
+		tables = mongo.db.list_collection_names()
+		slides_list = [slide for slide in slides]
+		print(jsonify(slides_list))
+	"""
 
 	# TODO use the mongo client class to encapsulate database interactions
-	db_client = MongoDBClient(uri)
+	db_client = DatabaseClient(mongo)
 	return app, db_client
 
 def createDatabaseSQL():

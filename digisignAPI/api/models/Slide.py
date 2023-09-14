@@ -1,9 +1,9 @@
 from bson.objectid import ObjectId
-from database.DatabaseTable import DatabaseTable
+from database.DatabaseClient import DatabaseClient
 
 
 class Slide:
-	def __init__(self, title, content, content_type, author_id):
+	def __init__(self, title: str, content: str, content_type: str, author_id: str):
 		"""
 		Constructor for the Slide class.
 
@@ -86,18 +86,8 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_id(slide_id: str, slides_table: DatabaseTable) -> (dict | None):
-		"""
-		Finds a slide by its unique slide ID (ObjectId) in the database.
-
-		:param slide_id: The unique identifier of the slide.
-		:param client: An instance of SlideClient used for database operations.
-		:return: slide dict
-		"""
-		return slides_table.find_by_id(slide_id)
-
-	@staticmethod
-	def find_by_title(title: str, slides_table: DatabaseTable) -> (dict | None):
+	def find_by_title(title: str, database_client: DatabaseClient) -> (dict | None):
+		print("==========================")
 		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
@@ -106,9 +96,9 @@ class Slide:
 		:param client: An instance of SlideClient used for database operations.
 		:return: slide dict
 		"""
-		return slides_table.find_by_title(title)
+		return database_client.get_one('slides', 'title', title)
 
-	def save(self, slides_table: DatabaseTable):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the slide instance to the database.
 
@@ -117,17 +107,17 @@ class Slide:
 		"""
 		slide_data = self.to_dict()
 		if self._id:
-			return slides_table.update_one(self._id, slide_data)
+			return database_client.update_entry('slides', 'title', self.title, slide_data)
 		else:
-			return slides_table.insert_one(slide_data)
+			return database_client.insert_entry('slides', slide_data)
 		
 	
 	@staticmethod
-	def getAll(slides_table: DatabaseTable):
+	def getAll(database_client: DatabaseClient):
 		"""
 		Get all the slides in the db
 		"""
-		return slides_table.getData()
+		return database_client.get_table('slides')
 	
-	def delete_me(self, slides_table: DatabaseTable):
-		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER
+	def delete_me(self, database_client: DatabaseClient):
+		database_client.delete_entry('slides', 'title', self.title)
