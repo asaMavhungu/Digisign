@@ -21,7 +21,7 @@ from pymongo.server_api import ServerApi
 
 from pymongo import MongoClient
 
-from database import createMongoDatabase
+from database import createDatabase
 
 from database import DatabaseClient
 
@@ -31,10 +31,8 @@ from database import DatabaseClient
 
 def createApi(module_name):
 
-	a, m  = createMongoDatabase(module_name)
+	app, db_client  = createDatabase(module_name)
 
-	app : Flask = a
-	db_client:DatabaseClient = m
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 

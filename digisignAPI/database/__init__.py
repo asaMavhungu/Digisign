@@ -30,9 +30,13 @@ from database.DatabaseClient import DatabaseClient
 
 	# Add more methods for other database operations
 
-def createMongoDatabase(module_name):
+def createDatabase(module_name):
+
 	app = Flask(module_name)
 
+	return createMongoDatabase(app)
+
+def createMongoDatabase(app: Flask):
 	# Connect to MongoDB Atlas cluster
 	app.config['MONGO_URI'] = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
 	mongo = PyMongo(app)
