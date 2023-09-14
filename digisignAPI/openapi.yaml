@@ -1,0 +1,224 @@
+openapi: 3.0.0
+info:
+  title: Combined User and Slide Management API
+  description: API for managing users, slides, and departments
+  version: 1.0.0
+servers:
+  - url: http://localhost:5000  # Update with your API's base URL
+    description: Local Development Server
+paths:
+  /user:
+    post:
+      summary: Create a new user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserSignupRequest'
+      responses:
+        '201':
+          description: User created successfully
+        '400':
+          description: Bad request (e.g., username already exists)
+  /user/{username}:
+    get:
+      summary: Retrieve user information by username
+      parameters:
+        - name: username
+          in: path
+          required: true
+          description: Username of the user to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserResponse'
+        '404':
+          description: User not found
+  /login: 
+    post:
+      summary: Authenticate and log in a user
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserLoginRequest'
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserLoginResponse'
+        '401':
+          description: Unauthorized (invalid password)
+        '404':
+          description: User not found
+  /slides:
+    post:
+      summary: Create a new slide
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlideRequest'
+      responses:
+        '201':
+          description: Slide created successfully
+        '400':
+          description: Bad request (e.g., slide with the same title already exists)
+  /slides/{slide_title}:
+    get:
+      summary: Retrieve slide information by slide title
+      parameters:
+        - name: slide_title
+          in: path
+          required: true
+          description: Title of the slide to retrieve
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SlideResponse'
+        '404':
+          description: Slide not found
+    patch:
+      summary: Update slide information by slide title
+      parameters:
+        - name: slide_title
+          in: path
+          required: true
+          description: Title of the slide to update
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlidePatchRequest'
+      responses:
+        '200':
+          description: Slide updated successfully
+        '400':
+          description: Bad request (e.g., invalid 'departments' format)
+        '404':
+          description: Slide not found
+    put:
+      summary: Replace slide information by slide title
+      parameters:
+        - name: slide_title
+          in: path
+          required: true
+          description: Title of the slide to replace
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlideRequest'
+      responses:
+        '200':
+          description: Slide replaced successfully
+        '400':
+          description: Bad request (e.g., invalid 'departments' format)
+        '404':
+          description: Slide not found
+components:
+  schemas:
+    UserSignupRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+        password:
+          type: string
+      required:
+        - username
+        - email
+        - password
+    UserResponse:
+      type: object
+      properties:
+        username:
+          type: string
+        email:
+          type: string
+          format: email
+    UserLoginRequest:
+      type: object
+      properties:
+        username:
+          type: string
+        password:
+          type: string
+      required:
+        - username
+        - password
+    UserLoginResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        access_token:
+          type: string
+    SlideRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        author_id:
+          type: string
+        departments:
+          type: array
+          items:
+            type: string
+      required:
+        - title
+        - content
+        - author_id
+    SlideResponse:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        author_id:
+          type: string
+        departments:
+          type: array
+          items:
+            type: string
+    SlidePatchRequest:
+      type: object
+      properties:
+        title:
+          type: string
+        content:
+          type: string
+        author_id:
+          type: string
+        departments:
+          type: array
+          items:
+            type: string
+

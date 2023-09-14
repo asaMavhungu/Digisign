@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Hello Page</title>
+</head>
+<body>
+	<h1>Hello, <span id="name"></span>!</h1>
+
+	<script>
+		// JavaScript code to get the name from the query parameter
+		const urlParams = new URLSearchParams(window.location.search);
+		const name = urlParams.get('name');
+
+		// Display the name in the HTML
+		const nameSpan = document.getElementById('name');
+		if (name) {
+			nameSpan.textContent = name;
+		} else {
+			nameSpan.textContent = 'Guest';
+		}
+	</script>
+</body>
+</html>

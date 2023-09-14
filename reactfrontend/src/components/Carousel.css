@@ -1,0 +1,78 @@
+/* src/Carousel.css */
+
+/* Container for the entire carousel */
+.carousel-container {
+	overflow: hidden;
+	width: 100%;
+	position: relative;
+  }
+  
+  /* Slide container that holds all items */
+  .carousel-slide {
+	display: flex;
+	transition: opacity 0.5s linear;
+  }
+  
+  /* Individual carousel item */
+  .carousel-item {
+	flex-shrink: 0;
+	width: 100%;
+  }
+  
+  /* Images within the carousel */
+  .carousel-image {
+	width: 100%; /* Make the image width 100% of the parent container */
+	height: auto; /* Automatically adjust the height to maintain aspect ratio */
+	object-fit: contain; /* Fit the image within the container without distortion */
+  }
+  
+  /* Videos within the carousel */
+  .carousel-video {
+	width: 100%;
+	height: auto; /* Automatically adjust the height to maintain aspect ratio */
+	object-fit: contain; /* Fit the video within the container without distortion */
+  }
+  
+  /* Navigation buttons (you can style these as needed) */
+  .carousel-button {
+	position: absolute;
+	top: 50%;
+	transform: translateY(-50%);
+	padding: 8px 16px;
+	background-color: #007bff; /* Example button background color */
+	color: #fff; /* Example button text color */
+	border: none;
+	cursor: pointer;
+  }
+  
+  /* Previous button */
+  .prev-button {
+	left: 0;
+  }
+  
+  /* Next button */
+  .next-button {
+	right: 0;
+  }
+  
+  /* Indicators (you can style these as needed) */
+  .carousel-indicators {
+	display: flex;
+	justify-content: center;
+	margin-top: 16px; /* Example margin to space indicators from the content */
+  }
+  
+  .carousel-indicator {
+	width: 10px;
+	height: 10px;
+	background-color: #007bff; /* Example indicator color */
+	border-radius: 50%;
+	margin: 0 4px; /* Example margin between indicators */
+	cursor: pointer;
+  }
+  
+  /* Active indicator (you can style this differently to indicate the current slide) */
+  .carousel-indicator.active {
+	background-color: #ff0000; /* Example active indicator color */
+  }
+  
