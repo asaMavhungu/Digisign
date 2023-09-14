@@ -1,6 +1,7 @@
 import React from 'react'
 import './SlidesPage.css'
 import Carousel from '../components/Carousel'
+import SplideCarousel from '../components/SplideCarousel';
 
 function SlidesPage() {
   const items = [
@@ -15,7 +16,7 @@ function SlidesPage() {
 
   return (
     <div className="SlidesPage">
-      <Carousel items={items} />
+      <SplideCarousel items={items} />
     </div>
   );
 }
