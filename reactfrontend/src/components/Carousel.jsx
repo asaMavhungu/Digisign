@@ -62,18 +62,6 @@ function Carousel({ items }) {
 
   return (
     <div className="carousel-container">
-
-      <button id="getDataButton" onClick={handleGetDataClick}>
-        Get Data from API
-      </button>
-      <div id="responseData">
-        {responseData ? (
-          <pre>{JSON.stringify(responseData, null, 2)}</pre>
-        ) : (
-          'No data available'
-        )}
-      </div>
-
       <div className="carousel-slide" style={{ transform: `translateX(-${currentIndex * 100}%)` }}>
         {items.map((item, index) => (
           <div key={index} className="carousel-item">
@@ -85,22 +73,6 @@ function Carousel({ items }) {
         ))}
       </div>
 
-      <button onClick={prevSlide} className="carousel-button prev-button">
-        Previous
-      </button>
-      <button onClick={nextSlide} className="carousel-button next-button">
-        Next
-      </button>
-
-      <div className="carousel-indicators">
-        {items.map((item, index) => (
-          <div
-            key={index}
-            onClick={() => goToSlide(index)}
-            className={`carousel-indicator ${currentIndex === index ? 'active' : ''}`}
-          ></div>
-        ))}
-      </div>
     </div>
   );
 }

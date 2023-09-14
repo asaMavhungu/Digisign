@@ -12,7 +12,6 @@ function SlidesPage() {
 
   return (
     <div className="SlidesPage">
-      <h1>React Carousel</h1>
       <Carousel items={items} />
     </div>
   );
