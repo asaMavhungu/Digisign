@@ -1,6 +1,8 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 
+from database.DatabaseClient import DatabaseClient
+
 class Device:
 	def __init__(self, name, description):
 		"""
@@ -70,23 +72,15 @@ class Device:
 			'slides': self.slides,
 		}
 
+	@staticmethod
+	def getAll(database_client: DatabaseClient):
+		"""
+		Get all the slides in the db
+		"""
+		return database_client.get_table('devices')
 
 	@staticmethod
-	def find_by_id(device_id, mongo):
-		"""
-		Finds a device by its unique device ID (ObjectId) in the database.
-
-		:param device_id: The unique identifier of the device.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Device class or None if not found.
-		"""
-		device_data = mongo.db.devices.find_one({'_id': ObjectId(device_id)})
-		if device_data:
-			return Device.from_dict(device_data)
-		return None
-
-	@staticmethod
-	def find_by_name(name, mongo):
+	def find_by_name(device_name, database_client: DatabaseClient):
 		"""
 		Finds devices by their name in the database.
 
@@ -94,12 +88,9 @@ class Device:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: A list of instances of the Device class matching the name or an empty list if not found.
 		"""
-		device_data = mongo.db.devices.find_one({'name': name})
-		if device_data:
-			return Device.from_dict(device_data)
-		return None
+		return database_client.get_one('devices', 'name', device_name)
 
-	def save(self, mongo):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the device instance to the database.
 
@@ -109,13 +100,10 @@ class Device:
 		device_data = self.to_dict()
 		if self._id:
 			# Update the existing device document
-			mongo.db.devices.update_one({'_id': self._id}, {'$set': device_data})
-			return self._id
+			return database_client.update_entry('devices', 'name', self.name, device_data)
 		else:
 			# Insert a new device document
-			result = mongo.db.devices.insert_one(device_data)
-			self._id = result.inserted_id
-		return str(self._id)
+			return database_client.insert_entry('devices', device_data)
 	
 	def delete(self, mongo):
 		"""
@@ -125,3 +113,6 @@ class Device:
 		"""
 		if self._id:
 			mongo.db.devices.delete_one({'_id': self._id})
+
+	def delete_me(self, database_client: DatabaseClient):
+		database_client.delete_entry('devices', 'name', self.name)

@@ -1,8 +1,9 @@
-from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from database.DatabaseClient import DatabaseClient
+
 
 class Slide:
-	def __init__(self, title, content, content_type, author_id):
+	def __init__(self, title: str, content: str, content_type: str, author_id: str):
 		"""
 		Constructor for the Slide class.
 
@@ -16,7 +17,6 @@ class Slide:
 		self.content_type = content_type
 		self.author_id = author_id
 		self.departments = []  # List to store associated department names
-		self.devices = []  # List to store associated device group names
 
 	def add_department(self, department_name):
 		"""
@@ -39,52 +39,13 @@ class Slide:
 	def clear_departments(self):
 		self.departments = []
 
-	def add_device(self, device_name):
-		"""
-		Add a device ObjectId to the slide's list of associated devices.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_name not in self.devices:
-			self.device_groups.append(device_name)
-
-	def remove_device(self, device_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_name in self.device_groups:
-			self.device_groups.remove(device_name)
-
-	def add_device_group(self, device_group_name):
-		"""
-		Add a device group ObjectId to the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be associated with the slide.
-		"""
-		if device_group_name not in self.device_groups:
-			self.device_groups.append(device_group_name)
-
-	def remove_device_group(self, device_group_name):
-		"""
-		Remove a device group ObjectId from the slide's list of associated device groups.
-
-		:param device_group_id: The ObjectId of the device group to be disassociated from the slide.
-		"""
-		if device_group_name in self.device_groups:
-			self.device_groups.remove(device_group_name)
-
-	def clear_device_groups(self):
-		self.device_groups = []
-
 	@classmethod
 	def from_dict(cls, slide_dict):
 		"""
 		Creates a Slide instance from a dictionary.
 
 		:param slide_dict: A dictionary containing slide data.
-		:return: An instance of the Slide class.
+		:return: An instance of the Slide or VideoSlide class, depending on content_type.
 		"""
 		slide = cls(
 			title=slide_dict['title'],
@@ -94,7 +55,6 @@ class Slide:
 		)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
 		slide.departments = slide_dict.get('departments', [])
-		slide.device_groups = slide_dict.get('device_groups', []) # does this
 		return slide
 
 	def to_dict(self):
@@ -109,10 +69,9 @@ class Slide:
 			'content_type': self.content_type,
 			'author_id': self.author_id,
 			'departments': self.departments,
-			'device_groups': self.device_groups
 		}
 		return slide_dict
-	
+
 	def to_marshal_representation(self):
 		"""
 		Convert the Slide object to a marshal-like representation.
@@ -127,47 +86,38 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_id(slide_id, mongo):
-		"""
-		Finds a slide by its unique slide ID (ObjectId) in the database.
-
-		:param slide_id: The unique identifier of the slide.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Slide class or None if not found.
-		"""
-		slide_data = mongo.db.slides.find_one({'_id': ObjectId(slide_id)})
-		if slide_data:
-			return Slide.from_dict(slide_data)
-		return None
-
-	@staticmethod
-	def find_by_title(title, mongo):
+	def find_by_title(title: str, database_client: DatabaseClient) -> (dict | None):
+		print("==========================")
+		# TODO Remove redundancy of creating Slide object
 		"""
 		Finds slides by their title in the database.
 
 		:param title: The title of the slide to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A list of instances of the Slide class matching the title or an empty list if not found.
+		:param client: An instance of SlideClient used for database operations.
+		:return: slide dict
 		"""
-		slide_data = mongo.db.slides.find_one({'title': title})
-		if slide_data:
-			return Slide.from_dict(slide_data)
-		return None
+		return database_client.get_one('slides', 'title', title)
 
-	def save(self, mongo):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the slide instance to the database.
 
-		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:param slides_table: The table to update.
 		:return: The unique identifier (_id) of the inserted or updated slide document.
 		"""
 		slide_data = self.to_dict()
 		if self._id:
-			# Update the existing slide document
-			mongo.db.slides.update_one({'_id': self._id}, {'$set': slide_data})
-			return self._id
+			return database_client.update_entry('slides', 'title', self.title, slide_data)
 		else:
-			# Insert a new slide document
-			result = mongo.db.slides.insert_one(slide_data)
-			self._id = result.inserted_id
-			return str(result.inserted_id)
+			return database_client.insert_entry('slides', slide_data)
+		
+	
+	@staticmethod
+	def getAll(database_client: DatabaseClient):
+		"""
+		Get all the slides in the db
+		"""
+		return database_client.get_table('slides')
+	
+	def delete_me(self, database_client: DatabaseClient):
+		database_client.delete_entry('slides', 'title', self.title)

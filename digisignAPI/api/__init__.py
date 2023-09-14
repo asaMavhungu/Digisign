@@ -21,57 +21,64 @@ from pymongo.server_api import ServerApi
 
 from pymongo import MongoClient
 
-def createApp():
+from database import createMongoDatabase
 
-	app = Flask(__name__)
+from database import DatabaseClient
 
+
+# TODO: check if all endpoint work as expected
+# TODO: Redo the api spec
+
+def createApi(module_name):
+
+	a, m  = createMongoDatabase(module_name)
+
+	app : Flask = a
+	db_client:DatabaseClient = m
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 
 	app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'  # Replace with your secret key
 	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Set token expiration time
 
-
-	# Connect to MongoDB Atlas cluster
-	uri = "mongodb+srv://asa:asas@cluster0.juh7xtg.mongodb.net/your_database?retryWrites=true&w=majority"
-	client = MongoClient(uri)
-
-	# Check if the connection is successful
-	try:
-		client.admin.command('ping')
-		print("Connected to MongoDB Atlas cluster!")
-	except Exception as e:
-		print(e)
-
-	# Initialize PyMongo with the app
-	app.config['MONGO_URI'] = uri
-	mongo = PyMongo(app)
+# TODO use mongoClient class to handle database
 	api = Api(app)
 
+	"""
+	# User login and stuff
+	from .resources.user_resource import UserResource
+	api.add_resource(UserResource, '/api/user', '/api/user/<string:username>', resource_class_args=(mongo_client,))
 
-	# Import and add your UserResource here
-	from .resources.user_signup_resource import UserSignupResource
-	api.add_resource(UserSignupResource, '/user', '/user/<string:username>', resource_class_args=(mongo,))
-
-	from .resources.user_login_resource import UserLoginResource
-	api.add_resource(UserLoginResource, '/login', resource_class_args=(mongo,))
-
-	
-	
+	# User reg and stuff
+	from .resources.user_list_resource import UserListResource
+	api.add_resource(UserListResource, '/api/users', resource_class_args=(mongo_client,))
+	"""
 
 	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/slides/<string:slide_title>', resource_class_args=(mongo,))
+	api.add_resource(SlideResource, '/api/slides/<string:slide_title>', resource_class_args=(db_client,))
 
 	# Register SlideList with endpoint /slides
 	from .resources.slide_list_resource import SlideList 
-	api.add_resource(SlideList, '/slides', resource_class_args=(mongo,))
+	api.add_resource(SlideList, '/api/slides', resource_class_args=(db_client,))
 
+	# Register DeviceResource with endpoint /devices/<string:device_name>
+	from .resources.device_resource import DeviceResource
+	api.add_resource(DeviceResource, '/api/devices/<string:device_name>', resource_class_args=(db_client,))
 
+	# Register DeviceListResource with endpoint /devices
+	from .resources.device_list_resource import DeviceListResource
+	api.add_resource(DeviceListResource, '/api/devices', resource_class_args=(db_client,))
+
+	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
-	api.add_resource(DepartmentResource, '/department', resource_class_args=(mongo,))
+	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>', resource_class_args=(db_client,))
+
+	# Register DepartmentListResource with endpoint /departments
+	from .resources.department_list_resource import DepartmentListResource
+	api.add_resource(DepartmentListResource, '/api/departments', resource_class_args=(db_client,))
 
 
 
-	return app, mongo
+	return app, db_client
 

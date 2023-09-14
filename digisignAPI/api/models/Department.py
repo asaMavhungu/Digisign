@@ -1,4 +1,7 @@
+from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
+from database.DatabaseClient import DatabaseClient
+
 
 class Department:
 	def __init__(self, name):
@@ -9,24 +12,40 @@ class Department:
 		"""
 		self._id = None  # MongoDB ObjectId (optional)
 		self.name = name
-		self.slides = []  # List to store associated slide ObjectIds
+		self.slides = []  # List to store associated slides
+		self.devices = []  # List to store associated devices
 
-	def add_slide(self, slide_id):
+	def add_slide(self, slide_name):
 		"""
-		Add a slide ObjectId to the department's list of associated slides.
+		Add a slide to the department.
 
-		:param slide_id: The ObjectId of the slide to be associated with the department.
+		:param slide: The Slide name to associate with the department.
 		"""
-		self.slides.append(slide_id)
+		self.slides.append(slide_name)
 
-	def remove_slide(self, slide_id):
+	def remove_slide(self, slide_name):
 		"""
-		Remove a slide ObjectId from the department's list of associated slides.
+		Remove a slide from the department.
 
-		:param slide_id: The ObjectId of the slide to be disassociated from the department.
+		:param slide: The Slide name to disassociate from the department.
 		"""
-		if slide_id in self.slides:
-			self.slides.remove(slide_id)
+		self.slides.remove(slide_name)
+
+	def add_device(self, device_name):
+		"""
+		Add a device to the department.
+
+		:param device: The Device name to associate with the department.
+		"""
+		self.devices.append(device_name)
+
+	def remove_device(self, device_name):
+		"""
+		Remove a device from the department.
+
+		:param device: The Device name to disassociate from the department.
+		"""
+		self.devices.remove(device_name)
 
 	@classmethod
 	def from_dict(cls, department_dict):
@@ -36,9 +55,12 @@ class Department:
 		:param department_dict: A dictionary containing department data.
 		:return: An instance of the Department class.
 		"""
-		department = cls(department_dict['name'])
+		department = cls(
+			name=department_dict['name']
+		)
 		department._id = department_dict.get('_id')  # Optional ObjectId
 		department.slides = department_dict.get('slides', [])
+		department.devices = department_dict.get('devices', [])
 		return department
 
 	def to_dict(self):
@@ -49,28 +71,13 @@ class Department:
 		"""
 		department_dict = {
 			'name': self.name,
-			'slides': self.slides
+			'slides': self.slides,  # Include associated slide ObjectIds
+			'devices': self.devices  # Include associated device ObjectIds
 		}
-		if self._id:
-			department_dict['_id'] = self._id
 		return department_dict
 
 	@staticmethod
-	def find_by_id(department_id, mongo):
-		"""
-		Finds a department by its unique department ID (ObjectId) in the database.
-
-		:param department_id: The unique identifier of the department.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Department class or None if not found.
-		"""
-		department_data = mongo.db.departments.find_one({'_id': ObjectId(department_id)})
-		if department_data:
-			return Department.from_dict(department_data)
-		return None
-
-	@staticmethod
-	def find_by_name(department_name, mongo):
+	def find_by_name(department_name: str, database_client: DatabaseClient):
 		"""
 		Finds a department by its name in the database.
 
@@ -78,12 +85,9 @@ class Department:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Department class or None if not found.
 		"""
-		department_data = mongo.db.departments.find_one({'name': department_name})
-		if department_data:
-			return Department.from_dict(department_data)
-		return None
+		return database_client.get_one('departments', 'name', department_name)
 
-	def save(self, mongo):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the department instance to the database.
 
@@ -93,11 +97,18 @@ class Department:
 		department_data = self.to_dict()
 		if self._id:
 			# Update the existing department document
-			mongo.db.departments.update_one({'_id': self._id}, {'$set': department_data})
-			return self._id
+			return database_client.update_entry('departments', 'name', self.name, department_data)
 		else:
 			# Insert a new department document
-			result = mongo.db.departments.insert_one(department_data)
-			self._id = result.inserted_id
-			return str(result.inserted_id)
+			return database_client.insert_entry('departments', department_data)
 
+	@staticmethod
+	def getAll(database_client: DatabaseClient):
+		"""
+		Get all the slides in the db
+		"""
+		print("CHECK 2")
+		return database_client.get_table('departments')
+	
+	def delete_me(self, database_client: DatabaseClient):
+		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER

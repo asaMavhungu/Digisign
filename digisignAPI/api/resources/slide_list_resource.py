@@ -3,7 +3,10 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Slide import Slide
 from api.models.Department import Department
-from api.models.Device import Device
+from api.models.SlideFactory import SlideFactory
+import json
+
+from database.DatabaseClient import DatabaseClient
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
@@ -11,7 +14,8 @@ slide_parser.add_argument('title', type=str, required=True, help='Title of the s
 slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
 slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
-slide_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
+slide_parser.add_argument('image_url', type=str, required=False, help='URL of image slide')
+slide_parser.add_argument('video_url', type=str, required=False, help='URL of video slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 # Define the fields for marshaling slide data in responses
@@ -21,7 +25,6 @@ slide_fields = {
 	'content': fields.String,
 	'content_type': fields.String,
 	'author_id': fields.String,
-	'devices': fields.List(fields.String),
 	'departments': fields.List(fields.String),
 }
 
@@ -29,8 +32,8 @@ class SlideList(Resource):
 	"""
 	Resource class for managing collections of slides.
 	"""
-	def __init__(self, mongo):
-		self.mongo = mongo
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
 
 	@marshal_with(slide_fields)
 	def get(self):
@@ -39,9 +42,13 @@ class SlideList(Resource):
 		Returns:
 			List[Slide]: A list of all slides.
 		"""
-		slides_data = self.mongo.db.slides.find()
-		slides = [Slide.from_dict(slide_data) for slide_data in slides_data]
-		return slides, 200
+		slides_data = Slide.getAll(self.db_client)
+		if slides_data is not None:
+			slides = [SlideFactory.slide_from_dict(slide_data) for slide_data in slides_data]
+			return slides, 200
+		else:
+			return {"message": "Departments not found"}, 404		
+		
 
 	def post(self):
 		"""
@@ -52,33 +59,34 @@ class SlideList(Resource):
 		content = args['content']
 		content_type = args['content_type']
 		author_id = args['author_id']
-		devices = args.get('devices', [])
+		image_url = args['image_url']
+		video_url = args['video_url']
 		departments = args.get('departments', [])
 
-		if Slide.find_by_title(title, self.mongo):
+		if Slide.find_by_title(title, self.db_client):
 			return {"message": f"Slide titled [{title}] already exists"}, 400
 
-		slide = Slide(title, content, content_type, author_id)
+		slide = SlideFactory.create_slide(title, content, content_type, author_id, image_url, video_url)
 
-		for device in devices:
-			device = Device.find_by_name(device, self.mongo)
+		if slide:
+			pass
 
-			if device:
-				slide.add_device(device.name)
-			else:
-				return {"message": f"Device [{device}] not found"}, 404
+			for department_name in departments:
+				department_data = Department.find_by_name(department_name, self.db_client)
 
-		for department_name in departments:
-			department = Department.find_by_name(department_name, self.mongo)
+				if department_data:
+					department = Department.from_dict(department_data)
+					slide.add_department(department.name)
+					department.add_slide(slide.title)
+					department.save(self.db_client)
+				else:
+					return {"message": f"Department [{department_name}] not found"}, 404
 
-			if department:
-				slide.add_department(department.name)
-			else:
-				return {"message": f"Department [{department_name}] not found"}, 404
+			slide_id = slide.save(self.db_client)
 
-		slide_id = slide.save(self.mongo)
-
-		return {'message': 'Slide created', 'slide_id': slide_id}, 201
+			return {'message': 'Slide created', 'slide_id': slide_id}, 201
+		
+		return {'message': 'Slide NOT created'}, 400
 	
 	def delete(self):
 		"""
@@ -97,9 +105,10 @@ class SlideList(Resource):
 
 		deleted_count = 0
 		for slide_title in slide_titles:
-			slide = Slide.find_by_title(slide_title, self.mongo)
+			slide_dict = Slide.find_by_title(slide_title, self.db_client)
+			slide = SlideFactory.slide_from_dict(slide_dict)
 			if slide:
-				self.mongo.db.slides.delete_one({'_id': slide._id})
+				slide.delete_me(self.db_client)
 				deleted_count += 1
 
 		return {"message": f"{deleted_count} slides deleted"}, 200
