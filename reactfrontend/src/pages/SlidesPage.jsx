@@ -16,7 +16,7 @@ function SlidesPage() {
 
   return (
     <div className="SlidesPage">
-      <SplideCarousel items={items} />
+      <Carousel items={items} />
     </div>
   );
 }
