@@ -15,6 +15,7 @@ from flask_bcrypt import Bcrypt
 from api.models.User import User  # Import your User class
 from datetime import timedelta  # Import timedelta from datetime
 bcrypt = Bcrypt()
+from tinydb import TinyDB
 
 
 from pymongo.mongo_client import MongoClient
@@ -30,11 +31,16 @@ from database.DatabaseClient import DatabaseClient
 
 	# Add more methods for other database operations
 
-def createDatabase(module_name):
+def createDatabase(module_name: str, databaseOption: str):
 
 	app = Flask(module_name)
+	
+	if databaseOption == 'mongoDB':
+		app, db_client = createMongoDatabase(app)
+	else:
+		app, db_client = createTinyDatabase(app)
 
-	return createMongoDatabase(app)
+	return app, db_client
 
 def createMongoDatabase(app: Flask):
 	# Connect to MongoDB Atlas cluster
@@ -51,7 +57,13 @@ def createMongoDatabase(app: Flask):
 	"""
 
 	# TODO use the mongo client class to encapsulate database interactions
-	db_client = DatabaseClient(mongo)
+	db_client = DatabaseClient(mongo, 'mongoDB')
+	return app, db_client
+
+def createTinyDatabase(app: Flask):
+	tiny = TinyDB('db.json')
+	db_client = DatabaseClient(tiny, 'tinyDB')
+
 	return app, db_client
 
 def createDatabaseSQL():

@@ -1,9 +1,9 @@
 from api import createApi
 
 
-def createApp():
+def createApp(databaseOption):
 
-	app, _ = createApi(__name__)
+	app, _ = createApi(__name__, databaseOption)
 
 	app.static_folder = 'assets'
 
