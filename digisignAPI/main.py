@@ -1,6 +1,7 @@
-from client import createApp
+from client import createClient
 from database import createMongoDatabase
 from api import createApi
+from database import createDatabase
 
 import argparse
 
@@ -37,7 +38,13 @@ if __name__ == "__main__":
 	else:
 		print("No database type specified. Usind default of tinyDB")
 
-	app = createApp(database)
+	#app = createApp(database)
+
+	app, db_client = createDatabase(__name__, database)
+
+	app, db_client = createApi(app, db_client)
+
+	app = createClient(app)
 
 	#print(json.dumps(data, indent=4))
 

@@ -1,9 +1,6 @@
-from api import createApi
+from flask import Flask
 
-
-def createApp(databaseOption):
-
-	app, _ = createApi(__name__, databaseOption)
+def createClient(app: Flask):
 
 	app.static_folder = 'assets'
 

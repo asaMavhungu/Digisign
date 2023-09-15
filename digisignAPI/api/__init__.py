@@ -29,9 +29,9 @@ from database import DatabaseClient
 # TODO: check if all endpoint work as expected
 # TODO: Redo the api spec
 
-def createApi(module_name, databaseOption):
+def createApi(app: Flask, db_client: DatabaseClient):
 
-	app, db_client  = createDatabase(module_name, databaseOption)
+	#app, db_client  = createDatabase(module_name, databaseOption)
 
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)

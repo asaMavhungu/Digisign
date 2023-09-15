@@ -12,7 +12,6 @@ from flask import request
 from flask_restful import Resource, reqparse
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-from api.models.User import User  # Import your User class
 from datetime import timedelta  # Import timedelta from datetime
 bcrypt = Bcrypt()
 from tinydb import TinyDB
