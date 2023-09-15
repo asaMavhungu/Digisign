@@ -4,12 +4,12 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET'])
 def home():
-	return send_file("html/asa.html")
+	return send_file("client/html/asa.html")
 
 @views.route('/devices', methods=['GET'])
 def devices():
-	return send_file("html/ten.html")
+	return send_file("client/html/ten.html")
 
 @views.route('/test', methods=['GET'])
 def test():
-	return send_file("html/carousel.html")
+	return send_file("client/html/carousel.html")
