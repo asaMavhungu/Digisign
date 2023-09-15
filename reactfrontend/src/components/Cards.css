@@ -1,0 +1,33 @@
+.card-container {
+    width: 15rem;
+    border: 1rem;
+    border-radius: 1rem 1rem 1rem 1rem;
+    /*box-shadow: 0px 10px 8px #999;*/
+    display: flex;
+    flex-direction: column;
+    margin: 5rem;
+    background-color: rgba(246, 250, 253, 0.822);
+    height: fit-content;
+    width: fit-content;
+}
+
+.card-img {
+    width: 100%;
+    border-radius: 1rem 1rem 0 0;
+}
+
+.card-title {
+    text-align: center;
+    margin: 0.5rem 5%;
+}
+
+.card-btn{
+    text-align: center;
+    width: 90%;
+    border-radius: 5px;
+    padding: 0.5rem, 1rem;
+    background-color: #2563eb;
+    color: white;
+    text-decoration: none;
+    margin: 0.5rem auto;
+}

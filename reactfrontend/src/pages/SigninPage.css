@@ -1,0 +1,8 @@
+.SigninPage{
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: rgba(13, 104, 104, 0.685);
+}

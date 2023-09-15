@@ -1,0 +1,9 @@
+.App{
+  display: flex;
+  /*flex-direction: column;*/
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-image: url(https://www.news.uct.ac.za/images/userfiles/images/publications/campuslife/2023/01-01_About-UCT-and-CPT_00.jpg);
+  background-size: cover;
+}
