@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import './Carousel.css'; // Import the CSS file
+import ReactPlayer from 'react-player';
 
 function Carousel({ items }) {
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -67,7 +68,11 @@ function Carousel({ items }) {
           <div key={index} className="carousel-item">
             {item.type === 'image' && <img src={item.src} alt="Carousel Image" className="carousel-image" />}
             {item.type === 'video' && (
-              <video src={item.src} controls className="carousel-video"></video>
+              //<video src={item.src} controls className="carousel-video"></video>
+              <ReactPlayer 
+              url={item.src}
+              width='100%'
+              height='100%'/>
             )}
           </div>
         ))}
