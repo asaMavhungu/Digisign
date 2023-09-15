@@ -11,7 +11,17 @@ function SwiperCarousel({items}) {
                 // default delay
                 "delay":4000
             }}>
-
+            <SwiperSlide>
+                {items.map(item,index)=>{
+                    <div key={index} className="carousel-item">
+                        {item.type === 'image' && <img src={item.src} alt="Carousel Image" className="carousel-image" />}
+                        {item.type === 'video' && 
+                            <ReactPlayer>
+                                
+                            </ReactPlayer>}
+                    </div>
+                }}
+            </SwiperSlide>
         </Swiper>
     )
 }
