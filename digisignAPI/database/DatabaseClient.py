@@ -2,16 +2,21 @@ from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 from pymongo import MongoClient
 from database.mongoDatabase import MongoDatabase
+from tinydb import TinyDB
+from database.tinyDatabase import TinyDatabase
 
 class DatabaseClient():
 
-	def __init__(self, conn: PyMongo, database_option: str = 'mongo'):
+	def __init__(self, conn: PyMongo | TinyDB, database_option: str = 'mongo'):
 		self.connection = conn
-		
+		self.database = MongoDatabase()
+
 		if database_option == 'mongo':
 			self.database = MongoDatabase()
 		
-		self.database = MongoDatabase()
+		elif database_option == 'tinyDB':
+			self.database = TinyDatabase()
+		
 		pass
 
 	def get_table(self, table_name: str):

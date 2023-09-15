@@ -21,7 +21,7 @@ from pymongo.server_api import ServerApi
 
 from pymongo import MongoClient
 
-from database import createMongoDatabase
+from database import createDatabase
 
 from database import DatabaseClient
 
@@ -29,12 +29,10 @@ from database import DatabaseClient
 # TODO: check if all endpoint work as expected
 # TODO: Redo the api spec
 
-def createApi(module_name):
+def createApi(app: Flask, db_client: DatabaseClient):
 
-	a, m  = createMongoDatabase(module_name)
+	#app, db_client  = createDatabase(module_name, databaseOption)
 
-	app : Flask = a
-	db_client:DatabaseClient = m
 	# Initialize JWTManager with your Flask app
 	jwt = JWTManager(app)
 
