@@ -1,9 +1,8 @@
 openapi: 3.0.0
 info:
   title: DigiSign API
+  description: API endpoint for digital signage
   version: 1.0.0
-  description: API endpoints for managing departments, devices, and slides
-
 servers:
   - url: http://localhost:5000  # Update with your API's base URL
 
@@ -166,7 +165,7 @@ paths:
 
   /api/slides:
     get:
-      summary: Get a list of all slides.
+      summary: Get a list of all slides
       responses:
         '200':
           description: A list of all slides
@@ -179,7 +178,7 @@ paths:
         '404':
           description: Slides not found
     post:
-      summary: Create a new slide.
+      summary: Create a new slide
       requestBody:
         required: true
         content:
@@ -194,7 +193,77 @@ paths:
               schema:
                 $ref: '#/components/schemas/Slide'
         '400':
-          description: Slide not created
+          description: Slide NOT created
+
+  /api/slides/{slide_title}:
+    get:
+      summary: Get details of a specific slide by title
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Slide details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slide'
+        '404':
+          description: Slide not found
+    patch:
+      summary: Update a specific slide by title (partial update)
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlideInput'
+      responses:
+        '200':
+          description: Slide updated
+        '400':
+          description: Slide not found or invalid data
+    put:
+      summary: Update a specific slide by title (full update)
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlideInput'
+      responses:
+        '200':
+          description: Slide updated
+        '400':
+          description: Slide not found or invalid data
+    delete:
+      summary: Delete a slide by title
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Slide deleted
+        '404':
+          description: Slide not found
 
 components:
   schemas:
@@ -214,7 +283,6 @@ components:
           items:
             type: string
           description: Devices associated with the department
-
     Device:
       type: object
       properties:
@@ -229,7 +297,6 @@ components:
           items:
             type: string
           description: Slides associated with the device
-
     Slide:
       type: object
       properties:
@@ -237,40 +304,39 @@ components:
           type: string
         title:
           type: string
-          required: true
+          required: true  # Marked as required
         content:
           type: string
-          required: true
+          required: true  # Marked as required
         content_type:
           type: string
-          required: true
+          required: true  # Marked as required
         image_url:
           type: string
         video_url:
           type: string
         author_id:
           type: string
-          required: true
+          required: true  # Marked as required
         departments:
           type: array
           items:
             type: string
-
     SlideInput:
       type: object
       properties:
         title:
           type: string
-          required: true
+          required: true  # Marked as required
         content:
           type: string
-          required: true
+          required: true  # Marked as required
         content_type:
           type: string
-          required: true
+          required: true  # Marked as required
         author_id:
           type: string
-          required: true
+          required: true  # Marked as required
         image_url:
           type: string
         video_url:
