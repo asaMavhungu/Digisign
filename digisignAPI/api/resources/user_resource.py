@@ -1,122 +1,159 @@
+from flask import request, jsonify, current_app
+from flask_restful import Resource, reqparse
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 from flask import request
-from flask_restful import Resource, reqparse
-from flask_bcrypt import Bcrypt
-from api.models.User import User
-from flask import current_app as app
+from flask_restful import Resource, reqparse, marshal_with, fields
+from bson.objectid import ObjectId
+from api.models.Slide import Slide
+from api.models.SlideFactory import SlideFactory
+from api.models.Department import Department
+from api.models.SlideFactory import SlideFactory
+from api.models.Device import Device
+from database.DatabaseClient import DatabaseClient
 
-bcrypt = Bcrypt()
+import hashlib
 
+def hash_password(password):
+	"""
+	Hashes a password using SHA-256.
+
+	:param password: The password to hash.
+	:return: The hashed password.
+	"""
+	salt = b'some_salt_value'  # Replace with your actual salt value
+	password_bytes = password.encode('utf-8')
+	hashed_password = hashlib.pbkdf2_hmac('sha256', password_bytes, salt, 100000)
+	return hashed_password.hex()
+
+
+# Your User model or authentication logic (replace with your actual implementation)
+from api.models.User import User  # Import your User model
+
+# Request parser for user registration and update
 user_parser = reqparse.RequestParser()
-user_parser.add_argument("email", type=str, help="Email address")
-user_parser.add_argument("password", type=str, help="Password")
+user_parser.add_argument('username', type=str, required=True, help='Username')
+user_parser.add_argument('password', type=str, required=True, help='Password')
+user_parser.add_argument('email', type=str, required=True, help='Email')
+user_parser.add_argument('verified', type=bool, required=False, default=False, help='User verification status')
 
 class UserResource(Resource):
-	def __init__(self, mongo):
-		self.mongo = mongo
-
-	def get(self, username):
-		"""
-		Endpoint for retrieving user information by username.
-
-		:param username: The username of the user.
-		:return: JSON response with user information or a "User not found" message.
-		"""
-		user = User.find_by_username(username, self.mongo)
-		if user:
-			return user.to_dict()
-		return {"message": "User not found"}, 404
-
-	def post(self):
-		"""
-		User login endpoint.
-
-		:return: JSON response with a JWT access token if login is successful or an error message.
-		"""
-		args = user_parser.parse_args()
-		username = args["username"]
-		password = args["password"]
-
-		# Find the user by username
-		user = User.find_by_username(username, self.mongo)
-
-		if user:
-			# Verify the password
-			if user.verify_password(password):
-				# Create a JWT token
-				access_token = create_access_token(identity=username)
-
-				return {"message": "Login successful", "access_token": access_token}, 200
-			else:
-				return {"message": "Invalid password"}, 401
-		else:
-			return {"message": "User not found"}, 404
-
-	@jwt_required()  # Requires authentication
-	def patch(self, username):
-		"""
-		Partially update user information.
-
-		:param username: The username of the user to update.
-		:return: JSON response with the updated user information or an error message.
-		"""
-		current_username = get_jwt_identity()
-		if current_username != username:
-			return {"message": "You can only update your own user information"}, 403
-
-		args = user_parser.parse_args()
-		email = args.get("email")
-		password = args.get("password")
-
-		user = User.find_by_username(username, self.mongo)
-		if not user:
-			return {"message": "User not found"}, 404
-
-		if email:
-			user.email = email
-		if password:
-			# Hash and update the password
-			user.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
-
-		# Save the updated user
-		user.save(self.mongo)
-
-		return {"message": "User information updated successfully", **user.to_dict()}, 200
-
-	@jwt_required()  # Requires authentication
-	def put(self, username):
-		"""
-		Fully update user information.
-
-		:param username: The username of the user to update.
-		:return: JSON response with the updated user information or an error message.
-		"""
-		current_username = get_jwt_identity()
-		if current_username != username:
-			return {"message": "You can only update your own user information"}, 403
-
-		args = user_parser.parse_args()
-		email = args.get("email")
-		password = args.get("password")
-
-		user = User.find_by_username(username, self.mongo)
-		if not user:
-			return {"message": "User not found"}, 404
-
-		user.email = email
-		if password:
-			# Hash and update the password
-			user.password_hash = bcrypt.generate_password_hash(password).decode("utf-8")
-
-		# Save the updated user
-		user.save(self.mongo)
-
-		return {"message": "User information updated successfully", **user.to_dict()}, 200
-
-# Example protected resource that requires a valid JWT token
-class ProtectedResource(Resource):
-	@jwt_required() # so this means that to access this i need an access token?
+	
+	def __init__(self, dbClient: DatabaseClient):
+		self.db_client =  dbClient
+	"""
+	Resource class for user registration, retrieval, update, and deletion.
+	"""
+	@jwt_required()
 	def get(self):
-		# This resource is protected by JWT authentication
-		current_user_id = get_jwt_identity() 
-		return {"message": "This is a protected resource for user ID: " + current_user_id}, 200
+		current_user = get_jwt_identity()
+		user_dict = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		if user_dict:
+			return user_dict, 200
+		return {'message': 'User not found'}, 404
+	
+	def post(self):
+		print("======================POST=======================")
+		args = user_parser.parse_args()
+		username = args['username']
+		password = args['password']
+		email = args['email']
+		verified = args['verified']
+
+		# Check if the user exists
+		existing_user = User.find_by_username(username, self.db_client)  # Replace 'database_client' with your actual database client
+
+		if existing_user:
+			return {'message': 'User with this username already exists'}, 400
+
+		# Hash the password (you should use a password hashing library)
+		# Replace 'hash_password' with your actual password hashing function
+		hashed_password = hash_password(password)
+
+		# Create a new user
+		new_user = User(username, hashed_password, email, verified)
+
+		# Save the user to the database
+		user_id = new_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+
+		return {'message': 'User registered successfully', 'user_id': user_id}, 201
+
+	@jwt_required()
+	def put(self):
+		current_user = get_jwt_identity()
+		args = user_parser.parse_args()
+		new_username = args['username']
+		new_password = args['password']
+		new_email = args['email']
+		verified = args['verified']
+
+		# Check if the new username exists
+		existing_user = User.find_by_username(new_username, self.db_client)  # Replace 'database_client' with your actual database client
+
+		if existing_user:
+			return {'message': 'User with this username already exists'}, 400
+		
+		our_user = User.find_by_username(current_user, self.db_client)
+		this_user = User.from_dict(our_user)
+
+		# Hash the password (you should use a password hashing library)
+		# Replace 'hash_password' with your actual password hashing function
+		new_hashed_password = hash_password(new_password)
+
+		this_user.password = new_hashed_password
+
+		# Create a new user
+		# this_user.username = username
+		this_user.email = new_email
+		this_user.verified = verified
+
+		# Save the user to the database
+		user_id = this_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+
+		return {'message': 'User replaced successfully', 'user_id': user_id}, 201
+
+	@jwt_required()
+	def patch(self):
+		current_user = get_jwt_identity()
+		args = user_parser.parse_args()
+		username = args['username']
+		password = args['password']
+		email = args['email']
+		verified = args['verified']
+
+		# Check if the user exists
+		existing_user = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		this_user = User.from_dict(existing_user)
+
+		if not existing_user:
+			return {'message': 'User not found'}, 404
+
+		# Hash the new password (if provided)
+		if password:
+			hashed_password = hash_password(password)
+			this_user.password = hashed_password
+
+		# if username:
+			# this_user.username = username
+		if email:
+			this_user.email = email
+		if verified:
+			this_user.verified = verified
+
+		# Update the user in the database
+		user_id = this_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+
+		return {'message': 'User updated successfully', 'user_id': user_id}, 200
+
+	@jwt_required()
+	def delete(self):
+		current_user = get_jwt_identity()
+		existing_user = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		this_user = User.from_dict(existing_user)
+
+		if not existing_user:
+			return {'message': 'User not found'}, 404
+
+		this_user.delete(self.db_client)
+		return {'message': 'User deleted successfully'}, 200
+
+

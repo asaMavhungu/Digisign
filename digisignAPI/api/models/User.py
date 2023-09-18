@@ -1,20 +1,23 @@
-from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-from flask_bcrypt import Bcrypt
+from database.DatabaseClient import DatabaseClient
+import hashlib
+
 
 class User:
-	def __init__(self, username, email, password_hash=None):
+	def __init__(self, username: str, password: str, email: str, verified: bool = False):
 		"""
 		Constructor for the User class.
 
 		:param username: The username of the user.
+		:param password: The hashed password of the user.
 		:param email: The email address of the user.
-		:param password_hash: The hashed password of the user (default is None).
+		:param verified: A boolean indicating whether the user is verified.
 		"""
 		self._id = None  # MongoDB ObjectId (optional)
 		self.username = username
+		self.password = password
 		self.email = email
-		self.password_hash = password_hash  # You may want to store hashed passwords
+		self.verified = verified
 
 	@classmethod
 	def from_dict(cls, user_dict):
@@ -25,9 +28,10 @@ class User:
 		:return: An instance of the User class.
 		"""
 		user = cls(
-			username=user_dict.get('username'),
-			email=user_dict.get('email'),
-			password_hash=user_dict.get('password_hash')
+			username=user_dict['username'],
+			password=user_dict['password'],
+			email=user_dict['email'],
+			verified=user_dict.get('verified', False)
 		)
 		user._id = user_dict.get('_id')  # Optional ObjectId
 		return user
@@ -39,61 +43,126 @@ class User:
 		:return: A dictionary representation of the user instance.
 		"""
 		user_dict = {
-			'_id': self._id,
 			'username': self.username,
+			'password': self.password,
 			'email': self.email,
-			'password_hash': self.password_hash
+			'verified': self.verified
 		}
 		return user_dict
 
 	@staticmethod
-	def find_by_username(username, mongo):
+	def find_by_username(username: str, database_client: DatabaseClient) -> (dict | None):
 		"""
 		Finds a user by their username in the database.
 
-		:param username: The username to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A user document from the database with the specified username or None if not found.
+		:param username: The username of the user to search for.
+		:param database_client: An instance of DatabaseClient used for database operations.
+		:return: User dict or None if not found.
 		"""
-		user_data = mongo.db.users.find_one({'username': username})
-		if user_data:
-			return User.from_dict(user_data)
-		return None
+		return database_client.get_one('users', 'username', username) # type: ignore
 
 	@staticmethod
-	def find_by_id(user_id, mongo):
+	def find_by_email(email: str, database_client: DatabaseClient) -> (dict | None):
 		"""
-		Finds a user by their unique user ID (ObjectId) in the database.
+		Finds a user by their email address in the database.
 
-		:param user_id: The unique identifier of the user.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A user document from the database with the specified user ID or None if not found.
+		:param email: The email address of the user to search for.
+		:param database_client: An instance of DatabaseClient used for database operations.
+		:return: User dict or None if not found.
 		"""
-		user_data = mongo.db.users.find_one({'_id': ObjectId(user_id)})
-		if user_data:
-			return User.from_dict(user_data)
-		return None
+		return database_client.get_one('users', 'email', email) # type: ignore
 
-	def verify_password(self, password):
-		"""
-		Verify the user's password.
-
-		:param password: The password to verify.
-		:return: True if the password is correct, False otherwise.
-		"""
-		bcrypt = Bcrypt()
-		if self.password_hash:
-			return bcrypt.check_password_hash(self.password_hash, password)
-		return False
-
-	def save(self, mongo):
+	def save(self, database_client: DatabaseClient):
 		"""
 		Saves the user instance to the database.
 
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: The unique identifier (_id) of the inserted user document.
+		:param database_client: The DatabaseClient instance for database operations.
+		:return: The unique identifier (_id) of the inserted or updated user document.
 		"""
 		user_data = self.to_dict()
-		result = mongo.db.users.insert_one(user_data)
-		self._id = result.inserted_id  # Set the _id attribute to the inserted ObjectId
-		return str(self._id)
+		if self._id:
+			return database_client.update_entry('users', 'username', self.username, user_data)
+		else:
+			return database_client.insert_entry('users', user_data)
+
+	@staticmethod
+	def get_all(database_client: DatabaseClient):
+		"""
+		Get all users from the database.
+
+		:param database_client: The DatabaseClient instance for database operations.
+		:return: List of user dictionaries.
+		"""
+		return database_client.get_table('users')
+
+	def delete(self, database_client: DatabaseClient):
+		"""
+		Deletes the user from the database.
+
+		:param database_client: The DatabaseClient instance for database operations.
+		:return: True if the user is deleted, False otherwise.
+		"""
+		if self._id:
+			return database_client.delete_entry('users', 'username', self.username)
+		return False
+	
+	@staticmethod
+	def verify_credentials(username: str, password: str, database_client: DatabaseClient):
+		"""
+		Verifies user credentials against the database.
+
+		:param username: The username of the user.
+		:param password: The password provided by the user (not hashed).
+		:param database_client: An instance of DatabaseClient used for database operations.
+		:return: User dict if credentials are valid, None otherwise.
+		"""
+		user_dict = database_client.get_one('users', 'username', username)  # Fetch user by username
+
+		if user_dict and User.check_password(password, user_dict['password']):# type: ignore
+			return user_dict  # Return user data if credentials are valid 
+
+		return None  # Return None if credentials are invalid
+
+	@staticmethod
+	def check_password(input_password: str, hashed_password: str) -> bool:
+		"""
+		Checks if the input password matches the hashed password.
+
+		:param input_password: The input password provided by the user (not hashed).
+		:param hashed_password: The hashed password stored in the database.
+		:return: True if passwords match, False otherwise.
+		"""
+		# Hash the input password and compare it to the stored hashed password
+		return User.hash_password(input_password) == hashed_password
+
+	@staticmethod
+	def hash_password(password: str) -> str:
+		"""
+		Hashes a password using SHA-256.
+
+		:param password: The password to hash.
+		:return: The hashed password.
+		"""
+		salt = b'some_salt_value'  # Replace with your actual salt value
+		password_bytes = password.encode('utf-8')
+		hashed_password = hashlib.pbkdf2_hmac('sha256', password_bytes, salt, 100000)
+		return hashed_password.hex()
+	
+	@staticmethod
+	def get_user_identity(username: str, password: str, database_client: DatabaseClient):
+		"""
+		Get the user's identity (e.g., username) based on credentials.
+
+		:param username: The username provided by the user.
+		:param password: The password provided by the user (not hashed).
+		:param database_client: An instance of DatabaseClient used for database operations.
+		:return: User identity (e.g., username) if credentials are valid, None otherwise.
+		"""
+		user_dict = database_client.get_one('users', 'username', username)
+
+		if user_dict and User.check_password(password, user_dict['password']): # type: ignore
+			return username
+
+		return None
+
+

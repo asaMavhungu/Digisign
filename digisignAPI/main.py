@@ -12,8 +12,8 @@ if __name__ == "__main__":
 
 	import json
 
-	with open('db.json', 'r') as file:
-		data = json.load(file)
+	#with open('db.json', 'r') as file:
+		#data = json.load(file)
 
 	#app, DB_CLIENT = createApi(__name__)
 

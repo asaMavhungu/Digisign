@@ -52,6 +52,16 @@ def createApi(app: Flask, db_client: DatabaseClient):
 	api.add_resource(UserListResource, '/api/users', resource_class_args=(mongo_client,))
 	"""
 
+
+	# Register UserResource with endpoint /api/users
+	from .resources.user_resource import UserResource
+	api.add_resource(UserResource, '/api/users', resource_class_args=(db_client,))
+
+	# Register UserResource with login
+	from .resources.user_login_resource import UserLoginResource
+	api.add_resource(UserLoginResource, '/api/login', resource_class_args=(db_client,))
+
+
 	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
 	api.add_resource(SlideResource, '/api/slides/<string:slide_title>', resource_class_args=(db_client,))
