@@ -17,7 +17,11 @@ export const Cards = ({
         style={{width: "300px", height: "auto"}}
         />}
         {title && <h1 className='card-title'>{title}</h1>}
-        {buttonText && link && (<Link to = {link} className='card-btn'>{buttonText}</Link>)}
+        {buttonText && link && (
+        <a href={link} className='card-btn'>
+          {buttonText}
+        </a>
+      )}
     </div>
   )
 }
