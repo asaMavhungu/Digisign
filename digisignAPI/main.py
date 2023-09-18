@@ -2,6 +2,7 @@ from client import createClient
 from database import createMongoDatabase
 from api import createApi
 from database import createDatabase
+from flask import Flask
 
 import argparse
 
@@ -40,7 +41,9 @@ if __name__ == "__main__":
 
 	#app = createApp(database)
 
-	app, db_client = createDatabase(__name__, database)
+	app = Flask(__name__)
+
+	app, db_client = createDatabase(app, database)
 
 	app, db_client = createApi(app, db_client)
 
