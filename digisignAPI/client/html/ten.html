@@ -4,9 +4,9 @@
 	<title>Sample Page</title>
 </head>
 <body>
-	<button id="getDataButton">Get Data from API</button>
-	<div id="responseData"></div>
-
+	<button id="getDataButton" type="button">Get Devices Data</button>
+	<ul id="responseDataList"></ul>
+	
 	<script>
 		// Event listener for the button click
 		document.getElementById('getDataButton').addEventListener('click', function() {
@@ -14,13 +14,21 @@
 			fetch('/api/devices')  // Replace with the actual endpoint
 				.then(response => response.json())
 				.then(data => {
-					// Process the response data
-					document.getElementById('responseData').textContent = JSON.stringify(data);
+					// Process the response data and display it as list items
+					const responseDataList = document.getElementById('responseDataList');
+					responseDataList.innerHTML = ''; // Clear any previous content
+	
+					data.forEach(item => {
+						const listItem = document.createElement('li');
+						listItem.textContent = `Name: ${item.name}, Description: ${item.description}`;
+						responseDataList.appendChild(listItem);
+					});
 				})
 				.catch(error => {
 					console.error('Error:', error);
 				});
 		});
 	</script>
+	
 </body>
 </html>
