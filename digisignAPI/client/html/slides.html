@@ -23,6 +23,22 @@
 			  max-width: 100%;
 			}
 		  }
+
+		/* Custom CSS to make the iframe fill the screen */
+		.embed-responsive {
+			position: relative;
+			width: 100%;
+			padding-bottom: 56.25%; /* 16:9 aspect ratio (change as needed) */
+		}
+
+		.embed-responsive iframe {
+			position: absolute;
+			width: 100%;
+			height: 100%;
+			left: 0;
+			top: 0;
+		}
+
 	</style>
 
 
@@ -62,28 +78,44 @@
 		}
 	
 		// Function to create carousel items
-		function createCarouselItems(slides) {
-			const carouselInner = document.getElementById('carouselInner');
-	
-			slides.forEach((slide, index) => {
-				const carouselItem = document.createElement('div');
-				carouselItem.classList.add('carousel-item');
-				if (index === 0) {
-					carouselItem.classList.add('active');
-				}
-	
-				const slideContent = `
-					<img src="${slide.image_url}" class="d-block w-100" alt="...">
-					<div class="carousel-caption d-none d-md-block">
-						<h5>${slide.title}</h5>
-						<p>${slide.description}</p>
-					</div>
-				`;
-	
-				carouselItem.innerHTML = slideContent;
-				carouselInner.appendChild(carouselItem);
-			});
-		}
+function createCarouselItems(slides) {
+    const carouselInner = document.getElementById('carouselInner');
+
+    slides.forEach((slide, index) => {
+        const carouselItem = document.createElement('div');
+        carouselItem.classList.add('carousel-item');
+        if (index === 0) {
+            carouselItem.classList.add('active');
+        }
+
+        let slideContent;
+
+        if (index === slides.length - 1) {
+            // For the last item, include a video instead of an image
+            slideContent = `
+                <div class="embed-responsive embed-responsive-16by9">
+                    <iframe class="embed-responsive-item" src="https://www.youtube.com/embed/iggBne5kuvU" allowfullscreen></iframe>
+                </div>
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>${slide.title}</h5>
+                    <p>${slide.description}</p>
+                </div>
+            `;
+        } else {
+            // For other items, include an image
+            slideContent = `
+                <img src="${slide.image_url}" class="d-block w-100" alt="...">
+                <div class="carousel-caption d-none d-md-block">
+                    <h5>${slide.title}</h5>
+                    <p>${slide.description}</p>
+                </div>
+            `;
+        }
+
+        carouselItem.innerHTML = slideContent;
+        carouselInner.appendChild(carouselItem);
+    });
+}
 	
 		// Fetch data from the API and populate the carousel
 		fetch('/api/slides') 
