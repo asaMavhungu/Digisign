@@ -4,7 +4,8 @@ views = Blueprint('views', __name__)
 
 @views.route('/', methods=['GET'])
 def home():
-	return send_file("client/html/asa.html")
+	return send_file("client/ApiSpecs/redoc-static.html")
+
 
 @views.route('/devices', methods=['GET'])
 def devices():
