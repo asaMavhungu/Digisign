@@ -7,6 +7,13 @@
     <h1>Devices Data</h1>
     <ul id="responseDataList"></ul>
 
+    <h2>User Information</h2>
+    <div id="userInfo">
+        <p>Username: <span id="username"></span></p>
+        <p>Email: <span id="email"></span></p>
+        <!-- Add more user-related information here as needed -->
+    </div>
+
     <div id="errorMessage" style="color: red;"></div>
 
     <script>
@@ -18,7 +25,7 @@
         }
 
         document.addEventListener('DOMContentLoaded', function () {
-            // Send authorized GET request to the protected API endpoint
+            // Send authorized GET request to the protected API endpoint /api/devices
             fetch('/api/devices', {
                 headers: {
                     'Authorization': `Bearer ${accessToken}`,
@@ -47,6 +54,31 @@
             })
             .catch(error => {
                 console.error('Error:', error);
+            });
+
+            // Send a GET request to fetch user information from /api/users
+            fetch('/api/users', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            })
+            .then(response => response.json())
+            .then(userData => {
+                // Update user information in the HTML
+                const userInfo = document.getElementById('userInfo');
+                const usernameElement = document.getElementById('username');
+                const emailElement = document.getElementById('email');
+
+                if (userData) {
+                    usernameElement.textContent = userData.username;
+                    emailElement.textContent = userData.email;
+                } else {
+                    // Handle the case where user data is not available (e.g., user is not logged in)
+                    userInfo.style.display = 'none'; // Hide user information if not available
+                }
+            })
+            .catch(error => {
+                console.error('Error fetching user data:', error);
             });
         });
     </script>

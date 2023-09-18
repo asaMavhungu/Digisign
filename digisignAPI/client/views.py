@@ -11,10 +11,14 @@ def home():
 def devices():
 	return send_file("client/html/ten.html")
 
-@views.route('/test', methods=['GET'])
+@views.route('/signup', methods=['GET'])
 def test():
-	return send_file("client/html/carousel.html")
+	return send_file("client/html/signup.html")
 
 @views.route('/slides', methods=['GET'])
 def slides():
 	return send_file("client/html/slides.html")
+
+@views.route('/login', methods=['GET'])
+def login():
+	return send_file("client/html/login.html")

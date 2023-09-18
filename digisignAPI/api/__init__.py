@@ -37,7 +37,7 @@ def createApi(app: Flask, db_client: DatabaseClient):
 	jwt = JWTManager(app)
 
 	app.config['JWT_SECRET_KEY'] = 'your_secret_key_here'  # Replace with your secret key
-	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(hours=1)  # Set token expiration time
+	app.config['JWT_ACCESS_TOKEN_EXPIRES'] = timedelta(minutes=15)  # Set token expiration time
 
 # TODO use mongoClient class to handle database
 	api = Api(app)

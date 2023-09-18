@@ -45,21 +45,22 @@ if __name__ == "__main__":
     api_url = 'http://localhost:5000/api/users'  # Replace with your API endpoint
 
     # Replace 'your_access_token' with the actual access token obtained during login
-    access_token = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJmcmVzaCI6ZmFsc2UsImlhdCI6MTY5NTA3MTk3NSwianRpIjoiNGQ2ODE0ZTEtODFlNi00ODBlLTk1MDQtNmY3NDVhYjA4MjhhIiwidHlwZSI6ImFjY2VzcyIsInN1YiI6Im5ld191c2VyIiwibmJmIjoxNjk1MDcxOTc1LCJleHAiOjE2OTUwNzU1NzV9.AirY_N0iJ6MWHicepRB2Ms8LezfOPe7bnBIy7qy1uMs'
+    access_token = None
     # Test a GET request with the access token
     get_response = test_api('GET', api_url, access_token=access_token)
     print("GET Response:", get_response)
 
     # Test a POST request with data and the access token
     post_data = {
-        'username': 'new_user',
-        'password': 'password123',
-        'email': 'new_user@example.com',
+        'username': 'asa',
+        'password': 'asa',
+        'email': 'asa@example.com',
         'verified': True
     }
+
     post_response = test_api('POST', api_url, data=post_data, access_token=access_token)
     print("POST Response:", post_response)
-
+'''
     # Test a PUT request with data and the access token
     put_data = {
         'username': 'updated_user',
@@ -73,3 +74,4 @@ if __name__ == "__main__":
     # Test a DELETE request with the access token
     #delete_response = test_api('DELETE', api_url, access_token=access_token)
     #print("DELETE Response:", delete_response)
+'''

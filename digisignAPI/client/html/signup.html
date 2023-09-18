@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Sign Up</title>
+</head>
+<body>
+    <h1>Sign Up</h1>
+    <form id="signupForm">
+        <label for="username">Username:</label>
+        <input type="text" id="username" required><br>
+
+        <label for="password">Password:</label>
+        <input type="password" id="password" required><br>
+
+        <label for="email">Email:</label>
+        <input type="email" id="email" required><br>
+
+        <label for="verified">Verified:</label>
+        <input type="checkbox" id="verified"><br>
+
+        <input type="submit" value="Sign Up">
+    </form>
+
+    <!-- Message Div -->
+    <div id="message" style="display: none;"></div>
+
+    <script>
+        // Function to display a message on the page
+        function showMessage(message, success) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = message;
+            messageDiv.style.color = success ? 'green' : 'red';
+            messageDiv.style.display = 'block';
+        }
+
+        // Event listener for the form submission
+        document.getElementById('signupForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // Get form values
+            const username = document.getElementById('username').value;
+            const password = document.getElementById('password').value;
+            const email = document.getElementById('email').value;
+            const verified = document.getElementById('verified').checked;
+
+            // Create JSON data
+            const userData = {
+                username,
+                password,
+                email,
+                verified,
+            };
+
+            // Send a POST request to register the user with JSON data
+            fetch('/api/users', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(userData),
+            })
+            .then(response => response.json())
+            .then(data => {
+                // Check if the registration was successful
+                if (data.message === 'User registered successfully') {
+                    showMessage('User created successfully!', true);
+                } else {
+                    showMessage(data.message+'Username already exists. Please choose another.', false);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showMessage('An error occurred. Please try again later.', false);
+            });
+        });
+    </script>
+</body>
+</html>
