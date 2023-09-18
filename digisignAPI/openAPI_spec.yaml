@@ -1,0 +1,281 @@
+openapi: 3.0.0
+info:
+  title: DigiSign API
+  version: 1.0.0
+  description: API endpoints for managing departments, devices, and slides
+
+servers:
+  - url: http://localhost:5000  # Update with your API's base URL
+
+paths:
+  /api/departments/{department_name}:
+    parameters:
+      - name: department_name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the department.
+    get:
+      summary: Get details of a specific department.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '404':
+          description: Department not found
+    patch:
+      summary: Partially update an existing department.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Department partially updated
+        '404':
+          description: Department not found
+    put:
+      summary: Replace an existing department with new data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Department replaced
+        '404':
+          description: Department not found
+    delete:
+      summary: Delete a department by its name.
+      responses:
+        '200':
+          description: Department deleted
+        '404':
+          description: Department not found
+
+  /api/departments:
+    get:
+      summary: Get a list of all departments.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Department'
+        '404':
+          description: Departments not found
+    post:
+      summary: Create a new department.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Department created
+        '400':
+          description: Bad request
+
+  /api/devices/{device_name}:
+    parameters:
+      - name: device_name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the device.
+    get:
+      summary: Get details of a specific device.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+    patch:
+      summary: Partially update an existing device.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device partially updated
+        '404':
+          description: Device not found
+    put:
+      summary: Replace an existing device with new data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device replaced
+        '404':
+          description: Device not found
+    delete:
+      summary: Delete a device by its name.
+      responses:
+        '200':
+          description: Device deleted
+        '404':
+          description: Device not found
+
+  /api/devices:
+    get:
+      summary: Get a list of all devices.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '404':
+          description: Devices not found
+    post:
+      summary: Create a new device.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '201':
+          description: Device created
+        '400':
+          description: Bad request
+
+  /api/slides:
+    get:
+      summary: Get a list of all slides.
+      responses:
+        '200':
+          description: A list of all slides
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slide'
+        '404':
+          description: Slides not found
+    post:
+      summary: Create a new slide.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SlideInput'
+      responses:
+        '201':
+          description: Slide created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slide'
+        '400':
+          description: Slide not created
+
+components:
+  schemas:
+    Department:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the department
+        slides:
+          type: array
+          items:
+            type: string
+          description: Slides associated with the department
+        devices:
+          type: array
+          items:
+            type: string
+          description: Devices associated with the department
+
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device
+        description:
+          type: string
+          description: Description of the device
+        slides:
+          type: array
+          items:
+            type: string
+          description: Slides associated with the device
+
+    Slide:
+      type: object
+      properties:
+        _id:
+          type: string
+        title:
+          type: string
+          required: true
+        content:
+          type: string
+          required: true
+        content_type:
+          type: string
+          required: true
+        image_url:
+          type: string
+        video_url:
+          type: string
+        author_id:
+          type: string
+          required: true
+        departments:
+          type: array
+          items:
+            type: string
+
+    SlideInput:
+      type: object
+      properties:
+        title:
+          type: string
+          required: true
+        content:
+          type: string
+          required: true
+        content_type:
+          type: string
+          required: true
+        author_id:
+          type: string
+          required: true
+        image_url:
+          type: string
+        video_url:
+          type: string
+        departments:
+          type: array
+          items:
+            type: string
