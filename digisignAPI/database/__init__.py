@@ -30,9 +30,8 @@ from database.DatabaseClient import DatabaseClient
 
 	# Add more methods for other database operations
 
-def createDatabase(module_name: str, databaseOption: str):
+def createDatabase(app: Flask, databaseOption: str):
 
-	app = Flask(module_name)
 	
 	if databaseOption == 'mongoDB':
 		app, db_client = createMongoDatabase(app)
