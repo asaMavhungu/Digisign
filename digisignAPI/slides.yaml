@@ -1,7 +1,7 @@
 openapi: 3.0.0
 info:
   title: Combined User and Slide Management API
-  description: API for managing users, slides, and departments
+  description: API endpoint for slides
   version: 1.0.0
 servers:
   - url: http://localhost:5000  # Update with your API's base URL
@@ -115,16 +115,20 @@ components:
           type: string
         title:
           type: string
+          required: true  # Marked as required
         content:
           type: string
+          required: true  # Marked as required
         content_type:
           type: string
+          required: true  # Marked as required
         image_url:
           type: string
         video_url:
           type: string
         author_id:
           type: string
+          required: true  # Marked as required
         departments:
           type: array
           items:
@@ -134,12 +138,16 @@ components:
       properties:
         title:
           type: string
+          required: true  # Marked as required
         content:
           type: string
+          required: true  # Marked as required
         content_type:
           type: string
+          required: true  # Marked as required
         author_id:
           type: string
+          required: true  # Marked as required
         image_url:
           type: string
         video_url:
