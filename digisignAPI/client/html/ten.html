@@ -1,34 +1,54 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>Sample Page</title>
+    <title>Devices Page</title>
 </head>
 <body>
-	<button id="getDataButton" type="button">Get Devices Data</button>
-	<ul id="responseDataList"></ul>
-	
-	<script>
-		// Event listener for the button click
-		document.getElementById('getDataButton').addEventListener('click', function() {
-			// Send a GET request to your Flask API endpoint
-			fetch('/api/devices')  // Replace with the actual endpoint
-				.then(response => response.json())
-				.then(data => {
-					// Process the response data and display it as list items
-					const responseDataList = document.getElementById('responseDataList');
-					responseDataList.innerHTML = ''; // Clear any previous content
-	
-					data.forEach(item => {
-						const listItem = document.createElement('li');
-						listItem.textContent = `Name: ${item.name}, Description: ${item.description}`;
-						responseDataList.appendChild(listItem);
-					});
-				})
-				.catch(error => {
-					console.error('Error:', error);
-				});
-		});
-	</script>
-	
+    <h1>Devices Data</h1>
+    <ul id="responseDataList"></ul>
+
+    <div id="errorMessage" style="color: red;"></div>
+
+    <script>
+        // JavaScript code to retrieve the JWT token and send authorized requests
+        const accessToken = localStorage.getItem('access_token');
+        if (!accessToken) {
+            // Redirect to the login page if the token is missing
+            window.location.href = '/login'; // Replace with the actual URL
+        }
+
+        document.addEventListener('DOMContentLoaded', function () {
+            // Send authorized GET request to the protected API endpoint
+            fetch('/api/devices', {
+                headers: {
+                    'Authorization': `Bearer ${accessToken}`,
+                },
+            })
+            .then(response => {
+                if (response.status === 401) {
+                    // Token has expired, show an error message to the user
+                    const errorMessage = document.getElementById('errorMessage');
+                    errorMessage.textContent = 'API token has expired. Please log in again.';
+                    return null; // Don't proceed with processing the response
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data) {
+                    const responseDataList = document.getElementById('responseDataList');
+                    responseDataList.innerHTML = '';
+
+                    data.forEach(item => {
+                        const listItem = document.createElement('li');
+                        listItem.textContent = `Name: ${item.name}, Description: ${item.description}`;
+                        responseDataList.appendChild(listItem);
+                    });
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
 </body>
 </html>

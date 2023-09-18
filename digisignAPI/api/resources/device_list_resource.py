@@ -4,6 +4,7 @@ from api.models.Device import Device  # Updated import
 from api.models.Slide import Slide
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
+from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
 from database.DatabaseClient import DatabaseClient
 
@@ -31,6 +32,7 @@ class DeviceListResource(Resource):
 		self.db_client =  dbClient
 
 	@marshal_with(device_fields)
+	@jwt_required()
 	def get(self):
 		"""
 		Get a list of all devices.
