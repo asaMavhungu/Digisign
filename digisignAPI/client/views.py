@@ -13,3 +13,7 @@ def devices():
 @views.route('/test', methods=['GET'])
 def test():
 	return send_file("client/html/carousel.html")
+
+@views.route('/slides', methods=['GET'])
+def slides():
+	return send_file("client/html/slides.html")
