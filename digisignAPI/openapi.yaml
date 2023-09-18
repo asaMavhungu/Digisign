@@ -5,62 +5,21 @@ info:
   version: 1.0.0
 servers:
   - url: http://localhost:5000  # Update with your API's base URL
-    description: Local Development Server
 paths:
-  /user:
-    post:
-      summary: Create a new user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserSignupRequest'
-      responses:
-        '201':
-          description: User created successfully
-        '400':
-          description: Bad request (e.g., username already exists)
-  /user/{username}:
+  /api/slides:
     get:
-      summary: Retrieve user information by username
-      parameters:
-        - name: username
-          in: path
-          required: true
-          description: Username of the user to retrieve
-          schema:
-            type: string
+      summary: Get a list of all slides
       responses:
         '200':
-          description: Successful response
+          description: A list of all slides
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UserResponse'
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slide'
         '404':
-          description: User not found
-  /login: 
-    post:
-      summary: Authenticate and log in a user
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: '#/components/schemas/UserLoginRequest'
-      responses:
-        '200':
-          description: Authentication successful
-          content:
-            application/json:
-              schema:
-                $ref: '#/components/schemas/UserLoginResponse'
-        '401':
-          description: Unauthorized (invalid password)
-        '404':
-          description: User not found
-  /slides:
+          description: Departments not found
     post:
       summary: Create a new slide
       requestBody:
@@ -68,38 +27,40 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SlideRequest'
+              $ref: '#/components/schemas/SlideInput'
       responses:
         '201':
-          description: Slide created successfully
-        '400':
-          description: Bad request (e.g., slide with the same title already exists)
-  /slides/{slide_title}:
-    get:
-      summary: Retrieve slide information by slide title
-      parameters:
-        - name: slide_title
-          in: path
-          required: true
-          description: Title of the slide to retrieve
-          schema:
-            type: string
-      responses:
-        '200':
-          description: Successful response
+          description: Slide created
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/SlideResponse'
+                $ref: '#/components/schemas/Slide'
+        '400':
+          description: Slide NOT created
+  /api/slides/{slide_title}:
+    get:
+      summary: Get details of a specific slide by title
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Slide details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Slide'
         '404':
           description: Slide not found
     patch:
-      summary: Update slide information by slide title
+      summary: Update a specific slide by title (partial update)
       parameters:
-        - name: slide_title
-          in: path
+        - in: path
+          name: slide_title
           required: true
-          description: Title of the slide to update
           schema:
             type: string
       requestBody:
@@ -107,21 +68,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SlidePatchRequest'
+              $ref: '#/components/schemas/SlideInput'
       responses:
         '200':
-          description: Slide updated successfully
+          description: Slide updated
         '400':
-          description: Bad request (e.g., invalid 'departments' format)
-        '404':
-          description: Slide not found
+          description: Slide not found or invalid data
     put:
-      summary: Replace slide information by slide title
+      summary: Update a specific slide by title (full update)
       parameters:
-        - name: slide_title
-          in: path
+        - in: path
+          name: slide_title
           required: true
-          description: Title of the slide to replace
           schema:
             type: string
       requestBody:
@@ -129,61 +87,41 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/SlideRequest'
+              $ref: '#/components/schemas/SlideInput'
       responses:
         '200':
-          description: Slide replaced successfully
+          description: Slide updated
         '400':
-          description: Bad request (e.g., invalid 'departments' format)
+          description: Slide not found or invalid data
+    delete:
+      summary: Delete a slide by title
+      parameters:
+        - in: path
+          name: slide_title
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Slide deleted
         '404':
           description: Slide not found
 components:
   schemas:
-    UserSignupRequest:
+    Slide:
       type: object
       properties:
-        username:
+        _id:
           type: string
-        email:
-          type: string
-          format: email
-        password:
-          type: string
-      required:
-        - username
-        - email
-        - password
-    UserResponse:
-      type: object
-      properties:
-        username:
-          type: string
-        email:
-          type: string
-          format: email
-    UserLoginRequest:
-      type: object
-      properties:
-        username:
-          type: string
-        password:
-          type: string
-      required:
-        - username
-        - password
-    UserLoginResponse:
-      type: object
-      properties:
-        message:
-          type: string
-        access_token:
-          type: string
-    SlideRequest:
-      type: object
-      properties:
         title:
           type: string
         content:
+          type: string
+        content_type:
+          type: string
+        image_url:
+          type: string
+        video_url:
           type: string
         author_id:
           type: string
@@ -191,34 +129,22 @@ components:
           type: array
           items:
             type: string
-      required:
-        - title
-        - content
-        - author_id
-    SlideResponse:
+    SlideInput:
       type: object
       properties:
         title:
           type: string
         content:
           type: string
+        content_type:
+          type: string
         author_id:
+          type: string
+        image_url:
+          type: string
+        video_url:
           type: string
         departments:
           type: array
           items:
             type: string
-    SlidePatchRequest:
-      type: object
-      properties:
-        title:
-          type: string
-        content:
-          type: string
-        author_id:
-          type: string
-        departments:
-          type: array
-          items:
-            type: string
-
