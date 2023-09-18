@@ -96,7 +96,7 @@ class Slide:
 		:param client: An instance of SlideClient used for database operations.
 		:return: slide dict
 		"""
-		return database_client.get_one('slides', 'title', title)
+		return database_client.get_one('slides', 'title', title) # type: ignore
 
 	def save(self, database_client: DatabaseClient):
 		"""
