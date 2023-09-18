@@ -24,6 +24,8 @@ slide_fields = {
 	'title': fields.String,
 	'content': fields.String,
 	'content_type': fields.String,
+	'image_url': fields.String,
+	'video_url': fields.String,
 	'author_id': fields.String,
 	'departments': fields.List(fields.String),
 }
