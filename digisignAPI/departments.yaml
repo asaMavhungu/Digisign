@@ -1,0 +1,103 @@
+openapi: 3.0.0
+info:
+  title: DigiSign API
+  version: 1.0.0
+  description: API endpoint for devices
+
+paths:
+  /api/departments/{department_name}:
+    parameters:
+      - name: department_name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the department.
+    get:
+      summary: Get details of a specific department.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Department'
+        '404':
+          description: Department not found
+    patch:
+      summary: Partially update an existing department.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Department partially updated
+        '404':
+          description: Department not found
+    put:
+      summary: Replace an existing department with new data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '200':
+          description: Department replaced
+        '404':
+          description: Department not found
+    delete:
+      summary: Delete a department by its name.
+      responses:
+        '200':
+          description: Department deleted
+        '404':
+          description: Department not found
+
+  /api/departments:
+    get:
+      summary: Get a list of all departments.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Department'
+        '404':
+          description: Departments not found
+    post:
+      summary: Create a new department.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Department'
+      responses:
+        '201':
+          description: Department created
+        '400':
+          description: Bad request
+
+components:
+  schemas:
+    Department:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the department
+        slides:
+          type: array
+          items:
+            type: string
+          description: Slides associated with the department
+        devices:
+          type: array
+          items:
+            type: string
+          description: Devices associated with the department

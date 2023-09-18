@@ -15,7 +15,7 @@ def postRequest(endpoint, json_data):
 	response = requests.post(base_url + endpoint, data=json.dumps(json_data), headers=headers)
 
 	# Check the response status code
-	if response.status_code == 200:
+	if response.status_code == 201:
 		# If the status code is 200, the request was successful
 		print("Request was successful")
 		# Print the response content as-is
@@ -93,3 +93,4 @@ json_data = {
 postRequest(endpoint, json_data)
 getRequest(endpoint)
 deleteRequest('/api/slides/ASASAS')
+getRequest(endpoint)
