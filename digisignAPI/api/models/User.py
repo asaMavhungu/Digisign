@@ -136,6 +136,8 @@ class User:
 		:param hashed_password: The hashed password stored in the database.
 		:return: True if passwords match, False otherwise.
 		"""
+		# TODO BRING BACK HASHING
+		return input_password == hashed_password
 		# Hash the input password and compare it to the stored hashed password
 		return User.hash_password(input_password) == hashed_password
 

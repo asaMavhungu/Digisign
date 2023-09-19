@@ -68,6 +68,8 @@ class UserResource(Resource):
 		# Hash the password (you should use a password hashing library)
 		# Replace 'hash_password' with your actual password hashing function
 		hashed_password = hash_password(password)
+		#TODO Bring hashing back
+		hashed_password = password
 
 		# Create a new user
 		new_user = User(username, hashed_password, email, verified)
