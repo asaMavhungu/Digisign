@@ -9,16 +9,19 @@
     <script src='main.js'></script>
 </head>
 <body>
-    <div class="weathr-container" style="height: 600px">
-        <a class="weatherwidget-io" href="https://forecast7.com/en/n33d9218d42/cape-town/" data-label_1="CAPE TOWN" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="original" >CAPE TOWN WEATHER</a>
+    <div>
+        <div class="weathr-container" style="">
+            <a class="weatherwidget-io" href="https://forecast7.com/en/n33d9218d42/cape-town/" data-label_1="CAPE TOWN" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="original" >CAPE TOWN WEATHER</a>
+        </div>
+        
+        <!--Weather Script-->
+        <script>
+            !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
+        </script>
+        <div class="newsContainer">
+            <div class='sk-ww-rss-feed' data-embed-id='196641'></div><script src='https://widgets.sociablekit.com/rss-feed/widget.js' async defer></script>
+        </div>
     </div>
     
-    <!--Weather Script-->
-    <script>
-        !function(d,s,id){var js,fjs=d.getElementsByTagName(s)[0];if(!d.getElementById(id)){js=d.createElement(s);js.id=id;js.src='https://weatherwidget.io/js/widget.min.js';fjs.parentNode.insertBefore(js,fjs);}}(document,'script','weatherwidget-io-js');
-    </script>
-    <div class="newsContainer">
-        <div class='sk-ww-rss-feed' data-embed-id='196641'></div><script src='https://widgets.sociablekit.com/rss-feed/widget.js' async defer></script>
-    </div>
 </body>
 </html>
