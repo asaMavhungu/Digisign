@@ -35,7 +35,7 @@ if __name__ == "__main__":
     api_url = 'http://localhost:5000/api/login'  # Replace with your API endpoint
 
     # Test user login with valid credentials
-    login_response = test_user_login(api_url, 'new_user', 'password123')
+    login_response = test_user_login(api_url, 'new_user', 'new_password123')
     print("Login Response:", login_response)
 
     # Test user login with invalid credentials

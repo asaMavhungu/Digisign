@@ -102,14 +102,16 @@ class UserResource(Resource):
 		this_user.password = new_hashed_password
 
 		# Create a new user
-		# this_user.username = username
+		this_user.username = new_username
 		this_user.email = new_email
 		this_user.verified = verified
 
 		# Save the user to the database
 		user_id = this_user.save(self.db_client)  # Replace 'database_client' with your actual database client
 
-		return {'message': 'User replaced successfully', 'user_id': user_id}, 201
+		me = User.find_by_username(new_username, self.db_client)
+
+		return this_user.to_dict(), 201
 
 	@jwt_required()
 	def patch(self):

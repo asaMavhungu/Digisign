@@ -57,6 +57,10 @@ def createApi(app: Flask, db_client: DatabaseClient):
 	from .resources.user_resource import UserResource
 	api.add_resource(UserResource, '/api/users', resource_class_args=(db_client,))
 
+	# Register UserResource with endpoint /api/userslist
+	from .resources.user_list_resource import UserListResource
+	api.add_resource(UserListResource, '/api/userslist', resource_class_args=(db_client,))
+
 	# Register UserResource with login
 	from .resources.user_login_resource import UserLoginResource
 	api.add_resource(UserLoginResource, '/api/login', resource_class_args=(db_client,))

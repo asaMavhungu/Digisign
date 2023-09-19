@@ -43,6 +43,7 @@ class User:
 		:return: A dictionary representation of the user instance.
 		"""
 		user_dict = {
+			'_id': self._id,
 			'username': self.username,
 			'password': self.password,
 			'email': self.email,
@@ -80,8 +81,11 @@ class User:
 		:return: The unique identifier (_id) of the inserted or updated user document.
 		"""
 		user_data = self.to_dict()
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
+		print(user_data)
+		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		if self._id:
-			return database_client.update_entry('users', 'username', self.username, user_data)
+			return database_client.update_entry('users', '_id', self._id, user_data)
 		else:
 			return database_client.insert_entry('users', user_data)
 

@@ -55,6 +55,7 @@ class Device:
 		:return: A dictionary representation of the device instance.
 		"""
 		device_dict = {
+			'_id': self._id,
 			'name': self.name,
 			'description': self.description,
 			'slides': self.slides  # Include associated slide ObjectIds

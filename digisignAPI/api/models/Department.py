@@ -70,6 +70,7 @@ class Department:
 		:return: A dictionary representation of the department instance.
 		"""
 		department_dict = {
+			'_id': self._id,
 			'name': self.name,
 			'slides': self.slides,  # Include associated slide ObjectIds
 			'devices': self.devices  # Include associated device ObjectIds
