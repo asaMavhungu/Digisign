@@ -87,6 +87,8 @@
 
         <p id="file-name" style="display: none;"></p>
 
+        <img id="file-preview" src="" alt="File Preview" style="max-width: 100%; max-height: 300px; display: none;">
+
         <form action="/upload" method="POST" enctype="multipart/form-data">
             <input type="submit" value="Upload">
         </form>
@@ -128,6 +130,12 @@
             e.preventDefault();
             label.classList.remove("drag-over");
             fileInput.files = e.dataTransfer.files;
+            displayFileName(fileInput);
+            fileInput.files = e.dataTransfer.files;
+            displayFileName(fileInput);
+        });
+
+        fileInput.addEventListener("change", function() {
             displayFileName(fileInput);
         });
 
