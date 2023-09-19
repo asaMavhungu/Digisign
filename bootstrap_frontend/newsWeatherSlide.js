@@ -2,7 +2,7 @@
 const RSS_URL = "https://widgets.sociablekit.com/rss-feed/widget.js";
 const weatherURL = "https://forecast7.com/en/n33d9218d42/cape-town/";
 
-const slide = `<div>
+const slideContent = `<div>
     <div class="weathr-container" style="">
         <a class="weatherwidget-io" href=${weatherURL} data-label_1="CAPE TOWN" data-label_2="WEATHER" data-icons="Climacons Animated" data-theme="original" >CAPE TOWN WEATHER</a>
     </div>
