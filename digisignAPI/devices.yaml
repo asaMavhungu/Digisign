@@ -1,0 +1,101 @@
+openapi: 3.0.0
+info:
+  title: DigiSign API
+  version: 1.0.0
+  description: API endpoint for departments
+
+paths:
+  /api/devices/{device_name}:
+    parameters:
+      - name: device_name
+        in: path
+        required: true
+        schema:
+          type: string
+        description: The name of the device.
+    get:
+      summary: Get details of a specific device.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Device'
+        '404':
+          description: Device not found
+    patch:
+      summary: Partially update an existing device.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device partially updated
+        '404':
+          description: Device not found
+    put:
+      summary: Replace an existing device with new data.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '200':
+          description: Device replaced
+        '404':
+          description: Device not found
+    delete:
+      summary: Delete a device by its name.
+      responses:
+        '200':
+          description: Device deleted
+        '404':
+          description: Device not found
+
+  /api/devices:
+    get:
+      summary: Get a list of all devices.
+      responses:
+        '200':
+          description: Successful response
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Device'
+        '404':
+          description: Devices not found
+    post:
+      summary: Create a new device.
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Device'
+      responses:
+        '201':
+          description: Device created
+        '400':
+          description: Bad request
+
+components:
+  schemas:
+    Device:
+      type: object
+      properties:
+        name:
+          type: string
+          description: Name of the device
+        description:
+          type: string
+          description: Description of the device
+        slides:
+          type: array
+          items:
+            type: string
+          description: Slides associated with the device

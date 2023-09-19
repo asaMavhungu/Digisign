@@ -1,8 +1,8 @@
-from api import createApi
+from flask import Flask
 
-def createApp():
+def createClient(app: Flask):
 
-	app, _ = createApi(__name__)
+	app.static_folder = 'assets'
 
 	from .views import views
 
