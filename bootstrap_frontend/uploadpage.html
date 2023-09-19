@@ -25,17 +25,20 @@
             <div class="navbar-nav">
               <a class="nav-link" href="department.html">Departments</a>
               <a class="nav-link" href="all-devices.html">All Devices</a>
-              <a class="nav-link active" aria-current="page" href="slides.html">All Slides</a>
-              <a class="nav-link" href="uploadpage.html">Upload</a>
+              <a class="nav-link" href="slides.html">All Slides</a>
+              <a class="nav-link active" aria-current="page"  href="uploadpage.html">Upload</a>
             </div>
           </div>
           <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
         </div>
     </nav>
-
-    <!--main body-->
-    <h1>ALL SLIDES ARE PUT HERE</h1>
     
+    <!--main body-->
+    <h1>Upload a File</h1>
+    <form action="/upload" method="POST" enctype="multipart/form-data">
+        <input type="file" name="file" accept=".txt, .pdf, .png, .jpg, .jpeg, .gif">
+        <input type="submit" value="Upload">
+    </form>
     
   </body>
 </html>
