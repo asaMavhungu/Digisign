@@ -32,6 +32,7 @@ def insert_with_unique_id(table, data):
 	# Define your custom ID field name
 	id_field = "_id"
 
+	#TODO make sure id is int
 	# Check if the table is empty
 	if not table:
 		max_id = 0

@@ -3,7 +3,7 @@ import database.Database_utils as db_client
 
 
 class Slide:
-	def __init__(self, title: str, content: str, content_type: str, author_id: str):
+	def __init__(self, title: str, author_id: str, departments: list):
 		"""
 		Constructor for the Slide class.
 
@@ -11,12 +11,11 @@ class Slide:
 		:param content: The content of the slide.
 		:param author_id: The unique identifier of the author (user) of the slide.
 		"""
-		self._id = None  # MongoDB ObjectId (optional)
+		self._id = None 
 		self.title = title
-		self.content = content
-		self.content_type = content_type
+		self.type = "generic"
 		self.author_id = author_id
-		self.departments = []  # List to store associated department names
+		self.departments = departments
 
 	def add_department(self, department_name):
 		"""
@@ -49,12 +48,10 @@ class Slide:
 		"""
 		slide = cls(
 			title=slide_dict['title'],
-			content=slide_dict['content'],
-			content_type=slide_dict['content_type'],
-			author_id=slide_dict['author_id']
+			author_id=slide_dict['author_id'],
+			departments = slide_dict.get('departments', [])
 		)
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
-		slide.departments = slide_dict.get('departments', [])
 		return slide
 
 	def to_dict(self):
@@ -65,22 +62,20 @@ class Slide:
 		"""
 		slide_dict = {
 			'title': self.title,
-			'content': self.content,
-			'content_type': self.content_type,
+			'type': self.type,
 			'author_id': self.author_id,
 			'departments': self.departments,
 		}
 		return slide_dict
 
-	def to_marshal_representation(self):
+	def to_marshal_representation(self) -> dict[str, str | list[str] | None]:
 		"""
 		Convert the Slide object to a marshal-like representation.
 		"""
 		return {
 			'_id': self._id,
 			'title': self.title,
-			'content': self.content,
-			'content_type': self.content_type,
+			'type': self.type,
 			'author_id': self.author_id,
 			'departments': self.departments,
 		}

@@ -65,10 +65,9 @@ class DeviceResource(Resource):
 
 		for slide_title in slides:
 			slide_dict = Slide.find_by_title(slide_title)
-			slide = SlideFactory.slide_from_dict(slide_dict)
 
-			if slide:
-				device.add_slide(slide.title)
+			if slide_dict:
+				device.add_slide(slide_title)
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
@@ -102,10 +101,9 @@ class DeviceResource(Resource):
 
 			for slide_title in new_slides:
 				slide_dict = Slide.find_by_title(slide_title)
-				slide = SlideFactory.slide_from_dict(slide_dict)
 
-				if slide:
-					device.add_slide(slide.title)
+				if slide_dict:
+					device.add_slide(slide_title)
 				else:
 					return {"message": f"Slide '{slide_title}' not found"}, 404
 
@@ -145,10 +143,9 @@ class DeviceResource(Resource):
 
 		for slide_title in slides:
 			slide_dict = Slide.find_by_title(slide_title)
-			slide = SlideFactory.slide_from_dict(slide_dict)
 
-			if slide:
-				new_device.add_slide(slide.title)
+			if slide_dict:
+				new_device.add_slide(slide_title)
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 

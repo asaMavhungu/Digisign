@@ -5,6 +5,7 @@ from api.models.Slide import Slide
 from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
+from api.models.ImageSlide import ImageSlide
 
 
 # Request parsers for slide data
@@ -53,11 +54,12 @@ class SlideResource(Resource):
 		"""
 		args = slide_parser_patch.parse_args()
 		slide_dict = Slide.find_by_title(slide_title)
-		slide = SlideFactory.slide_from_dict(slide_dict)
 
-
-		if not slide:
+		if not slide_dict:
 			return {"message": "Slide not found"}, 404
+		
+		slide_factory = SlideFactory()
+		slide = slide_factory.create_slide(slide_dict)
 
 		if 'departments' in args:
 			args = slide_parser_patch.parse_args()
@@ -78,7 +80,8 @@ class SlideResource(Resource):
 					return {"message": f"Department [{department_name}] not found"}, 404
 
 		if 'content' in args and args['content']:
-			slide.content = args['content']
+			if isinstance(slide, ImageSlide):
+				slide.add_image_url = args['content']
 
 		if 'title' in args and args['title']:
 			slide.title = args['title']
@@ -87,11 +90,36 @@ class SlideResource(Resource):
 		
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
+	
+	def delete(self, slide_title):
+		"""
+		Delete a slide by its title.
 
+		Args:
+			slide_title (str): The title of the slide to delete.
+
+		Returns:
+			dict: A message indicating the result of the deletion.
+		"""
+		slide_dict = Slide.find_by_title(slide_title)
+
+		if not slide_dict:
+			return {"message": "Slide not found"}, 404
+		
+		slide_factory = SlideFactory()
+		slide = slide_factory.create_slide(slide_dict)
+		
+		if slide:
+			slide.delete_me()
+			return {"message": f"Slide '{slide_title}' deleted"}, 200
+		else:
+			return {"message": "Slide not found"}, 404
+
+"""
 	def put(self, slide_title):
-		"""
-		Update a specific slide by title (full update).
-		"""
+"""
+		#Update a specific slide by title (full update).
+"""
 		args = slide_parser.parse_args()
 		title = args['title']
 		content = args['content']
@@ -127,20 +155,5 @@ class SlideResource(Resource):
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
 	
-	def delete(self, slide_title):
-		"""
-		Delete a slide by its title.
-
-		Args:
-			slide_title (str): The title of the slide to delete.
-
-		Returns:
-			dict: A message indicating the result of the deletion.
-		"""
-		slide_dict = Slide.find_by_title(slide_title)
-		slide = SlideFactory.slide_from_dict(slide_dict)
-		if slide:
-			slide.delete_me()
-			return {"message": f"Slide '{slide_title}' deleted"}, 200
-		else:
-			return {"message": "Slide not found"}, 404
+"""
+	

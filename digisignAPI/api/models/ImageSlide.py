@@ -1,7 +1,8 @@
 from .Slide import Slide
 	
 class ImageSlide(Slide):
-	def __init__(self, title, content, author_id, image_url):
+
+	def __init__(self, title: str, author_id: str, departments: list, image_url: str):
 		"""
 		Constructor for the ImageSlide class.
 
@@ -10,7 +11,8 @@ class ImageSlide(Slide):
 		:param author_id: The unique identifier of the author (user) of the image slide.
 		:param image_url: The URL of the image.
 		"""
-		super().__init__(title, content, "image", author_id)  # Call the constructor of the base class
+		super().__init__(title, author_id, departments) 
+		self.type = 'image'
 		self.image_url = image_url
 
 	def to_dict(self):
@@ -19,7 +21,7 @@ class ImageSlide(Slide):
 
 		:return: A dictionary representation of the image slide instance.
 		"""
-		slide_dict = super().to_dict()  # Call the base class method to get the common slide properties
+		slide_dict = super().to_dict()  
 		slide_dict['image_url'] = self.image_url
 		return slide_dict
 	
@@ -27,11 +29,14 @@ class ImageSlide(Slide):
 	def from_dict(cls, slide_dict):
 		slide = cls(
 			title=slide_dict['title'],
-			content=slide_dict['content'],
 			author_id=slide_dict['author_id'],
-			image_url=slide_dict['image_url']
+			image_url=slide_dict['content_url'],
+			departments = slide_dict.get('departments', [])
 		)
-		slide.content_type = 'image'
+
 		slide._id = slide_dict.get('_id')  # Optional ObjectId
-		slide.departments = slide_dict.get('departments', [])
+
 		return slide
+	
+	def add_image_url(self, url: str):
+		self.image_url = url

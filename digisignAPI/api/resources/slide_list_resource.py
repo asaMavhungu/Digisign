@@ -4,27 +4,24 @@ from bson.objectid import ObjectId
 from api.models.Slide import Slide
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
+from api.models.User import User
 import json
 
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
+slide_parser.add_argument('content_url', type=str, required=True, help='Content of the slide')
 slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
-slide_parser.add_argument('image_url', type=str, required=False, help='URL of image slide')
-slide_parser.add_argument('video_url', type=str, required=False, help='URL of video slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 # Define the fields for marshaling slide data in responses
 slide_fields = {
 	'_id': fields.String(attribute='_id'),
 	'title': fields.String,
-	'content': fields.String,
+	'content_url': fields.String,
 	'content_type': fields.String,
-	'image_url': fields.String,
-	'video_url': fields.String,
 	'author_id': fields.String,
 	'departments': fields.List(fields.String),
 }
@@ -41,9 +38,10 @@ class SlideList(Resource):
 		Returns:
 			List[Slide]: A list of all slides.
 		"""
-		slides_data = Slide.getAll()
-		if slides_data is not None:
-			slides = [SlideFactory.slide_from_dict(slide_data) for slide_data in slides_data]
+		slides_dicts = Slide.getAll()
+		if slides_dicts is not None:
+			slide_factory = SlideFactory()
+			slides = [slide_factory.create_slide(slide_dict) for slide_dict in slides_dicts]
 			return slides, 200
 		else:
 			return {"message": "Departments not found"}, 404		
@@ -55,17 +53,29 @@ class SlideList(Resource):
 		"""
 		args = slide_parser.parse_args()
 		title = args['title']
-		content = args['content']
+		content_url = args['content_url']
 		content_type = args['content_type']
 		author_id = args['author_id']
-		image_url = args['image_url']
-		video_url = args['video_url']
 		departments = args.get('departments', [])
+
+		user_dict = User.find_by_username(author_id)
+
+		if not user_dict:
+			return {"message": f"User [{author_id}] does not exist"}, 400
+		
+		user = User.from_dict(user_dict)
 
 		if Slide.find_by_title(title):
 			return {"message": f"Slide titled [{title}] already exists"}, 400
 
-		slide = SlideFactory.create_slide(title, content, content_type, author_id, image_url, video_url)
+		slide_dict = {
+			'title' : title,
+			'type' : content_type,
+			'author_id' : user.username,
+			'content_url' : content_url
+		}
+		slide_factory = SlideFactory()
+		slide = slide_factory.create_slide(slide_dict)
 
 		if slide:
 			pass
@@ -105,7 +115,13 @@ class SlideList(Resource):
 		deleted_count = 0
 		for slide_title in slide_titles:
 			slide_dict = Slide.find_by_title(slide_title)
-			slide = SlideFactory.slide_from_dict(slide_dict)
+
+			if slide_dict is None:
+				return {"message": f" slide '{slide_title}' not found"}, 400
+			
+			slide_factory = SlideFactory()
+			slide = slide_factory.create_slide(slide_dict)
+
 			if slide:
 				slide.delete_me()
 				deleted_count += 1
