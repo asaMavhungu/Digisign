@@ -20,8 +20,8 @@ class UserLoginResource(Resource):
 			access_token = create_access_token(identity=user_identity)
 
 			# Return the token to the client
-			return {'message': 'Login successful', 'access_token': access_token}, 200
+			return { 'success' : True,'message': 'Login successful', 'access_token': access_token}, 200
 
-		return {'message': 'Invalid credentials'}, 401
+		return { 'success' : False ,'message': 'Invalid credentials'}, 401
 
 
