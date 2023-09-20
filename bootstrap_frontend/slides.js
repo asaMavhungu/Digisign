@@ -5,7 +5,7 @@ function createCarouselIndicators(slides) {
     slides.forEach((slide, index) => {
         const indicatorButton = document.createElement('li');
         indicatorButton.classList.add('indicator-button'); // Add custom styling class
-        indicatorButton.setAttribute('data-bs-target', '#carouselExampleCaptions');
+        indicatorButton.setAttribute('data-bs-target', '#carousel');
         indicatorButton.setAttribute('data-bs-slide-to', index);
         indicatorButton.setAttribute('aria-label', `Slide ${index + 1}`);
         if (index === 0) {
