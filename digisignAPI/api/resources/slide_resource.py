@@ -11,14 +11,14 @@ from api.models.ImageSlide import ImageSlide
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('image_rul', type=str, required=True, help='image_rul of the slide')
+slide_parser.add_argument('image_url', type=str, required=True, help='image_rul of the slide')
 slide_parser.add_argument('slide_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 slide_parser_patch = reqparse.RequestParser()
 slide_parser_patch.add_argument('title', type=str, required=False, help='Title of the slide')
-slide_parser_patch.add_argument('content', type=str, required=False, help='Content of the slide')
+slide_parser_patch.add_argument('image_url', type=str, required=False, help='image_rul of the slide')
 slide_parser_patch.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
 slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
 slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
@@ -90,13 +90,19 @@ class SlideResource(Resource):
 				else:
 					return {"message": f"Department [{department_name}] not found"}, 404
 
-		if 'content' in args and args['content']:
+		if 'image_url' in args and args['image_url']:
+			print("TTTTTTTTTTTTTTTTTTTTTTTTTTT")
 			if isinstance(slide, ImageSlide):
-				slide.add_image_url = args['content']
+				new_url = args['image_url']
+				slide.add_image_url(new_url)
+				print("VBVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV")
+				slide.save()
 
 		# TODO add changing names
 		#if 'title' in args and args['title']:
 			#slide.title = args['title']
+
+		print()
 
 		slide.save()
 		
