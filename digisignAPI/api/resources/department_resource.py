@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
 from api.models.Slide import Slide
+from api.models.Device import Device
 
 
 # Request parsers for department data
@@ -52,19 +53,26 @@ class DepartmentResource(Resource):
 			#department.name = args['name']
 
 		if 'slides' in args:
+			print("EEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEEE")
 			new_slides: list = args.get('slides', [])
 			# This sometimes give back NONE
 			if new_slides is None:
 				new_slides = []
 
-			old_slides = department.get_slides()
+			# TODO This was a refrence to the lisy in the object not a copy
+			#old_slides = department.get_slides()
+			old_slides = list(department.get_slides())
+			print(old_slides)
+			print(new_slides)
 
 			for slide_name in old_slides:
+				print(slide_name + "         " + str(len(old_slides)))
 				slide_data = Slide.find_by_title(slide_name)
 
 				slide = Slide.from_dict(slide_data)
 				
 				slide.remove_department(department_name)
+				print(f"slide [{slide.title}] remved department [{department_name}]")
 				department.remove_slide(slide_name)
 
 				slide.save()
@@ -81,6 +89,44 @@ class DepartmentResource(Resource):
 				department.add_slide(slide.title)
 				
 				slide.save()
+
+			if 'devices' in args:
+				new_devices = args.get('devices', [])
+
+				if new_devices is None:
+					new_devices = []
+
+				# TODO This was a refrence to the lisy in the object not a copy
+				#old_devices = department.get_devices()
+				old_devices = list(department.get_devices())
+
+				for device_name in old_devices:
+					#slide_data = Slide.find_by_title(slide_name)
+					device_data = Device.find_by_name(device_name)
+
+					#slide = Slide.from_dict(slide_data)
+					device =  Device.from_dict(device_data)
+					
+					#slide.remove_department(department_name)
+					#department.remove_slide(slide_name)
+
+					device.remove_department(department_name)
+					department.remove_device(device_name)
+
+					device.save()
+
+				for device_name in new_devices:
+					device_data = Device.find_by_name(device_name)
+
+					if not device_data:
+						return {'message': f'Device [{device_name}] doesnt exist'}, 400
+					
+					device = Device.from_dict(device_data)
+
+					department.add_device(device.name)
+					device.add_department(department_name)
+
+					device.save()
 
 		department_id = department.save()
 

@@ -3,6 +3,7 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
 from api.models.Slide import Slide
+from api.models.Device import Device
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
@@ -66,6 +67,24 @@ class DepartmentListResource(Resource):
 				slide.add_department(department.name)
 				department.add_slide(slide.title)
 				slide.save()
+
+			if 'devices' in args:
+				devices = args.get('slides', [])
+
+				if devices is None:
+					devices = []
+
+				for device_name in devices:
+					device_data = Device.find_by_name(device_name)
+
+					if not device_data:
+						return {'message': f'Device [{device_name}] doesnt exist'}, 400
+					
+					device = Device.from_dict(device_data)
+					department.add_device(device.name)
+					
+
+
 
 
 		department_id = department.save()

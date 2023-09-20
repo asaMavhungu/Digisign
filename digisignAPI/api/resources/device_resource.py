@@ -1,6 +1,7 @@
 from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
 from api.models.Device import Device
+from api.models.Department  import Department
 from api.models.Slide import Slide
 from api.models.SlideFactory import SlideFactory
 
@@ -9,11 +10,13 @@ device_parser = reqparse.RequestParser()
 device_parser.add_argument('name', type=str, required=True, help='Name of the device')
 device_parser.add_argument('description', type=str, required=True, help='Description of the device')
 device_parser.add_argument('slides', type=list, location='json', help='Slides associated with the device')
+device_parser.add_argument('departments', type=list, location='json', help='departments associated with the device')
 
 device_parser_patch = reqparse.RequestParser()
 device_parser_patch.add_argument('name', type=str, required=False, help='Name of the device')
 device_parser_patch.add_argument('description', type=str, required=False, help='Description of the device')
 device_parser_patch.add_argument('slides', type=list, location='json', help='Slides associated with the device')
+device_parser_patch.add_argument('departments', type=list, location='json', help='departments associated with the device')
 
 # Fields to marshal device data in responses
 device_fields = {
@@ -21,11 +24,12 @@ device_fields = {
 	'name': fields.String,
 	'description': fields.String,
 	'slides': fields.List(fields.String),
+	'departments': fields.List(fields.String),
 }
 
 class DeviceResource(Resource):
 
-	#@marshal_with(device_fields)
+	@marshal_with(device_fields)
 	def get(self, device_name):
 		"""
 		Get details of a specific device by its name.
@@ -42,7 +46,8 @@ class DeviceResource(Resource):
 		print(device_data)
 		print("========================")
 		if device_data:
-			return device_data, 200
+			device = Device.from_dict(device_data)
+			return device, 200
 		return {"message": "Device not found"}, 404
 
 	def post(self):
@@ -57,6 +62,7 @@ class DeviceResource(Resource):
 		name = args['name']
 		description = args['description']
 		slides = args.get('slides', [])
+		departments = args.get('departments', [])
 
 		if Device.find_by_name(name):
 			return {"message": f"Device named '{name}' already exists"}, 400
@@ -70,6 +76,14 @@ class DeviceResource(Resource):
 				device.add_slide(slide_title)
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
+			
+		for department_name in departments:
+			dep_dict = Department.find_by_name(department_name)
+
+			if dep_dict:
+				device.add_department(department_name)
+			else:
+				return {"message": f"Department '{department_name}' not found"}, 404
 
 		device_id = device.save()
 
@@ -110,8 +124,22 @@ class DeviceResource(Resource):
 		if 'description' in args and args['description']:
 			device.description = args['description']
 
-		if 'name' in args and args['name']:
-			device.name = args['name']
+		#if 'name' in args and args['name']:
+			#device.name = args['name']
+
+		if 'departments' in args and args['departments']:
+
+
+			departments = args.get('departments', [])
+			device.departments = []  # Clear existing slides
+
+			for department_name in departments:
+				dep_dict = Department.find_by_name(department_name)
+
+				if dep_dict:
+					device.add_department(department_name)
+				else:
+					return {"message": f"Department '{department_name}' not found"}, 404
 
 		device.save()
 

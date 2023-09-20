@@ -116,3 +116,6 @@ class Department:
 
 	def get_slides(self):
 		return self.slides
+	
+	def get_devices(self):
+		return self.devices

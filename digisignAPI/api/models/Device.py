@@ -15,23 +15,39 @@ class Device:
 		self.name = name
 		self.description = description
 		self.slides = []  # List to store associated slides
+		self.departments = []
 
-	def add_slide(self, slide):
+	def add_slide(self, slide_name):
 		"""
 		Add a slide to the device.
 
 		:param slide: The Slide object to associate with the device.
 		"""
-		self.slides.append(slide)
+		self.slides.append(slide_name)
 
-	def remove_slide(self, slide):
+	def remove_slide(self, slide_name):
 		"""
 		Remove a slide from the device.
 
 		:param slide: The Slide object to disassociate from the device.
 		"""
-		self.slides.remove(slide)
+		self.slides.remove(slide_name)
 		
+	def add_department(self, department_name):
+		"""
+		Add a device to the department.
+
+		:param device: The department name to associate with the department.
+		"""
+		self.departments.append(department_name)
+
+	def remove_department(self, department_name):
+		"""
+		Remove a device from the department.
+
+		:param device: The department name to disassociate from the department.
+		"""
+		self.departments.remove(department_name)
 
 	@classmethod
 	def from_dict(cls, device_dict):
@@ -47,6 +63,7 @@ class Device:
 		)
 		device._id = device_dict.get('_id')  # Optional ObjectId
 		device.slides = device_dict.get('slides', [])
+		device.departments = device_dict.get('departments', [])
 		return device
 
 	def to_dict(self):
@@ -59,7 +76,8 @@ class Device:
 			'_id': self._id,
 			'name': self.name,
 			'description': self.description,
-			'slides': self.slides  # Include associated slide ObjectIds
+			'slides': self.slides,  # Include associated slide ObjectIds
+			'departments': self.departments
 		}
 		return device_dict
 	
@@ -72,6 +90,7 @@ class Device:
 			'name': self.name,
 			'description': self.description,
 			'slides': self.slides,
+			'departments': self.departments
 		}
 
 	@staticmethod

@@ -20,10 +20,11 @@ device_parser_patch.add_argument('slides', type=list, location='json', help='Sli
 
 # Fields to marshal device data in responses
 device_fields = {
-	#'_id': fields.String(attribute='_id'),
+	'_id': fields.String(attribute='_id'),
 	'name': fields.String,
 	'description': fields.String,
 	'slides': fields.List(fields.String),
+	'departments': fields.List(fields.String),
 }
 
 class DeviceListResource(Resource):
