@@ -157,6 +157,7 @@
         </div>
     </nav>
     
+    <div id="message" class="alert" style="display: none;"></div>
     <!--Signin code-->
     <div class="wrapper">
         <div class="container main">
@@ -188,16 +189,15 @@
             </div>
         </div>
     </div>
-    <div id="message" style="display: none;"></div>
-    
+
 
 <script>
     
-    // Function to display a message on the page
+    // Function to display a Bootstrap alert message
     function showMessage(message, success) {
         const messageDiv = document.getElementById('message');
         messageDiv.textContent = message;
-        messageDiv.style.color = success ? 'green' : 'red';
+        messageDiv.className = `alert ${success ? 'alert-success' : 'alert-danger'}`;
         messageDiv.style.display = 'block';
     }
 
