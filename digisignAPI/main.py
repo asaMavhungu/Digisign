@@ -1,5 +1,4 @@
 from client import createClient
-from database import createMongoDatabase
 from api import createApi
 from database import createDatabase
 from flask import Flask
@@ -12,8 +11,8 @@ if __name__ == "__main__":
 
 	import json
 
-	#with open('db.json', 'r') as file:
-		#data = json.load(file)
+	with open('db.json', 'r') as file:
+		data = json.load(file)
 
 	#app, DB_CLIENT = createApi(__name__)
 
@@ -43,12 +42,12 @@ if __name__ == "__main__":
 
 	app = Flask(__name__)
 
-	app, db_client = createDatabase(app, database)
+	createDatabase()
 
-	app, db_client = createApi(app, db_client)
+	app = createApi(app)
 
 	app = createClient(app)
 
-	#print(json.dumps(data, indent=4))
+	print(json.dumps(data, indent=4))
 
 	app.run(debug=True)

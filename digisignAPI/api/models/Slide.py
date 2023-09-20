@@ -1,5 +1,5 @@
 from bson.objectid import ObjectId
-from database.DatabaseClient import DatabaseClient
+import database.Database_utils as db_client
 
 
 class Slide:
@@ -86,7 +86,7 @@ class Slide:
 		}
 
 	@staticmethod
-	def find_by_title(title: str, database_client: DatabaseClient) -> (dict | None):
+	def find_by_title(title: str) -> (dict | None):
 		print("==========================")
 		# TODO Remove redundancy of creating Slide object
 		"""
@@ -96,9 +96,9 @@ class Slide:
 		:param client: An instance of SlideClient used for database operations.
 		:return: slide dict
 		"""
-		return database_client.get_one('slides', 'title', title) # type: ignore
+		return db_client.get_one('slides', 'title', title) # type: ignore
 
-	def save(self, database_client: DatabaseClient):
+	def save(self):
 		"""
 		Saves the slide instance to the database.
 
@@ -107,17 +107,17 @@ class Slide:
 		"""
 		slide_data = self.to_dict()
 		if self._id:
-			return database_client.update_entry('slides', 'title', self.title, slide_data)
+			return db_client.update_entry('slides', 'title', self.title, slide_data)
 		else:
-			return database_client.insert_entry('slides', slide_data)
+			return db_client.insert_entry('slides', slide_data)
 		
 	
 	@staticmethod
-	def getAll(database_client: DatabaseClient):
+	def getAll():
 		"""
 		Get all the slides in the db
 		"""
-		return database_client.get_table('slides')
+		return db_client.get_table('slides')
 	
-	def delete_me(self, database_client: DatabaseClient):
-		database_client.delete_entry('slides', 'title', self.title)
+	def delete_me(self):
+		db_client.delete_entry('slides', 'title', self.title)

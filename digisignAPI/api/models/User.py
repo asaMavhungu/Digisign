@@ -1,5 +1,5 @@
 from bson.objectid import ObjectId
-from database.DatabaseClient import DatabaseClient
+import database.Database_utils as db_client
 import hashlib
 
 
@@ -52,7 +52,7 @@ class User:
 		return user_dict
 
 	@staticmethod
-	def find_by_username(username: str, database_client: DatabaseClient) -> (dict | None):
+	def find_by_username(username: str) -> (dict | None):
 		"""
 		Finds a user by their username in the database.
 
@@ -60,10 +60,10 @@ class User:
 		:param database_client: An instance of DatabaseClient used for database operations.
 		:return: User dict or None if not found.
 		"""
-		return database_client.get_one('users', 'username', username) # type: ignore
+		return db_client.get_one('users', 'username', username) # type: ignore
 
 	@staticmethod
-	def find_by_email(email: str, database_client: DatabaseClient) -> (dict | None):
+	def find_by_email(email: str) -> (dict | None):
 		"""
 		Finds a user by their email address in the database.
 
@@ -71,9 +71,9 @@ class User:
 		:param database_client: An instance of DatabaseClient used for database operations.
 		:return: User dict or None if not found.
 		"""
-		return database_client.get_one('users', 'email', email) # type: ignore
+		return db_client.get_one('users', 'email', email) # type: ignore
 
-	def save(self, database_client: DatabaseClient):
+	def save(self):
 		"""
 		Saves the user instance to the database.
 
@@ -85,21 +85,21 @@ class User:
 		print(user_data)
 		print("$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 		if self._id:
-			return database_client.update_entry('users', '_id', self._id, user_data)
+			return db_client.update_entry('users', '_id', self._id, user_data)
 		else:
-			return database_client.insert_entry('users', user_data)
+			return db_client.insert_entry('users', user_data)
 
 	@staticmethod
-	def get_all(database_client: DatabaseClient):
+	def get_all():
 		"""
 		Get all users from the database.
 
 		:param database_client: The DatabaseClient instance for database operations.
 		:return: List of user dictionaries.
 		"""
-		return database_client.get_table('users')
+		return db_client.get_table('users')
 
-	def delete(self, database_client: DatabaseClient):
+	def delete(self):
 		"""
 		Deletes the user from the database.
 
@@ -107,11 +107,11 @@ class User:
 		:return: True if the user is deleted, False otherwise.
 		"""
 		if self._id:
-			return database_client.delete_entry('users', 'username', self.username)
+			return db_client.delete_entry('users', 'username', self.username)
 		return False
 	
 	@staticmethod
-	def verify_credentials(username: str, password: str, database_client: DatabaseClient):
+	def verify_credentials(username: str, password: str):
 		"""
 		Verifies user credentials against the database.
 
@@ -120,7 +120,7 @@ class User:
 		:param database_client: An instance of DatabaseClient used for database operations.
 		:return: User dict if credentials are valid, None otherwise.
 		"""
-		user_dict = database_client.get_one('users', 'username', username)  # Fetch user by username
+		user_dict = db_client.get_one('users', 'username', username)  # Fetch user by username
 
 		if user_dict and User.check_password(password, user_dict['password']):# type: ignore
 			return user_dict  # Return user data if credentials are valid 
@@ -155,7 +155,7 @@ class User:
 		return hashed_password.hex()
 	
 	@staticmethod
-	def get_user_identity(username: str, password: str, database_client: DatabaseClient):
+	def get_user_identity(username: str, password: str):
 		"""
 		Get the user's identity (e.g., username) based on credentials.
 
@@ -164,7 +164,7 @@ class User:
 		:param database_client: An instance of DatabaseClient used for database operations.
 		:return: User identity (e.g., username) if credentials are valid, None otherwise.
 		"""
-		user_dict = database_client.get_one('users', 'username', username)
+		user_dict = db_client.get_one('users', 'username', username)
 
 		if user_dict and User.check_password(password, user_dict['password']): # type: ignore
 			return username

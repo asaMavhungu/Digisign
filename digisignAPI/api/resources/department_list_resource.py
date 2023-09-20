@@ -3,8 +3,6 @@ from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
 
-from database.DatabaseClient import DatabaseClient
-
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
 department_parser.add_argument('name', type=str, required=True, help='Name of the department')
@@ -21,8 +19,6 @@ class DepartmentListResource(Resource):
 	"""
 	Resource class for managing collections of departments.
 	"""
-	def __init__(self, dbClient: DatabaseClient):
-		self.db_client =  dbClient
 
 	@marshal_with(department_fields)
 	def get(self):
@@ -32,7 +28,7 @@ class DepartmentListResource(Resource):
 			List[Department]: A list of all departments.
 		"""
 		print("CHECK 1")
-		departments_data = Department.getAll(self.db_client)
+		departments_data = Department.getAll()
 		if departments_data is not None:
 			departments = [Department.from_dict(department_data).to_dict() for department_data in departments_data]
 			return departments, 200
@@ -46,11 +42,11 @@ class DepartmentListResource(Resource):
 		args = department_parser.parse_args()
 		name = args['name']
 
-		if Department.find_by_name(name, self.db_client):
+		if Department.find_by_name(name):
 			return {"message": f"Department named '{name}' already exists"}, 400
 
 		department = Department(name)
 
-		department_id = department.save(self.db_client)
+		department_id = department.save()
 
 		return {'message': 'Department created', 'department_id': department_id}, 201

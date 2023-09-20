@@ -1,7 +1,6 @@
 from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
-from database.DatabaseClient import DatabaseClient
-
+import database.Database_utils as db_client
 
 class Department:
 	def __init__(self, name):
@@ -78,7 +77,7 @@ class Department:
 		return department_dict
 
 	@staticmethod
-	def find_by_name(department_name: str, database_client: DatabaseClient):
+	def find_by_name(department_name: str):
 		"""
 		Finds a department by its name in the database.
 
@@ -86,9 +85,9 @@ class Department:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: An instance of the Department class or None if not found.
 		"""
-		return database_client.get_one('departments', 'name', department_name)
+		return db_client.get_one('departments', 'name', department_name)
 
-	def save(self, database_client: DatabaseClient):
+	def save(self):
 		"""
 		Saves the department instance to the database.
 
@@ -98,18 +97,19 @@ class Department:
 		department_data = self.to_dict()
 		if self._id:
 			# Update the existing department document
-			return database_client.update_entry('departments', 'name', self.name, department_data)
+			return db_client.update_entry('departments', 'name', self.name, department_data)
 		else:
 			# Insert a new department document
-			return database_client.insert_entry('departments', department_data)
+			return db_client.insert_entry('departments', department_data)
 
 	@staticmethod
-	def getAll(database_client: DatabaseClient):
+	def getAll():
 		"""
 		Get all the slides in the db
 		"""
 		print("CHECK 2")
-		return database_client.get_table('departments')
+		return db_client.get_table('departments')
 	
-	def delete_me(self, database_client: DatabaseClient):
+	def delete_me(self):
+		# TODO FIXXXX
 		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER

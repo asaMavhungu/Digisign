@@ -1,35 +1,25 @@
 
 # api/__init__.py
-from flask import Flask, request
-from flask_restful import Api, Resource, reqparse, abort
+from flask import Flask
+from flask_restful import Api
 
 from flask import Flask
 from flask_restful import Api
-from flask_pymongo import PyMongo
 
-from flask import request
-from flask_restful import Resource, reqparse
+
+
 from flask_jwt_extended import JWTManager
 from flask_bcrypt import Bcrypt
-from api.models.User import User  # Import your User class
-from datetime import timedelta  # Import timedelta from datetime
+
+from datetime import timedelta 
 bcrypt = Bcrypt()
 
-
-from pymongo.mongo_client import MongoClient
-from pymongo.server_api import ServerApi
-
-from pymongo import MongoClient
-
-from database import createDatabase
-
-from database import DatabaseClient
 
 
 # TODO: check if all endpoint work as expected
 # TODO: Redo the api spec
 
-def createApi(app: Flask, db_client: DatabaseClient):
+def createApi(app: Flask):
 
 	#app, db_client  = createDatabase(module_name, databaseOption)
 
@@ -55,42 +45,42 @@ def createApi(app: Flask, db_client: DatabaseClient):
 
 	# Register UserResource with endpoint /api/users
 	from .resources.user_resource import UserResource
-	api.add_resource(UserResource, '/api/users', resource_class_args=(db_client,))
+	api.add_resource(UserResource, '/api/users')
 
 	# Register UserResource with endpoint /api/userslist
 	from .resources.user_list_resource import UserListResource
-	api.add_resource(UserListResource, '/api/userslist', resource_class_args=(db_client,))
+	api.add_resource(UserListResource, '/api/userslist')
 
 	# Register UserResource with login
 	from .resources.user_login_resource import UserLoginResource
-	api.add_resource(UserLoginResource, '/api/login', resource_class_args=(db_client,))
+	api.add_resource(UserLoginResource, '/api/login')
 
 
 	# Register SlideResource with endpoint /slides/<string:slide_title>
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/api/slides/<string:slide_title>', resource_class_args=(db_client,))
+	api.add_resource(SlideResource, '/api/slides/<string:slide_title>')
 
 	# Register SlideList with endpoint /slides
 	from .resources.slide_list_resource import SlideList 
-	api.add_resource(SlideList, '/api/slides', resource_class_args=(db_client,))
+	api.add_resource(SlideList, '/api/slides')
 
 	# Register DeviceResource with endpoint /devices/<string:device_name>
 	from .resources.device_resource import DeviceResource
-	api.add_resource(DeviceResource, '/api/devices/<string:device_name>', resource_class_args=(db_client,))
+	api.add_resource(DeviceResource, '/api/devices/<string:device_name>')
 
 	# Register DeviceListResource with endpoint /devices
 	from .resources.device_list_resource import DeviceListResource
-	api.add_resource(DeviceListResource, '/api/devices', resource_class_args=(db_client,))
+	api.add_resource(DeviceListResource, '/api/devices')
 
 	# Register DepartmentResource with endpoint /departments/<string:department_id>
 	from .resources.department_resource import DepartmentResource
-	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>', resource_class_args=(db_client,))
+	api.add_resource(DepartmentResource, '/api/departments/<string:department_name>')
 
 	# Register DepartmentListResource with endpoint /departments
 	from .resources.department_list_resource import DepartmentListResource
-	api.add_resource(DepartmentListResource, '/api/departments', resource_class_args=(db_client,))
+	api.add_resource(DepartmentListResource, '/api/departments')
 
 
 
-	return app, db_client
+	return app
 

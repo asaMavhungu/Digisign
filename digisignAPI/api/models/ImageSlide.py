@@ -1,5 +1,4 @@
 from .Slide import Slide
-from bson.objectid import ObjectId
 	
 class ImageSlide(Slide):
 	def __init__(self, title, content, author_id, image_url):

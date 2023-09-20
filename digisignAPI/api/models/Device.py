@@ -1,7 +1,8 @@
-from flask_pymongo import PyMongo
-from bson.objectid import ObjectId
 
-from database.DatabaseClient import DatabaseClient
+
+import database.Database_utils as db_client
+
+
 
 class Device:
 	def __init__(self, name, description):
@@ -74,14 +75,14 @@ class Device:
 		}
 
 	@staticmethod
-	def getAll(database_client: DatabaseClient):
+	def getAll():
 		"""
 		Get all the slides in the db
 		"""
-		return database_client.get_table('devices')
+		return db_client.get_table('devices')
 
 	@staticmethod
-	def find_by_name(device_name, database_client: DatabaseClient):
+	def find_by_name(device_name):
 		"""
 		Finds devices by their name in the database.
 
@@ -89,9 +90,9 @@ class Device:
 		:param mongo: An instance of Flask-PyMongo used for database operations.
 		:return: A list of instances of the Device class matching the name or an empty list if not found.
 		"""
-		return database_client.get_one('devices', 'name', device_name)
+		return db_client.get_one('devices', 'name', device_name)
 
-	def save(self, database_client: DatabaseClient):
+	def save(self):
 		"""
 		Saves the device instance to the database.
 
@@ -101,12 +102,13 @@ class Device:
 		device_data = self.to_dict()
 		if self._id:
 			# Update the existing device document
-			return database_client.update_entry('devices', 'name', self.name, device_data)
+			return db_client.update_entry('devices', 'name', self.name, device_data)
 		else:
 			# Insert a new device document
-			return database_client.insert_entry('devices', device_data)
+			return db_client.insert_entry('devices', device_data)
 	
 	def delete(self, mongo):
+		# TODO FIXXXX
 		"""
 		Deletes the device from the database.
 
@@ -115,5 +117,5 @@ class Device:
 		if self._id:
 			mongo.db.devices.delete_one({'_id': self._id})
 
-	def delete_me(self, database_client: DatabaseClient):
-		database_client.delete_entry('devices', 'name', self.name)
+	def delete_me(self):
+		db_client.delete_entry('devices', 'name', self.name)

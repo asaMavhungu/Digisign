@@ -6,7 +6,6 @@ from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identity
 
-from database.DatabaseClient import DatabaseClient
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
@@ -28,11 +27,9 @@ device_fields = {
 }
 
 class DeviceListResource(Resource):
-	def __init__(self, dbClient: DatabaseClient):
-		self.db_client =  dbClient
 
 	@marshal_with(device_fields)
-	@jwt_required()
+	#@jwt_required()
 	def get(self):
 		"""
 		Get a list of all devices.
@@ -41,7 +38,7 @@ class DeviceListResource(Resource):
 			list: A list of all devices.
 			int: HTTP status code.
 		"""
-		devices_data = Device.getAll(self.db_client)
+		devices_data = Device.getAll()
 		if devices_data is not None:
 			devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
 			return devices, 200
@@ -62,14 +59,14 @@ class DeviceListResource(Resource):
 		description = args['description']
 		slides = args.get('slides', [])
 
-		if Device.find_by_name(name, self.db_client):
+		if Device.find_by_name(name):
 			return {"message": f"Device named '{name}' already exists"}, 400
 
 		device = Device(name, description)
 
 	
 		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title, self.db_client)
+			slide_dict = Slide.find_by_title(slide_title)
 			slide = SlideFactory.slide_from_dict(slide_dict)
 
 			if slide:
@@ -77,7 +74,7 @@ class DeviceListResource(Resource):
 			else:
 				return {"message": f"Slide '{slide_title}' not found"}, 404
 
-		device_id = device.save(self.db_client)
+		device_id = device.save()
 
 		return {'message': 'Device created', 'device_id': device_id}, 201
 
@@ -99,11 +96,11 @@ class DeviceListResource(Resource):
 		not_found_devices = []
 
 		for device_name in device_names:
-			device_data = Device.find_by_name(device_name, self.db_client)
+			device_data = Device.find_by_name(device_name)
 
 			if device_data:
 				device = Device.from_dict(device_data)
-				device.delete_me(self.db_client)
+				device.delete_me()
 				deleted_devices.append(device_name)
 			else:
 				not_found_devices.append(device_name)

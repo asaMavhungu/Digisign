@@ -9,8 +9,6 @@ from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from api.models.Device import Device
-from database.DatabaseClient import DatabaseClient
-
 import hashlib
 
 def hash_password(password):
@@ -38,15 +36,13 @@ user_parser.add_argument('verified', type=bool, required=False, default=False, h
 
 class UserResource(Resource):
 	
-	def __init__(self, dbClient: DatabaseClient):
-		self.db_client =  dbClient
 	"""
 	Resource class for user registration, retrieval, update, and deletion.
 	"""
 	@jwt_required()
 	def get(self):
 		current_user = get_jwt_identity()
-		user_dict = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		user_dict = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
 		if user_dict:
 			return user_dict, 200
 		return {'message': 'User not found'}, 404
@@ -60,7 +56,7 @@ class UserResource(Resource):
 		verified = args['verified']
 
 		# Check if the user exists
-		existing_user = User.find_by_username(username, self.db_client)  # Replace 'database_client' with your actual database client
+		existing_user = User.find_by_username(username)  # Replace 'database_client' with your actual database client
 
 		if existing_user:
 			return {'message': 'User with this username already exists'}, 400
@@ -75,7 +71,7 @@ class UserResource(Resource):
 		new_user = User(username, hashed_password, email, verified)
 
 		# Save the user to the database
-		user_id = new_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+		user_id = new_user.save()  # Replace 'database_client' with your actual database client
 
 		return {'message': 'User registered successfully', 'user_id': user_id}, 201
 
@@ -89,12 +85,12 @@ class UserResource(Resource):
 		verified = args['verified']
 
 		# Check if the new username exists
-		existing_user = User.find_by_username(new_username, self.db_client)  # Replace 'database_client' with your actual database client
+		existing_user = User.find_by_username(new_username)  # Replace 'database_client' with your actual database client
 
 		if existing_user:
 			return {'message': 'User with this username already exists'}, 400
 		
-		our_user = User.find_by_username(current_user, self.db_client)
+		our_user = User.find_by_username(current_user)
 		this_user = User.from_dict(our_user)
 
 		# Hash the password (you should use a password hashing library)
@@ -109,9 +105,9 @@ class UserResource(Resource):
 		this_user.verified = verified
 
 		# Save the user to the database
-		user_id = this_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+		user_id = this_user.save()  # Replace 'database_client' with your actual database client
 
-		me = User.find_by_username(new_username, self.db_client)
+		me = User.find_by_username(new_username)
 
 		return this_user.to_dict(), 201
 
@@ -125,7 +121,7 @@ class UserResource(Resource):
 		verified = args['verified']
 
 		# Check if the user exists
-		existing_user = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		existing_user = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
 		this_user = User.from_dict(existing_user)
 
 		if not existing_user:
@@ -144,20 +140,20 @@ class UserResource(Resource):
 			this_user.verified = verified
 
 		# Update the user in the database
-		user_id = this_user.save(self.db_client)  # Replace 'database_client' with your actual database client
+		user_id = this_user.save()  # Replace 'database_client' with your actual database client
 
 		return {'message': 'User updated successfully', 'user_id': user_id}, 200
 
 	@jwt_required()
 	def delete(self):
 		current_user = get_jwt_identity()
-		existing_user = User.find_by_username(current_user, self.db_client)  # Replace 'database_client' with your actual database client
+		existing_user = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
 		this_user = User.from_dict(existing_user)
 
 		if not existing_user:
 			return {'message': 'User not found'}, 404
 
-		this_user.delete(self.db_client)
+		this_user.delete()
 		return {'message': 'User deleted successfully'}, 200
 
 

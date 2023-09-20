@@ -1,8 +1,6 @@
 from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
-from flask_jwt_extended import jwt_required, get_jwt_identity
 from api.models.User import User  # Import your User model
-from database.DatabaseClient import DatabaseClient
 
 # Request parser for user data
 user_parser = reqparse.RequestParser()
@@ -20,8 +18,7 @@ user_fields = {
 }
 
 class UserListResource(Resource):
-    def __init__(self, dbClient: DatabaseClient):
-        self.db_client = dbClient
+
 
     @marshal_with(user_fields)
     def get(self):
@@ -31,7 +28,7 @@ class UserListResource(Resource):
             List[User]: A list of all users.
         """
 
-        users_data = User.get_all(self.db_client)
+        users_data = User.get_all()
         if users_data:
             users = [User.from_dict(user_data) for user_data in users_data]
             return users, 200
