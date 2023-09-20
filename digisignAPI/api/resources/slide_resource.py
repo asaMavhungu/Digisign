@@ -71,17 +71,21 @@ class SlideResource(Resource):
 				department_data = Department.find_by_name(department_name)
 
 				department = Department.from_dict(department_data)
+				
 				department.remove_slide(slide_title)
-
-				department.save
+				slide.remove_department(department_name)
+				
+				department.save()
 
 			for department_name in new_departments:
 				department_data = Department.find_by_name(department_name)
 
 				if department_data:
 					department = Department.from_dict(department_data)
+					
 					slide.add_department(department.name)
 					department.add_slide(slide.title)
+					
 					department.save()
 				else:
 					return {"message": f"Department [{department_name}] not found"}, 404

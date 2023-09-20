@@ -60,7 +60,9 @@ class DepartmentResource(Resource):
 				slide_data = Slide.find_by_title(slide_name)
 
 				slide = Slide.from_dict(slide_data)
+				
 				slide.remove_department(department_name)
+				department.remove_slide(slide_name)
 
 				slide.save()
 
@@ -71,8 +73,10 @@ class DepartmentResource(Resource):
 					return {'message': f'slide [{slide_name}] doesnt exist'}, 400
 				
 				slide = Slide.from_dict(slide_data)
+				
 				slide.add_department(department.name)
 				department.add_slide(slide.title)
+				
 				slide.save()
 
 		department_id = department.save()
