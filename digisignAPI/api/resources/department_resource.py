@@ -52,7 +52,10 @@ class DepartmentResource(Resource):
 			#department.name = args['name']
 
 		if 'slides' in args:
-			new_slides = args.get('slides', [])
+			new_slides: list = args.get('slides', [])
+			# This sometimes give back NONE
+			if new_slides is None:
+				new_slides = []
 
 			old_slides = department.get_slides()
 
