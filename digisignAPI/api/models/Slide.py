@@ -115,5 +115,8 @@ class Slide:
 		"""
 		return db_client.get_table('slides')
 	
+	def get_departments(self):
+		return self.departments
+		
 	def delete_me(self):
 		db_client.delete_entry('slides', 'title', self.title)

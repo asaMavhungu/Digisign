@@ -65,8 +65,15 @@ class SlideResource(Resource):
 			args = slide_parser_patch.parse_args()
 			new_departments = args.get('departments', [])
 
-			if not isinstance(new_departments, list):
-				return {"message": "Invalid 'departments' format, expected a list"}, 400
+			old_departments = slide.get_departments()
+
+			for department_name in old_departments:
+				department_data = Department.find_by_name(department_name)
+
+				department = Department.from_dict(department_data)
+				department.remove_slide(slide_title)
+
+				department.save
 
 			for department_name in new_departments:
 				department_data = Department.find_by_name(department_name)
@@ -83,8 +90,9 @@ class SlideResource(Resource):
 			if isinstance(slide, ImageSlide):
 				slide.add_image_url = args['content']
 
-		if 'title' in args and args['title']:
-			slide.title = args['title']
+		# TODO add changing names
+		#if 'title' in args and args['title']:
+			#slide.title = args['title']
 
 		slide.save()
 		

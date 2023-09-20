@@ -107,15 +107,5 @@ class Device:
 			# Insert a new device document
 			return db_client.insert_entry('devices', device_data)
 	
-	def delete(self, mongo):
-		# TODO FIXXXX
-		"""
-		Deletes the device from the database.
-
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		"""
-		if self._id:
-			mongo.db.devices.delete_one({'_id': self._id})
-
 	def delete_me(self):
 		db_client.delete_entry('devices', 'name', self.name)

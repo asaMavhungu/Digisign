@@ -2,10 +2,13 @@ from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
 from bson.objectid import ObjectId
 from api.models.Department import Department
+from api.models.Slide import Slide
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
 department_parser.add_argument('name', type=str, required=True, help='Name of the department')
+department_parser.add_argument('slides', type=list, location='json', help='Departments associated with the slide')
+department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
 # Define the fields for marshaling department data in responses
 department_fields = {
@@ -46,6 +49,24 @@ class DepartmentListResource(Resource):
 			return {"message": f"Department named '{name}' already exists"}, 400
 
 		department = Department(name)
+
+		if 'slides' in args:
+			slides = args.get('slides', [])
+
+			if slides is None:
+				slides = []
+
+			for slide_name in slides:
+				slide_data = Slide.find_by_title(slide_name)
+				
+				if not slide_data:
+					return {'message': f'slide [{slide_name}] doesnt exist'}, 400
+				
+				slide = Slide.from_dict(slide_data)
+				slide.add_department(department.name)
+				department.add_slide(slide.title)
+				slide.save()
+
 
 		department_id = department.save()
 

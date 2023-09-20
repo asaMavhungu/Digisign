@@ -113,3 +113,6 @@ class Department:
 	def delete_me(self):
 		# TODO FIXXXX
 		slides_table.delete_one(self._id) # type: ignore #TODO TYPE IGNORE HERER
+
+	def get_slides(self):
+		return self.slides

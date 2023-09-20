@@ -1,6 +1,3 @@
-from flask_pymongo import PyMongo
-from bson.objectid import ObjectId
-from pymongo import MongoClient
 from tinydb import TinyDB
 import database.tinyDB_utils as tinyDB_utils
 
