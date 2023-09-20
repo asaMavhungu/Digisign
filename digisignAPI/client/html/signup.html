@@ -181,6 +181,10 @@
                                 <label for="pass">Password</label>
                             </div>
                             <div class="input-field">
+                                <input type="password" class="input" id="confirmPass" required="">
+                                <label for="confirmPass">Confirm Password</label>
+                            </div>
+                            <div class="input-field">
                                 <input type="submit" class="submit" value="Sign Up">
                             </div>
                         </form>
@@ -199,6 +203,9 @@
         messageDiv.textContent = message;
         messageDiv.className = `alert ${success ? 'alert-success' : 'alert-danger'}`;
         messageDiv.style.display = 'block';
+
+        // Set focus on the message div
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
 
     // Event listener for the form submission
@@ -209,7 +216,14 @@
         const username = document.getElementById('username').value;
         const email = document.getElementById('email').value;
         const password = document.getElementById('pass').value;
+        const confirmPassword = document.getElementById('confirmPass').value;
         const verified = true;
+
+        // Check if passwords match
+        if (password !== confirmPassword) {
+            showMessage('Passwords do not match. Please try again.', false);
+            return; // Exit the function
+        }
 
         // Create JSON data
         const formData = {
