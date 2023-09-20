@@ -60,6 +60,7 @@ class User:
 		:param database_client: An instance of DatabaseClient used for database operations.
 		:return: User dict or None if not found.
 		"""
+		# TODO Return a class instance
 		return db_client.get_one('users', 'username', username) # type: ignore
 
 	@staticmethod

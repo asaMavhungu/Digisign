@@ -89,6 +89,7 @@ class Slide:
 	def find_by_title(title: str) -> (dict | None):
 		print("==========================")
 		# TODO Remove redundancy of creating Slide object
+		# TODO Bring back redundancy
 		"""
 		Finds slides by their title in the database.
 
