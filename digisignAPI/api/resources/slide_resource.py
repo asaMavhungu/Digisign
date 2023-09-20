@@ -11,15 +11,15 @@ from api.models.ImageSlide import ImageSlide
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('content', type=str, required=True, help='Content of the slide')
-slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
+slide_parser.add_argument('image_rul', type=str, required=True, help='image_rul of the slide')
+slide_parser.add_argument('slide_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 slide_parser_patch = reqparse.RequestParser()
 slide_parser_patch.add_argument('title', type=str, required=False, help='Title of the slide')
 slide_parser_patch.add_argument('content', type=str, required=False, help='Content of the slide')
-slide_parser_patch.add_argument('content_type', type=str, required=False, help='Type of content of the slide') 
+slide_parser_patch.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
 slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
 slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
@@ -27,8 +27,8 @@ slide_parser_patch.add_argument('departments', type=list, location='json', help=
 slide_fields = {
 	'_id': fields.String(attribute='_id'),
 	'title': fields.String,
-	'content': fields.String,
-	'content_type': fields.String,
+	'image_url': fields.String,
+	'slide_type': fields.String,
 	'author_id': fields.String,
 	'departments': fields.List(fields.String),
 }
@@ -108,7 +108,7 @@ class SlideResource(Resource):
 		
 		slide_factory = SlideFactory()
 		slide = slide_factory.create_slide(slide_dict)
-		
+
 		if slide:
 			slide.delete_me()
 			return {"message": f"Slide '{slide_title}' deleted"}, 200

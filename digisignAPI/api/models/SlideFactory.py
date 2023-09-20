@@ -10,9 +10,9 @@ class SlideFactory:
 	
 	def create_slide(self, slide_dict: dict):
 
-		if slide_dict['type'] == 'generic':
+		if slide_dict['slide_type'] == 'generic':
 			return Slide.from_dict(slide_dict)
-		elif slide_dict['type'] == 'image':
+		elif slide_dict['slide_type'] == 'image':
 			return ImageSlide.from_dict(slide_dict)
 		
 		# TODO FIX HERE, JUST TO REMOVE THE 'NONE' ERRORS

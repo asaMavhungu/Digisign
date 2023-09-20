@@ -12,7 +12,7 @@ class ImageSlide(Slide):
 		:param image_url: The URL of the image.
 		"""
 		super().__init__(title, author_id, departments) 
-		self.type = 'image'
+		self.slide_type = 'image'
 		self.image_url = image_url
 
 	def to_dict(self):
@@ -30,7 +30,7 @@ class ImageSlide(Slide):
 		slide = cls(
 			title=slide_dict['title'],
 			author_id=slide_dict['author_id'],
-			image_url=slide_dict['content_url'],
+			image_url=slide_dict['image_url'],
 			departments = slide_dict.get('departments', [])
 		)
 

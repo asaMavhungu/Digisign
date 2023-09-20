@@ -11,8 +11,8 @@ import json
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('content_url', type=str, required=True, help='Content of the slide')
-slide_parser.add_argument('content_type', type=str, required=True, help='Type of content of the slide') 
+slide_parser.add_argument('image_url', type=str, required=True, help='image of the slide')
+slide_parser.add_argument('slide_type', type=str, required=True, help='Type of content of the slide') 
 slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
@@ -20,8 +20,8 @@ slide_parser.add_argument('departments', type=list, location='json', help='Depar
 slide_fields = {
 	'_id': fields.String(attribute='_id'),
 	'title': fields.String,
-	'content_url': fields.String,
-	'content_type': fields.String,
+	'image_url': fields.String,
+	'slide_type': fields.String,
 	'author_id': fields.String,
 	'departments': fields.List(fields.String),
 }
@@ -53,8 +53,8 @@ class SlideList(Resource):
 		"""
 		args = slide_parser.parse_args()
 		title = args['title']
-		content_url = args['content_url']
-		content_type = args['content_type']
+		image_url = args['image_url']
+		slide_type = args['slide_type']
 		author_id = args['author_id']
 		departments = args.get('departments', [])
 
@@ -70,9 +70,9 @@ class SlideList(Resource):
 
 		slide_dict = {
 			'title' : title,
-			'type' : content_type,
+			'slide_type' : slide_type,
 			'author_id' : user.username,
-			'content_url' : content_url
+			'image_url' : image_url
 		}
 		slide_factory = SlideFactory()
 		slide = slide_factory.create_slide(slide_dict)

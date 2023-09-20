@@ -13,7 +13,7 @@ class Slide:
 		"""
 		self._id = None 
 		self.title = title
-		self.type = "generic"
+		self.slide_type = "generic"
 		self.author_id = author_id
 		self.departments = departments
 
@@ -62,7 +62,7 @@ class Slide:
 		"""
 		slide_dict = {
 			'title': self.title,
-			'type': self.type,
+			'slide_type': self.slide_type,
 			'author_id': self.author_id,
 			'departments': self.departments,
 		}
@@ -75,7 +75,7 @@ class Slide:
 		return {
 			'_id': self._id,
 			'title': self.title,
-			'type': self.type,
+			'slide_type': self.slide_type,
 			'author_id': self.author_id,
 			'departments': self.departments,
 		}
