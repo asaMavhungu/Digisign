@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="en">
+
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
+    <title>Bootstrap Example</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <style>
+		*{
+            font-family: Arial, Helvetica, sans-serif;
+        }
+        .wrapper{
+            background: #f8f9fa;
+            padding: 0 20px 0 20px;
+        }
+        .main{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+        .side-image{
+            background-image: url("https://uct.ac.za/sites/default/files/content_migration/uct_ac_za/69/images/campus-top.jpg");
+            background-position: center;
+            background-size: cover;
+            background-repeat: no-repeat;
+            border-radius: 10px 0 0 10px;
+            position: relative;
+        }
+        .row{
+            width:  900px;
+            height:550px;
+            border-radius: 10px;
+            background: #fff;
+            padding: 0px;
+            box-shadow: 5px 5px 10px 1px rgba(0,0,0,0.2);
+        }
+        .text{
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .right{
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: relative;
+        }
+        .input-box{
+            width: 330px;
+            box-sizing: border-box;
+        }
+        .input-box header{
+            font-weight: 700;
+            text-align: center;
+            margin-bottom: 45px;
+        }
+        .input-field{
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            padding: 0 10px 0 10px;
+        }
+        .input{
+            height: 45px;
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.2);
+            outline: none;
+            margin-bottom: 20px;
+            color: #40414a;
+        }
+        .input-box .input-field label{
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            pointer-events: none;
+            transition: .5s;
+        }
+        .input-field input:focus ~ label
+        {
+            top: -10px;
+            font-size: 13px;
+        }
+        .input-field input:valid ~ label
+        {
+            top: -10px;
+            font-size: 13px;
+            color: #5d5076;
+        }
+        .input-field .input:focus, .input-field .input:valid{
+            border-bottom: 1px solid #0d6efd;
+        }
+        .submit{
+            border: none;
+            outline: none;
+            height: 45px;
+            background: #ececec;
+            border-radius: 5px;
+            transition: .4s;
+        }
+        .submit:hover{
+            background: #0d6efd;
+            color: #fff;
+        }
+        
+        @media only screen and (max-width: 768px){
+            .side-image{
+                border-radius: 10px 10px 0 0;
+            }
+            img{
+                width: 35px;
+                position: absolute;
+                top: 20px;
+                left: 47%;
+            }
+            .text{
+                position: absolute;
+                top: 70%;
+                text-align: center;
+            }
+            .text p, i{
+                font-size: 16px;
+            }
+            .row{
+                max-width:420px;
+                width: 100%;
+            }
+        }
+    </style>
+  </head>
+
+
+  <body class="p-3 m-0 border-0 bd-example">
+
+    <!--Navbar Code -->
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
+          <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link" href="department.html">Department</a>
+              <a class="nav-link" aria-current="page" href="slides.html">All Slides</a>
+            </div>
+          </div>
+          <a class="btn btn-outline-success me-2 active" aria-current="page" href= "signin.html" type="button">Login</a>
+        </div>
+    </nav>
+    
+    <div id="message" class="alert" style="display: none;"></div>
+    <!--Signin code-->
+    <div class="wrapper">
+        <div class="container main">
+            <div class="row">
+                <div class="col-md-6 side-image">
+                </div>
+                <div class="col-md-6 right">
+                    <div class="input-box">
+                        <header>UCT Email</header>
+                        <form id="signupForm">
+                            <div class="input-field">
+                                <input type="text" class="input" id="username" required="" autocomplete="off">
+                                <label for="username">Username</label>
+                            </div>
+                            <div class="input-field">
+                                <input type="password" class="input" id="pass" required="">
+                                <label for="pass">Password</label>
+                            </div>
+                            <div class="input-field">
+                                <input type="submit" class="submit" value="Login">
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+<script>
+    
+    // Function to display a Bootstrap alert message
+    function showMessage(message, success) {
+        const messageDiv = document.getElementById('message');
+        messageDiv.textContent = message;
+        messageDiv.className = `alert ${success ? 'alert-success' : 'alert-danger'}`;
+        messageDiv.style.display = 'block';
+
+        // Set focus on the message div
+        messageDiv.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    // Event listener for the form submission
+    document.getElementById('signupForm').addEventListener('submit', function(event) {
+        event.preventDefault();
+
+        // Get form values
+        const username = document.getElementById('username').value;
+        const password = document.getElementById('pass').value;
+        const verified = true;
+
+        // Create JSON data
+        const formData = {
+            username,
+            password,
+        };
+
+        // Send a POST request to your API endpoint with JSON data
+        fetch('/api/login', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(formData),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Check if the registration was successful
+            if (data.success) {
+                showMessage(data.message, true);
+				localStorage.setItem('access_token', data.access_token);
+				window.location.href = '/devices'; // Replace with the actual URL
+            } else {
+                showMessage(data.message + data.message, false);
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showMessage('An error occurred. Please try again later.', false);
+        });
+    });
+
+
+</script>
+    
+  </body>
+</html>
