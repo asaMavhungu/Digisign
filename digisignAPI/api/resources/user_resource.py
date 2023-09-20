@@ -59,7 +59,7 @@ class UserResource(Resource):
 		existing_user = User.find_by_username(username)  # Replace 'database_client' with your actual database client
 
 		if existing_user:
-			return {'message': 'User with this username already exists'}, 400
+			return {'success': False, 'message': 'User with this username already exists'}, 400
 
 		# Hash the password (you should use a password hashing library)
 		# Replace 'hash_password' with your actual password hashing function
@@ -73,7 +73,7 @@ class UserResource(Resource):
 		# Save the user to the database
 		user_id = new_user.save()  # Replace 'database_client' with your actual database client
 
-		return {'message': 'User registered successfully', 'user_id': user_id}, 201
+		return {'success': True, 'message': 'User registered successfully', 'user_id': user_id}, 201
 
 	@jwt_required()
 	def put(self):

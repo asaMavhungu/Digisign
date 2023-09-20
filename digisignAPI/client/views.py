@@ -22,3 +22,7 @@ def slides():
 @views.route('/login', methods=['GET'])
 def login():
 	return send_file("client/html/login.html")
+
+@views.route('/signin', methods=['GET'])
+def signin():
+	return send_file("client/html/signin.html")
