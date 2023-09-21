@@ -39,34 +39,38 @@
 
   
     <script>
-        // List of department titles
-        const departmentTitles = ["Computer Science", "Electrical Engineering", "Mechanical Engineering"];
+      // Function to create a new department card
+      function createDepartmentCard(title) {
+          const cardDiv = document.createElement("div");
+          cardDiv.className = "col mb-4";
+          cardDiv.innerHTML = `
+              <div class="card">
+                  <div class="card-body">
+                      <h5 class="card-title">${title}</h5>
+                      <p class="card-text">Description for ${title}.</p>
+                      <a href="slides.html" class="btn btn-primary">Go somewhere</a>
+                  </div>
+              </div>
+          `;
+          return cardDiv;
+      }
 
-        // Function to create a new department card
-        function createDepartmentCard(title) {
-            const cardDiv = document.createElement("div");
-            cardDiv.className = "col-mb-4";
-            cardDiv.innerHTML = `
-                <div class="card">
-                    <div class="card-body">
-                        <h5 class="card-title">${title}</h5>
-                        <p class="card-text">Description for ${title}.</p>
-                        <a href="slides.html" class="btn btn-primary">Go somewhere</a>
-                    </div>
-                </div>
-            `;
-            return cardDiv;
-        }
+      // Get the container div for department cards
+      const departmentCardsContainer = document.getElementById("department-cards");
 
-        // Get the container div for department cards
-        const departmentCardsContainer = document.getElementById("department-cards");
-
-        // Add department cards to the container
-        departmentTitles.forEach((title) => {
-            const departmentCard = createDepartmentCard(title);
-            departmentCardsContainer.appendChild(departmentCard);
-        });
-    </script>
+      // Fetch department titles from the API
+      fetch('/api/departments')
+          .then(response => response.json())
+          .then(data => {
+              data.forEach(department => {
+                  const departmentCard = createDepartmentCard(department.name);
+                  departmentCardsContainer.appendChild(departmentCard);
+              });
+          })
+          .catch(error => {
+              console.error('Error fetching department titles:', error);
+          });
+  </script>
 
   </body>
 </html>
