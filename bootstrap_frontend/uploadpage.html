@@ -19,13 +19,6 @@
             height: 100vh;
         }
 
-        .url-upload{
-            margin-bottom: 15px;
-            display: block;
-            width: 900px;
-        }
-
-        
         .file-upload {
             text-align: center; 
         }
@@ -55,6 +48,12 @@
             color: #007bff;
             border: 1px dashed #007bff;
         }
+
+        .custom-margin {
+            margin-bottom: 20px;
+            width: 769px;
+        }
+
 
     </style>
   </head>
@@ -86,10 +85,16 @@
     <!-- Main body content -->
     <div class="container">
 
-        <div class="url-upload">
-            <input type="text" id="url-input" class="form-control" placeholder="Enter URL of video or image here">
+        <div class="url-upload row">
+            <div class="col">
+                <input type="text" id="url-input" class="form-control custom-margin mr-0" placeholder="Enter URL of video or image here">
+            </div>
+            <div class="col">
+                <button id="upload-url-button" class="btn btn-primary btn-block ml-0">Upload URL</button>
+            </div>
         </div>
         
+
         <div class="file-upload">
             <input type="file" id="file-input" class="input" name="file" accept=".txt, .pdf, .png, .jpg, .jpeg, .gif">
             <label for="file-input" class="label label-container">Click or Drag &amp; Drop
@@ -111,6 +116,7 @@
         const fileInput = document.getElementById("file-input");
         const label = document.querySelector(".label");
         const thumbnailPreview = document.getElementById("thumbnail-preview");
+        const uploadUrlButton = document.getElementById("upload-url-button");
 
    
         function displayFileName(input) {
@@ -153,7 +159,7 @@
 
             if (url)
             {
-                console.log("Uploaded URL");
+                console.log("Uploaded URL:", url);
             }
             else
             {
