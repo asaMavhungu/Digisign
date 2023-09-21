@@ -26,3 +26,7 @@ def login():
 @views.route('/signin', methods=['GET'])
 def signin():
 	return send_file("client/html/signin.html")
+
+@views.route('/deps', methods=['GET'])
+def departments():
+	return send_file("client/html/department.html")
