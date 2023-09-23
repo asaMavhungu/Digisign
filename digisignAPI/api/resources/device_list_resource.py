@@ -23,7 +23,7 @@ device_fields = {
     'device_id': fields.String,
     'device_name': fields.String,
     'department_id': fields.String,
-    'slides_assigned': fields.List(fields.String),  # Assuming slide_id is a string
+    'slide_ids': fields.List(fields.String),  # Assuming slide_id is a string
 }
 
 class DeviceListResource(Resource):
@@ -39,8 +39,13 @@ class DeviceListResource(Resource):
 			int: HTTP status code.
 		"""
 		devices_data = Device.getAll()
+		print(devices_data[0])
 		if devices_data is not None:	
-			devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
+			dev_dicts = Device.extract_mult_devices_info(devices_data)
+			print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW------------")
+			print(dev_dicts[0])
+			print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW------------")
+			devices = [Device.from_dict(dev_dict) for dev_dict in dev_dicts]  # Updated model name
 			return devices, 200
 		else:
 			return {"message": "Departments not found"}, 404	

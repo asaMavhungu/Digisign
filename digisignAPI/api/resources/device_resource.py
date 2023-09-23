@@ -20,11 +20,10 @@ device_parser_patch.add_argument('departments', type=list, location='json', help
 
 # Fields to marshal device data in responses
 device_fields = {
-	'_id': fields.String(attribute='_id'),
-	'name': fields.String,
-	'description': fields.String,
-	'slides': fields.List(fields.String),
-	'departments': fields.List(fields.String),
+    'device_id': fields.String,
+    'device_name': fields.String,
+    'department_id': fields.String,
+    'slide_ids': fields.List(fields.String),  # Assuming slide_id is a string
 }
 
 class DeviceResource(Resource):
@@ -42,7 +41,7 @@ class DeviceResource(Resource):
 			int: HTTP status code.
 		"""
 		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-		device_data = Device.find_by_name(device_name)
+		device_data, code = Device.find_by_name(device_name)
 		print(device_data)
 		print("========================")
 		if device_data:

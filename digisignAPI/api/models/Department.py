@@ -61,13 +61,16 @@ class Department:
 
 		if code == 404:
 			return result, code
-		return {
+		
+		department_dict = {
 			'department_id': result['department_id'],
 			'department_name': result['department_name'],
 			'slide_ids': [slide['slide_id'] for slide in result['slides']],
 			'shared_slide_ids': [shared_slide['slide_id'] for shared_slide in result['shared_slides']],
 			'device_ids': [device['device_id'] for device in result['devices']]
-		} , code
+		}
+		
+		return department_dict, code
 			
 	@classmethod
 	def extract_mult_departments_info(cls, data: list[dict]):

@@ -5,28 +5,86 @@ import database.sql_utils as sql_client
 
 
 class Device:
-	def __init__(self, device_id, device_name, department_id):
-		self.device_id = device_id
-		self.device_name = device_name
-		self.department_id = department_id
-		self.slides_assigned = []  # List to hold assigned Slide objects
+	def __init__(self, device_name, device_id=None, department_id=None, slide_ids=None):
+		"""
+		Constructor for the Device class.
+
+		:param device_id: The ID of the device.
+		:param device_name: The name of the device.
+		:param department_id: The ID of the department to which the device belongs.
+		:param slide_ids: List of slide IDs assigned to this device (optional).
+		"""
+		self.device_id: str | None = device_id
+		self.device_name: str = device_name
+		self.department_id: str | None = department_id
+		self.slide_ids = slide_ids or []
 
 	def __repr__(self):
-		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slides_assigned={self.slides_assigned})>"
+		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slide_ids={self.slide_ids})>"
+	
+	
+	@staticmethod
+	def find_by_name(device_name: str):
+		"""
+		Finds a department by its name in the database.
 
+		:param department_name: The name of the department to search for.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: An instance of the Department class or None if not found.
+		"""
+		result, code = sql_client.get_entry('devices', {'device_name': device_name,})
+		if code == 404:
+			return result, code
+		
+		device_dict = {
+			'device_id': result['device_id'],
+			'device_name': result['device_name'],
+			'department_id': result['department_id'],
+			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']]
+		}
+
+		return device_dict, code
+	
+	
 	@classmethod
 	def from_dict(cls, data):
 		device_id = data.get("device_id")
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")
+		slide_ids = data.get("slide_ids", [])
 
-		assignments = data.get("assignments", [])
-		slide_ids = [assignment["slide_id"] for assignment in assignments]
+		return cls(device_id, device_name, department_id, slide_ids)
 
-		device = cls(device_id, device_name, department_id)
-		device.slides_assigned = slide_ids
+	def to_dict(self):
+		return {
+			"device_id": self.device_id,
+			"device_name": self.device_name,
+			"department_id": self.department_id,
+			"slide_ids": self.slide_ids
+		}
+	
+	@classmethod
+	def extract_mult_devices_info(cls, data_list):
+		devices = []
 
-		return device
+		for data in data_list:
+			device_id = data.get("device_id")
+			device_name = data.get("device_name")
+			department_id = data.get("department_id")
+			assignments_data = data.get("assignments", [])
+
+			slide_ids = [str(assignment.get("slide_id")) for assignment in assignments_data]
+
+			device_info = {
+				"device_id": device_id,
+				"device_name": device_name,
+				"department_id": department_id,
+				"slide_ids": slide_ids
+			}
+
+			devices.append(device_info)
+
+		return devices
 	
 	@staticmethod
 	def getAll():
@@ -34,8 +92,34 @@ class Device:
 		Get all the slides in the db
 		"""
 		return sql_client.get_table_data('devices')
+	
+	def create_database_entry(self):
+		result = sql_client.create_entry('devices', data = {
+			'department_name': self.department_name,  # Replace with your actual data
+			# Add other fields as needed
+		} )
 
-	def to_dict(self):
+		return result
+	
+	def update_database_entry(self, data: dict):
+
+		if 'department_name' in data:
+			self.department_name = data['department_name']
+		result = sql_client.update_entry('departments', 
+				filter_dict={'department_id': self.department_id},
+				data = data
+			)
+		
+		return result
+	
+	def delete_database_entry(self):
+		result = sql_client.delete_entry('departments', 
+				filter_dict={'department_id': self.department_id}
+			)
+		
+		return result
+
+	def to_dict_depracated(self):
 		"""
 		Converts the Device instance to a dictionary.
 
@@ -63,7 +147,7 @@ class Device:
 		}
 
 	@staticmethod
-	def getAll2():
+	def getAll_depracated():
 		"""
 		Get all the slides in the db
 		"""
@@ -71,7 +155,7 @@ class Device:
 		return db_client.get_table('devices')
 
 	@staticmethod
-	def find_by_name(device_name):
+	def find_by_name_depracated(device_name):
 		"""
 		Finds devices by their name in the database.
 
