@@ -18,12 +18,11 @@ slide_parser.add_argument('departments', type=list, location='json', help='Depar
 
 # Define the fields for marshaling slide data in responses
 slide_fields = {
-	'_id': fields.String(attribute='_id'),
-	'title': fields.String,
-	'image_url': fields.String,
-	'slide_type': fields.String,
-	'author_id': fields.String,
-	'departments': fields.List(fields.String),
+    'slide_id': fields.String(attribute='slide_id'),
+    'slide_name': fields.String(attribute='slide_name'),
+    'department_id': fields.String(attribute='department_id'),
+    'current_user_id': fields.String(attribute='current_user_id'),
+    'device_ids': fields.List(fields.String)
 }
 
 class SlideList(Resource):
@@ -38,16 +37,17 @@ class SlideList(Resource):
 		Returns:
 			List[Slide]: A list of all slides.
 		"""
-		slides_dicts = Slide.getAll()
-		if slides_dicts is not None:
-			slide_factory = SlideFactory()
-			slides = [slide_factory.create_slide(slide_dict) for slide_dict in slides_dicts]
+		slides_data = Slide.getAll()
+		#return {"message": "Departments not found"}, 400
+		if slides_data is not None:
+			slide_dicts = Slide.extract_mult_slide_info(slides_data)
+			slides = [Slide.from_dict(slide_dict) for slide_dict in slide_dicts]
 			return slides, 200
 		else:
 			return {"message": "Departments not found"}, 404		
 		
 
-	def post(self):
+	def post_deprecated(self):
 		"""
 		Create a new slide.
 		"""
@@ -97,7 +97,7 @@ class SlideList(Resource):
 		
 		return {'message': 'Slide NOT created'}, 400
 	
-	def delete(self):
+	def delete_deprecated(self):
 		"""
 		Delete multiple slides.
 

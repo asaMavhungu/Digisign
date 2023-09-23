@@ -126,9 +126,9 @@ def get_table_data(table_name):
 	# Close the session
 	session.close()
 
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
-	print(entry_dicts)
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	#print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	#print(entry_dicts)
+	#print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
 
 	return entry_dicts
 	return table_data
