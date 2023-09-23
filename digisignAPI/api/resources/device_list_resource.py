@@ -20,11 +20,10 @@ device_parser_patch.add_argument('slides', type=list, location='json', help='Sli
 
 # Fields to marshal device data in responses
 device_fields = {
-	'device_id': fields.String,
-	'device_name': fields.String,
-	'description': fields.String,
-	'slides': fields.List(fields.String),
-	'departments': fields.List(fields.String),
+    'device_id': fields.String,
+    'device_name': fields.String,
+    'department_id': fields.String,
+    'slides_assigned': fields.List(fields.String),  # Assuming slide_id is a string
 }
 
 class DeviceListResource(Resource):
@@ -40,7 +39,7 @@ class DeviceListResource(Resource):
 			int: HTTP status code.
 		"""
 		devices_data = Device.getAll()
-		if devices_data is not None:
+		if devices_data is not None:	
 			devices = [Device.from_dict(device_data) for device_data in devices_data]  # Updated model name
 			return devices, 200
 		else:
@@ -56,7 +55,7 @@ class DeviceListResource(Resource):
 			int: HTTP status code.
 		"""
 		args = device_parser.parse_args()
-		name = args['name']
+		name = args['device_name']
 		description = args['description']
 		slides = args.get('slides', [])
 

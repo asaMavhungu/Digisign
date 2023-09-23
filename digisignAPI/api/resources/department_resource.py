@@ -14,40 +14,12 @@ department_parser.add_argument('devices', type=list, location='json', help='Devi
 
 # Define the fields for marshaling department data in responses
 department_fields = {
-	'_id': fields.String(attribute='_id'),
-	'name': fields.String,
-	'slides': fields.List(fields.String),
-	'devices': fields.List(fields.String),
+    "department_id": fields.String,
+    "department_name": fields.String,
+    "slide_ids": fields.List(fields.String),
+    "device_ids": fields.List(fields.String),
+    "shared_slide_ids": fields.List(fields.String),
 }
-
-department_fields3 = {
-	'department_id': fields.String,
-	'department_name': fields.String,
-	'slides': fields.List(fields.Nested({
-		'id': fields.String,
-		'name': fields.String
-	})),
-	'devices': fields.List(fields.Nested({
-		'id': fields.String,
-		'name': fields.String
-	})),
-	'shared_slides': fields.List(fields.Nested({
-		'sharing_id': fields.String,
-		'slide_id': fields.String,
-		'to_department': fields.Nested({
-			'department_id': fields.String,
-			'department_name': fields.String
-		}),
-		'from_department': fields.Nested({
-			'department_id': fields.String,
-			'department_name': fields.String
-		}),
-		# Add other fields as needed
-	}))
-}
-
-
-
 
 class DepartmentResource(Resource):
 	"""
@@ -55,7 +27,7 @@ class DepartmentResource(Resource):
 	"""
 
 
-	@marshal_with(department_fields3)
+	@marshal_with(department_fields)
 	def get(self, department_name):
 		"""
 		Get details of a specific department by ID.
@@ -63,10 +35,13 @@ class DepartmentResource(Resource):
 		department_dict, code = Department.find_by_name(department_name)
 		if code == 200:
 			#print(department_dict)
-			#print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-			department = Department.from_db_query(department_dict)
+			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			print(department_dict)
+			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			department_json = Department.extract_department_info(department_dict)
+			department = Department.from_dict(department_json)
+			print(department)
 			return department, 200
-			return department_dict, 200
 		return {"message": "Department not found"}, 404
 	
 	def patch(self, department_name):
@@ -87,18 +62,21 @@ class DepartmentResource(Resource):
 			new_name = args['department_name']
 			old_name = department.department_name
 
-			department.update_database_entry({"department_name": new_name})
+			message, code = department.update_database_entry({"department_name": new_name})
 
-			return {"message": f"Department name {old_name} updated to {new_name}"}, 200
+			return message, code
 		
 	def delete(self, department_name):
-		department_dict, code = Department.find_by_name(department_name)
+		department_db_dict, code = Department.find_by_name(department_name)
 		
 
 		if code == 404:
 			return {"message": "Department not found"}, 404
-		
+	
+		department_dict = Department.extract_department_info(department_db_dict)
+
 		department = Department.from_dict(department_dict)
+
 		result, code  = department.delete_database_entry()
 
 		return result, code

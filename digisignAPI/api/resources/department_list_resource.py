@@ -12,11 +12,12 @@ department_parser.add_argument('slides', type=list, location='json', help='Depar
 department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
 
-department_fields3 = {
-	'department_id': fields.String,
-	'department_name': fields.String,
-	'slides': fields.List(fields.Nested({'id': fields.String, 'name': fields.String})),
-	'devices': fields.List(fields.Nested({'id': fields.String, 'name': fields.String})),
+department_fields = {
+    "department_id": fields.String,
+    "department_name": fields.String,
+    "slide_ids": fields.List(fields.String),
+    "device_ids": fields.List(fields.String),
+    "shared_slide_ids": fields.List(fields.String),
 }
 
 class DepartmentListResource(Resource):
@@ -24,7 +25,7 @@ class DepartmentListResource(Resource):
 	Resource class for managing collections of departments.
 	"""
 
-	@marshal_with(department_fields3)
+	@marshal_with(department_fields)
 	def get(self):
 		"""
 		Get a list of all departments.
@@ -33,9 +34,15 @@ class DepartmentListResource(Resource):
 		"""
 		departments_data = Department.getAll()
 		if departments_data is not None:
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------")
 			print(departments_data)
+			print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX------------")
+			print(Department.extract_mult_departments_info(departments_data))
+			dep_dicts = Department.extract_mult_departments_info(departments_data)
+			print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW------------")
 			#return departments_data, 200
-			departments = [Department.from_db_query(department_data) for department_data in departments_data]
+			departments = [Department.from_dict(department_dict) for department_dict in dep_dicts]
+			print(departments[0])
 			return departments, 200
 		else:
 			return {"message": "Departments not found"}, 404	

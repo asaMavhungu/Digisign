@@ -10,9 +10,8 @@ from sqlalchemy.orm import sessionmaker
 from sqlalchemy.ext.automap import automap_base
 from sqlalchemy.orm import Session
 from sqlalchemy.orm import relationship
-from database.sql_models import User, Department, Device, Slide, SharedSlide, SlideAssignment
-from sqlalchemy.exc import NoResultFound
-
+from sql_database import User, Department, Device, Slide, SharedSlide, SlideAssignment
+from sqlalchemy.orm.exc import NoResultFound
 
 Base = automap_base()
 
@@ -46,23 +45,14 @@ from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 import json
 
-def model_instance_to_json(instance, include_relationships=True):
+def model_instance_to_json(instance):
 	my_dict = {}
 	for column in instance.__table__.columns:
 		key = f"{column.name}"
 		val = f"{getattr(instance, column.name)}"
+
 		my_dict[key] = val
-
-	if include_relationships:
-		for relationship in instance.__mapper__.relationships:
-			rel_name = relationship.key
-			related_records = getattr(instance, rel_name)
-			if related_records is not None:
-				if relationship.uselist:
-					my_dict[rel_name] = [model_instance_to_json(record, include_relationships=False) for record in related_records]
-				else:
-					my_dict[rel_name] = model_instance_to_json(related_records, include_relationships=False)
-
+	
 	return my_dict
 
 def get_table_class_deprecated(table_name, base):
@@ -125,11 +115,6 @@ def get_table_data(table_name):
 	# Close the session
 	session.close()
 
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
-	print(entry_dicts)
-	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
-
-	return entry_dicts
 	return table_data
 
 
@@ -143,110 +128,62 @@ def create_entry(table_name, data):
 		new_entry = table_class(**data)
 		session.add(new_entry)
 		session.commit()
-		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
+		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)}
 	except Exception as e:
 		session.rollback()
-		return {"error": f"Failed to create {table_name} entry: {str(e)}"}, 301
+		return {"error": f"Failed to create {table_name} entry: {str(e)}"}
 	finally:
 		session.close()
 
-def get_entry_deprecated(table_name, filter_dict):
-	"""Get an entry from the specified table based on a filter dictionary."""
-	session = Session(bind=engine)
-	try:
-		table_class = get_table_class(table_name)
-		try:
-			print("found $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-			print(filter_dict)
-			entry = session.query(table_class).filter_by(**filter_dict).one()
-			print("found $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
-			return model_instance_to_json(entry)
-		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."}
-	finally:
-		session.close()
-		
 def get_entry(table_name, filter_dict):
-	"""Get an entry from the specified table based on a filter dictionary."""
-	session = Session(bind=engine)
-	try:
-		table_class = get_table_class(table_name)
-		try:
-			entry = session.query(table_class).filter_by(**filter_dict).one()
-			# Create a dictionary representation of the entry
-			entry_dict = model_instance_to_json(entry)
-
-			print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
-
-			print(entry_dict)
-			return entry_dict , 200
-
-			# Include information about relationships (slides and devices)
-			if hasattr(table_class, 'slides'):
-				entry_dict['slides'] = [{'slide_id': slide.slide_id, 'slide_name': slide.slide_name} for slide in entry.slides]
-
-			if hasattr(table_class, 'devices'):
-				entry_dict['devices'] = [{'device_id': device.device_id, 'device_name': device.device_name} for device in entry.devices]
-			if hasattr(table_class, 'shared_slides'):
-				shared_slide_info = []
-				for shared_slide in entry.shared_slides:
-					shared_slide_info.append({
-						'sharing_id': shared_slide.sharing_id,
-						'to_department': {
-							'department_id': shared_slide.to_department.department_id,
-							'department_name': shared_slide.to_department.department_name
-						},
-						'from_department': {
-							'department_id': shared_slide.from_department.department_id,
-							'department_name': shared_slide.from_department.department_name
-						},
-						'slide_id': shared_slide.slide.slide_id
-					})
-				entry_dict['shared_slides'] = shared_slide_info
-			print(entry_dict)
-			print("CCCCCCCCCCCCCCCCCCCCCCCC")
-			return entry_dict , 200
-		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."} , 404
-	finally:
-		session.close()
+    """Get an entry from the specified table based on a filter dictionary."""
+    session = Session(bind=engine)
+    try:
+        table_class = get_table_class(table_name)
+        try:
+            entry = session.query(table_class).filter_by(**filter_dict).one()
+            return model_instance_to_json(entry)
+        except NoResultFound:
+            return {"error": f"No {table_name} entry found matching the filter."}
+    finally:
+        session.close()
 
 def update_entry(table_name, filter_dict, data):
-	"""Update an entry in the specified table based on a filter dictionary with the provided data."""
-	session = Session(bind=engine)
-	try:
-		table_class = get_table_class(table_name)
-		try:
-			entry = session.query(table_class).filter_by(**filter_dict).one()
-			for key, value in data.items():
-				setattr(entry, key, value)
-			session.commit()
-			return {"message": f"{table_name} entry updated successfully.", "entry": model_instance_to_json(entry)}, 200
-		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."}, 301
-	except Exception as e:
-		session.rollback()
-		return {"error": f"Failed to update {table_name} entry: {str(e)}"}, 401
-	finally:
-		session.close()
+    """Update an entry in the specified table based on a filter dictionary with the provided data."""
+    session = Session(bind=engine)
+    try:
+        table_class = get_table_class(table_name)
+        try:
+            entry = session.query(table_class).filter_by(**filter_dict).one()
+            for key, value in data.items():
+                setattr(entry, key, value)
+            session.commit()
+            return {"message": f"{table_name} entry updated successfully.", "entry": model_instance_to_json(entry)}
+        except NoResultFound:
+            return {"error": f"No {table_name} entry found matching the filter."}
+    except Exception as e:
+        session.rollback()
+        return {"error": f"Failed to update {table_name} entry: {str(e)}"}
+    finally:
+        session.close()
 
 def delete_entry(table_name, filter_dict):
-	"""Delete an entry from the specified table based on a filter dictionary."""
-	session = Session(bind=engine)
-	try:
-		table_class = get_table_class(table_name)
-		try:
-			entry = session.query(table_class).filter_by(**filter_dict).one()
-			session.delete(entry)
-			session.commit()
-			return {"message": f"{table_name} entry deleted successfully."} , 200
-		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."} , 301
-	except Exception as e:
-		session.rollback()
-		return {"error": f"Failed to delete {table_name} entry: {str(e)}"}, 401
-	finally:
-		session.close()
+    """Delete an entry from the specified table based on a filter dictionary."""
+    session = Session(bind=engine)
+    try:
+        table_class = get_table_class(table_name)
+        try:
+            entry = session.query(table_class).filter_by(**filter_dict).one()
+            session.delete(entry)
+            session.commit()
+            return {"message": f"{table_name} entry deleted successfully."}
+        except NoResultFound:
+            return {"error": f"No {table_name} entry found matching the filter."}
+    except Exception as e:
+        session.rollback()
+        return {"error": f"Failed to delete {table_name} entry: {str(e)}"}
+    finally:
+        session.close()
 
 
 # Example usage:

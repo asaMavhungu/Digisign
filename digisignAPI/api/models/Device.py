@@ -5,66 +5,35 @@ import database.sql_utils as sql_client
 
 
 class Device:
-	def __init__(self, name, description):
-		"""
-		Constructor for the Device class.
+	def __init__(self, device_id, device_name, department_id):
+		self.device_id = device_id
+		self.device_name = device_name
+		self.department_id = department_id
+		self.slides_assigned = []  # List to hold assigned Slide objects
 
-		:param name: The name of the device.
-		"""
-		self._id = None  # MongoDB ObjectId (optional)
-		self.name = name
-		self.description = description
-		self.slides = []  # List to store associated slides
-		self.departments = []
-
-	def add_slide(self, slide_name):
-		"""
-		Add a slide to the device.
-
-		:param slide: The Slide object to associate with the device.
-		"""
-		self.slides.append(slide_name)
-
-	def remove_slide(self, slide_name):
-		"""
-		Remove a slide from the device.
-
-		:param slide: The Slide object to disassociate from the device.
-		"""
-		self.slides.remove(slide_name)
-		
-	def add_department(self, department_name):
-		"""
-		Add a device to the department.
-
-		:param device: The department name to associate with the department.
-		"""
-		self.departments.append(department_name)
-
-	def remove_department(self, department_name):
-		"""
-		Remove a device from the department.
-
-		:param device: The department name to disassociate from the department.
-		"""
-		self.departments.remove(department_name)
+	def __repr__(self):
+		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slides_assigned={self.slides_assigned})>"
 
 	@classmethod
-	def from_dict(cls, device_dict):
-		"""
-		Creates a Device instance from a dictionary.
+	def from_dict(cls, data):
+		device_id = data.get("device_id")
+		device_name = data.get("device_name")
+		department_id = data.get("department_id")
 
-		:param device_dict: A dictionary containing device data.
-		:return: An instance of the Device class.
-		"""
-		device = cls(
-			name=device_dict['name'],
-			description=device_dict['description']
-		)
-		device._id = device_dict.get('_id')  # Optional ObjectId
-		device.slides = device_dict.get('slides', [])
-		device.departments = device_dict.get('departments', [])
+		assignments = data.get("assignments", [])
+		slide_ids = [assignment["slide_id"] for assignment in assignments]
+
+		device = cls(device_id, device_name, department_id)
+		device.slides_assigned = slide_ids
+
 		return device
+	
+	@staticmethod
+	def getAll():
+		"""
+		Get all the slides in the db
+		"""
+		return sql_client.get_table_data('devices')
 
 	def to_dict(self):
 		"""
@@ -94,7 +63,7 @@ class Device:
 		}
 
 	@staticmethod
-	def getAll():
+	def getAll2():
 		"""
 		Get all the slides in the db
 		"""
