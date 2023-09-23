@@ -9,7 +9,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
-device_parser.add_argument('name', type=str, required=True, help='Name of the device')
+device_parser.add_argument('device_name', type=str, required=True, help='Name of the device')
 device_parser.add_argument('description', type=str, required=True, help='Description of the device')
 device_parser.add_argument('slides', type=list, location='json', help='Slides associated with the device')
 
@@ -61,9 +61,13 @@ class DeviceListResource(Resource):
 		"""
 		args = device_parser.parse_args()
 		name = args['device_name']
-		description = args['description']
-		slides = args.get('slides', [])
 
+		device = Device(name)
+
+		result = device.create_database_entry()
+		print(result)
+		return result
+	
 		if Device.find_by_name(name):
 			return {"message": f"Device named '{name}' already exists"}, 400
 

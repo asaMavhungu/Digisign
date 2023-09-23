@@ -53,7 +53,7 @@ class Device:
 		department_id = data.get("department_id")
 		slide_ids = data.get("slide_ids", [])
 
-		return cls(device_id, device_name, department_id, slide_ids)
+		return cls(device_name, device_id, department_id, slide_ids)
 
 	def to_dict(self):
 		return {
@@ -86,6 +86,24 @@ class Device:
 
 		return devices
 	
+	@classmethod
+	def extract_device_info(cls, data):
+
+		device_id = data.get("device_id")
+		device_name = data.get("device_name")
+		department_id = data.get("department_id")
+		slide_ids = data.get("slide_ids", [])
+
+		device_info = {
+			"device_id": device_id,
+			"device_name": device_name,
+			"department_id": department_id,
+			"slide_ids": slide_ids
+		}
+
+		return device_info
+	
+
 	@staticmethod
 	def getAll():
 		"""
@@ -95,7 +113,7 @@ class Device:
 	
 	def create_database_entry(self):
 		result = sql_client.create_entry('devices', data = {
-			'department_name': self.department_name,  # Replace with your actual data
+			'device_name': self.device_name,  # Replace with your actual data
 			# Add other fields as needed
 		} )
 
@@ -104,17 +122,17 @@ class Device:
 	def update_database_entry(self, data: dict):
 
 		if 'department_name' in data:
-			self.department_name = data['department_name']
-		result = sql_client.update_entry('departments', 
-				filter_dict={'department_id': self.department_id},
+			self.department_name = data['device_name']
+		result = sql_client.update_entry('devices', 
+				filter_dict={'device_name': self.device_name},
 				data = data
 			)
 		
 		return result
 	
 	def delete_database_entry(self):
-		result = sql_client.delete_entry('departments', 
-				filter_dict={'department_id': self.department_id}
+		result = sql_client.delete_entry('devices', 
+				filter_dict={'device_name': self.device_name}
 			)
 		
 		return result
