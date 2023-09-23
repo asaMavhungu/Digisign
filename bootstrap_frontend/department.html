@@ -15,6 +15,7 @@
         border: 2px dashed currentColor;
         transition: border-color 0.3s;
         height: 100%;
+        width: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
@@ -29,6 +30,17 @@
       .plus-icon{
         font-size: 20px;
       }
+
+      .modal-header{
+        background-color: #007bff;
+        color: white;
+      }
+
+      .required:after{
+        content: "*";
+        color: red;
+      }
+
     </style>
   </head>
 
@@ -79,9 +91,28 @@
       <div class="col-sm-4">
         <div class="card h-100">
           <div class="card-body">
-            <a href="slides.html" class="btn btn-outline-primary custom-btn btn-block">
-              <span class="plus-icon">+</span>
-            </a>
+            <button type="button" class="btn btn-outline-primary custom-btn btn-block" data-bs-toggle="modal" data-bs-target="#myModal"><span class="plus-icon">+</span></button>
+            <div class="modal" id = "myModal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+                  <div class="modal-header">
+                    <h5 class="modal-title">Add Department</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <form>
+                      <div class="mb-3">
+                        <label class="form-label required">Department Name</label>
+                        <input type="text" class="from-control">
+                      </div>
+
+                      <button type="submit" class="btn btn-primary">submit</button>
+                    </form>
+                  </div>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
