@@ -45,6 +45,28 @@
         width: 100%;
       }
 
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: 1px solid transparent;
+        font-size: 20px;
+        cursor: pointer;
+        color: red;
+        border-color: red;
+        border-radius: 4px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        line-height: 0.1px;
+      }
+
+      .close-button:hover {
+        color: white; 
+        background-color: red;
+      }
+
     </style>
   </head>
 
@@ -84,6 +106,30 @@
       </div>
       <div class="col-sm-4">
         <div class="card">
+          <button class="close-button" data-bs-toggle="modal" data-bs-target="#deleteModal">X</button>
+          <div class="modal" id = "deleteModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  <h5 class="modal-title">Add Department</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                  <form>
+                    <div class="mb-3">
+                      <label class="form-label required">Department Name</label>
+                      <input type="text" class="form-control custom-input-width">
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">delete</button>
+                  </form>
+                </div>
+
+              </div>
+            </div>
+          </div>
           <div class="card-body">
             <h5 class="card-title">Computer Science</h5>
             <p class="card-text">Computer Science Department Devices.</p>
