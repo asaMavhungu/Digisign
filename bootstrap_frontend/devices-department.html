@@ -9,6 +9,42 @@
     <title>UCT Slides</title>
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+    <style>
+      .custom-btn{
+        border: 2px dashed currentColor;
+        transition: border-color 0.3s;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .custom-btn:hover{
+        border-color: #007bff;
+        text-decoration: none;
+      }
+
+      .plus-icon{
+        font-size: 20px;
+      }
+
+      .modal-header{
+        background-color: #007bff;
+        color: white;
+      }
+
+      .required:after{
+        content: "*";
+        color: red;
+      }
+
+      .custom-input-width {
+        width: 100%;
+      }
+    </style>
   </head>
 
 
@@ -39,7 +75,7 @@
 
     <!--Department cards-->
     <div class="row">
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">DEVICES 1</h5>
@@ -48,7 +84,7 @@
             </div>
           </div>
         </div>
-        <div class="col-sm-6">
+        <div class="col-sm-4">
           <div class="card">
             <div class="card-body">
               <h5 class="card-title">DEVICES 2</h5>
@@ -57,6 +93,38 @@
             </div>
           </div>
         </div>
+
+        <div class="col-sm-4">
+          <div class="card h-100">
+            <div class="card-body">
+              <button type="button" class="btn btn-outline-primary custom-btn btn-block" data-bs-toggle="modal" data-bs-target="#myModal"><span class="plus-icon">+</span></button>
+              <div class="modal" id = "myModal">
+                <div class="modal-dialog">
+                  <div class="modal-content">
+
+                    <div class="modal-header">
+                      <h5 class="modal-title">Add Device to this Department</h5>
+                      <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+  
+                    <div class="modal-body">
+                      <form>
+                        <div class="mb-3">
+                          <label class="form-label required">Device Name</label>
+                          <input type="text" class="form-control custom-input-width">
+                        </div>
+  
+                        <button type="submit" class="btn btn-primary">submit</button>
+                      </form>
+                    </div>
+
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
     </div>
 
 
