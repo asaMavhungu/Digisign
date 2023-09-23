@@ -9,6 +9,27 @@
     <title>UCT Slides</title>
     <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+    <style>
+      .custom-btn{
+        border: 2px dashed currentColor;
+        transition: border-color 0.3s;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .custom-btn:hover{
+        border-color: #007bff;
+        text-decoration: none;
+      }
+
+      .plus-icon{
+        font-size: 20px;
+      }
+    </style>
   </head>
 
 
@@ -36,24 +57,36 @@
     
     <!--Department cards-->
     <div class="row">
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div class="card">
           <div class="card-body">
-            <h5 class="card-title">Computer Science</h5>
-            <p class="card-text">All Slides from all departments.</p>
+            <h5 class="card-title">UCT General</h5>
+            <p class="card-text">Devices that are not in a department.</p>
             <a href="devices-department.html" class="btn btn-primary">Go Slides.html for now</a>
           </div>
         </div>
       </div>
-      <div class="col-sm-6">
+      <div class="col-sm-4">
         <div class="card">
           <div class="card-body">
             <h5 class="card-title">Computer Science</h5>
-            <p class="card-text">With supporting text below as a natural lead-in to additional content.</p>
-            <a href="slides.html" class="btn btn-primary">Go somewhere</a>
+            <p class="card-text">Computer Science Department Devices.</p>
+            <a href="devices-department.html" class="btn btn-primary">Go somewhere</a>
           </div>
         </div>
       </div>
+
+      <div class="col-sm-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <a href="slides.html" class="btn btn-outline-primary custom-btn btn-block">
+              <span class="plus-icon">+</span>
+            </a>
+          </div>
+        </div>
+      </div>
+
+
     </div>
 
   </body>
