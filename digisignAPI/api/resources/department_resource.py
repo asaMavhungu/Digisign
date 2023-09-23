@@ -60,10 +60,10 @@ class DepartmentResource(Resource):
 		"""
 		Get details of a specific department by ID.
 		"""
-		department_dict = Department.find_by_name(department_name)
-		if department_dict:
-			print(department_dict)
-			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+		department_dict, code = Department.find_by_name(department_name)
+		if code == 200:
+			#print(department_dict)
+			#print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
 			department = Department.from_db_query(department_dict)
 			return department, 200
 			return department_dict, 200

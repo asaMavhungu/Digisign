@@ -20,6 +20,14 @@ class Department:
 		self.devices = devices or []
 		self.shared_slides = shared_slides or []
 
+	def create_database_entry(self):
+		result = sql_client.create_entry('departments', data = {
+    		'department_name': self.department_name,  # Replace with your actual data
+    		# Add other fields as needed
+		} )
+
+		return result
+
 	def add_slide(self, slide_name):
 		"""
 		Add a slide to the department.

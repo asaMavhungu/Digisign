@@ -88,6 +88,20 @@ class DepartmentListResource(Resource):
 		args = department_parser.parse_args()
 		name = args['name']
 
+		department = Department(name)
+
+		result = department.create_database_entry()
+		print("ASASASDASDSADSADAS")
+		print(result)
+		return result
+
+	def post_deprecated(self):
+		"""
+		Create a new department.
+		"""
+		args = department_parser.parse_args()
+		name = args['name']
+
 		if Department.find_by_name(name):
 			return {"message": f"Department named '{name}' already exists"}, 400
 

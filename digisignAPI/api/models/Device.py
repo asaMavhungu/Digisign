@@ -1,7 +1,7 @@
 
 
 import database.Database_utils as db_client
-
+import database.sql_utils as sql_client
 
 
 class Device:
@@ -98,6 +98,7 @@ class Device:
 		"""
 		Get all the slides in the db
 		"""
+		return sql_client.get_table_data('devices')
 		return db_client.get_table('devices')
 
 	@staticmethod

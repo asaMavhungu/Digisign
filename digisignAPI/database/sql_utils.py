@@ -125,6 +125,10 @@ def get_table_data(table_name):
 	# Close the session
 	session.close()
 
+	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+	print(entry_dicts)
+	print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
+
 	return entry_dicts
 	return table_data
 
@@ -139,10 +143,10 @@ def create_entry(table_name, data):
 		new_entry = table_class(**data)
 		session.add(new_entry)
 		session.commit()
-		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)}
+		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
 	except Exception as e:
 		session.rollback()
-		return {"error": f"Failed to create {table_name} entry: {str(e)}"}
+		return {"error": f"Failed to create {table_name} entry: {str(e)}"}, 301
 	finally:
 		session.close()
 
@@ -200,9 +204,9 @@ def get_entry(table_name, filter_dict):
 				entry_dict['shared_slides'] = shared_slide_info
 			print(entry_dict)
 			print("CCCCCCCCCCCCCCCCCCCCCCCC")
-			return entry_dict
+			return entry_dict , 200
 		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."}
+			return {"error": f"No {table_name} entry found matching the filter."} , 404
 	finally:
 		session.close()
 
