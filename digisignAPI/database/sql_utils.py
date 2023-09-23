@@ -90,7 +90,8 @@ def get_table_data(table_name):
 
 	if table_class is None:
 		session.close()
-		return json.dumps({"error": f"Table '{table_name}' not found."})
+		print({"error": f"Table '{table_name}' not found."})
+		return
 
 	# List of known relationship attributes (customize as needed)
 	KNOWN_RELATIONSHIPS = ['slides', 'shared_slides', 'devices', 'department', 'assignments', 'current_user']

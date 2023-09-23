@@ -39,12 +39,9 @@ class DeviceListResource(Resource):
 			int: HTTP status code.
 		"""
 		devices_data = Device.getAll()
-		print(devices_data[0])
+
 		if devices_data is not None:	
 			dev_dicts = Device.extract_mult_devices_info(devices_data)
-			print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW------------")
-			print(dev_dicts[0])
-			print("WWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWWW------------")
 			devices = [Device.from_dict(dev_dict) for dev_dict in dev_dicts]  # Updated model name
 			return devices, 200
 		else:
@@ -65,60 +62,5 @@ class DeviceListResource(Resource):
 		device = Device(name)
 
 		result = device.create_database_entry()
-		print(result)
+
 		return result
-	
-		if Device.find_by_name(name):
-			return {"message": f"Device named '{name}' already exists"}, 400
-
-		device = Device(name, description)
-
-	
-		for slide_title in slides:
-			slide_dict = Slide.find_by_title(slide_title)
-
-			if slide_dict:
-				device.add_slide(slide_title)
-			else:
-				return {"message": f"Slide '{slide_title}' not found"}, 404
-
-		device_id = device.save()
-
-		return {'message': 'Device created', 'device_id': device_id}, 201
-
-	def delete(self):
-		"""
-		Delete multiple devices by their names.
-
-		Returns:
-			dict: A message indicating the deletion status.
-			int: HTTP status code.
-		"""
-		args = request.get_json()
-		device_names = args.get('device_names', [])  # Updated parameter name
-
-		if not device_names:
-			return {"message": "No device names specified for deletion"}, 400
-
-		deleted_devices = []
-		not_found_devices = []
-
-		for device_name in device_names:
-			device_data = Device.find_by_name(device_name)
-
-			if device_data:
-				device = Device.from_dict(device_data)
-				device.delete_me()
-				deleted_devices.append(device_name)
-			else:
-				not_found_devices.append(device_name)
-
-		if deleted_devices:
-			message = f"Devices [{', '.join(deleted_devices)}] deleted successfully."
-		else:
-			message = "No devices were deleted."
-
-		if not_found_devices:
-			message += f" Devices [{', '.join(not_found_devices)}] not found and were not deleted."
-
-		return {"message": message}, 200

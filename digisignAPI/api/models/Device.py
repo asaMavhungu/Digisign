@@ -36,11 +36,13 @@ class Device:
 		if code == 404:
 			return result, code
 		
+		#TODO 'result' is ALWAYS in an expected format
+
 		device_dict = {
 			'device_id': result['device_id'],
 			'device_name': result['device_name'],
 			'department_id': result['department_id'],
-			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']]
+			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']] #type: ignore
 		}
 
 		return device_dict, code
@@ -109,7 +111,10 @@ class Device:
 		"""
 		Get all the slides in the db
 		"""
-		return sql_client.get_table_data('devices')
+		result = sql_client.get_table_data('devices')
+
+		if result:
+			return result
 	
 	def create_database_entry(self):
 		result = sql_client.create_entry('devices', data = {
@@ -136,67 +141,3 @@ class Device:
 			)
 		
 		return result
-
-	def to_dict_depracated(self):
-		"""
-		Converts the Device instance to a dictionary.
-
-		:return: A dictionary representation of the device instance.
-		"""
-		device_dict = {
-			'_id': self._id,
-			'name': self.name,
-			'description': self.description,
-			'slides': self.slides,  # Include associated slide ObjectIds
-			'departments': self.departments
-		}
-		return device_dict
-	
-	def to_marshal_representation(self):
-		"""
-		Convert the Device object to a marshal-like representation.
-		"""
-		return {
-			'_id': self._id,
-			'name': self.name,
-			'description': self.description,
-			'slides': self.slides,
-			'departments': self.departments
-		}
-
-	@staticmethod
-	def getAll_depracated():
-		"""
-		Get all the slides in the db
-		"""
-		return sql_client.get_table_data('devices')
-		return db_client.get_table('devices')
-
-	@staticmethod
-	def find_by_name_depracated(device_name):
-		"""
-		Finds devices by their name in the database.
-
-		:param name: The name of the device to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A list of instances of the Device class matching the name or an empty list if not found.
-		"""
-		return db_client.get_one('devices', 'name', device_name)
-
-	def save(self):
-		"""
-		Saves the device instance to the database.
-
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: The unique identifier (_id) of the inserted or updated device group document.
-		"""
-		device_data = self.to_dict()
-		if self._id:
-			# Update the existing device document
-			return db_client.update_entry('devices', 'name', self.name, device_data)
-		else:
-			# Insert a new device document
-			return db_client.insert_entry('devices', device_data)
-	
-	def delete_me(self):
-		db_client.delete_entry('devices', 'name', self.name)
