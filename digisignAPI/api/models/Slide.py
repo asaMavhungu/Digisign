@@ -40,6 +40,14 @@ class Slide:
 		current_user_id = data.get('current_user_id')
 		device_ids = data.get('device_ids', [])
 
+		print()
+		print(slide_id)
+		print(slide_name)
+		print(department_id)
+		print(current_user_id)
+		print(device_ids)
+		print("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+
 		# Create a new Slide instance with the extracted data
 		return cls(
 			slide_id=slide_id,
@@ -103,3 +111,43 @@ class Slide:
 		if result:
 			#print(result)
 			return result
+		
+	@staticmethod
+	def find_by_name(slide_name: str):
+		result, code = sql_client.get_entry('slides', {'slide_name': slide_name,})
+
+		if code == 404:
+			return result, code
+		
+		# TODO 'result' is ALWAYS in an expected format
+		print("TTTTTTTTTTTTTTTTTTTTTTTTTTT")
+		print(result)
+		print("TTTTTTTTTTTTTTTTTTTTTTTTTTT")
+
+		return result, code
+	
+	def create_database_entry(self):
+		result = sql_client.create_entry('slides', data = {
+			'slide_name': self.slide_name,  # Replace with your actual data
+			# Add other fields as needed
+		} )
+
+		return result
+	
+	def update_database_entry(self, data: dict):
+
+		if 'slide_name' in data:
+			self.department_name = data['slide_name']
+		result = sql_client.update_entry('slides', 
+				filter_dict={'slide_id': self.slide_id},
+				data = data
+			)
+		
+		return result
+	
+	def delete_database_entry(self):
+		result = sql_client.delete_entry('slides', 
+				filter_dict={'slide_id': self.slide_id}
+			)
+		
+		return result

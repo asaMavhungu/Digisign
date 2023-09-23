@@ -56,9 +56,9 @@ def createApi(app: Flask):
 	api.add_resource(UserLoginResource, '/api/login')
 
 
-	# Register SlideResource with endpoint /slides/<string:slide_title>
+	# Register SlideResource with endpoint /slides/<string:slide_name>
 	from .resources.slide_resource import SlideResource
-	api.add_resource(SlideResource, '/api/slides/<string:slide_title>')
+	api.add_resource(SlideResource, '/api/slides/<string:slide_name>')
 
 	# Register SlideList with endpoint /slides
 	from .resources.slide_list_resource import SlideList 

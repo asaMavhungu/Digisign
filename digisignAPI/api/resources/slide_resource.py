@@ -10,45 +10,74 @@ from api.models.ImageSlide import ImageSlide
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
-slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('image_url', type=str, required=True, help='image_rul of the slide')
-slide_parser.add_argument('slide_type', type=str, required=True, help='Type of content of the slide') 
-slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
+slide_parser.add_argument('slide_name', type=str, required=True, help='Title of the slide')
+slide_parser.add_argument('user_id', type=str, required=False, help='Author ID of the slide')
+slide_parser.add_argument('department_id', type=str, required=False, help='image of the slide')
+slide_parser.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
-slide_parser_patch = reqparse.RequestParser()
-slide_parser_patch.add_argument('title', type=str, required=False, help='Title of the slide')
-slide_parser_patch.add_argument('image_url', type=str, required=False, help='image_rul of the slide')
-slide_parser_patch.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
-slide_parser_patch.add_argument('author_id', type=str, required=False, help='Author ID of the slide')
-slide_parser_patch.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
-
 # Define the fields for marshaling slide data in responses
+# Define a fields dictionary to specify how to serialize the Slide object
 slide_fields = {
-	'_id': fields.String(attribute='_id'),
-	'title': fields.String,
-	'image_url': fields.String,
-	'slide_type': fields.String,
-	'author_id': fields.String,
-	'departments': fields.List(fields.String),
+    'slide_id': fields.String(attribute='slide_id'),
+    'slide_name': fields.String(attribute='slide_name'),
+    'department_id': fields.String(attribute='department_id'),
+    'current_user_id': fields.String(attribute='current_user_id'),
+    'device_ids': fields.List(fields.String),
 }
+
 
 class SlideResource(Resource):
 	"""
 	Resource class for managing individual slides.
 	"""
 
-
-	def get(self, slide_title):
+	@marshal_with(slide_fields)
+	def get(self, slide_name):
 		"""
 		Get details of a specific slide by title.
 		"""
-		slide_dict = Slide.find_by_title(slide_title)
-		if slide_dict:
-			return slide_dict, 200
+		slide_dict, code = Slide.find_by_name(slide_name)
+		if code == 200:
+			slide_json = Slide.extract_slide_info(slide_dict)
+			slide = Slide.from_dict(slide_json)
+			return slide, 200
 		return {"message": "Slide not found"}, 404
+	
+	def patch(self, slide_name):
 
-	def patch(self, slide_title):
+		args = slide_parser.parse_args()
+		slide_dict, code = Slide.find_by_name(slide_name)
+
+		if code == 404:
+			return {"message": "Slide not found"}, 404
+		
+		slide = Slide.from_dict(slide_dict)
+
+		if 'slide_name' in args:
+			new_name = args[slide_name]
+			old_name = slide.slide_name
+
+			message, code = slide.update_database_entry({"slide_name": new_name})
+
+			return message, code
+		pass
+
+	def delete(self, slide_name):
+		slide_db_dict, code = Slide.find_by_name(slide_name)
+		
+		if code == 404:
+			return {"message": "Slide not found"}, 404
+	
+		slide_dict = Slide.extract_slide_info(slide_db_dict)
+
+		slide = Slide.from_dict(slide_dict)
+
+		result, code  = slide.delete_database_entry()
+
+		return result, code
+
+	def patch_depracated(self, slide_title):
 		"""
 		Update a specific slide by title (partial update).
 		"""
@@ -109,7 +138,7 @@ class SlideResource(Resource):
 
 		return {'message': 'Slide updated', 'slide_title': slide_title}, 200
 	
-	def delete(self, slide_title):
+	def delete_deprecated(self, slide_title):
 		"""
 		Delete a slide by its title.
 

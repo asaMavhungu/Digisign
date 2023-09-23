@@ -10,10 +10,10 @@ import json
 
 # Request parsers for slide data
 slide_parser = reqparse.RequestParser()
-slide_parser.add_argument('title', type=str, required=True, help='Title of the slide')
-slide_parser.add_argument('image_url', type=str, required=True, help='image of the slide')
-slide_parser.add_argument('slide_type', type=str, required=True, help='Type of content of the slide') 
-slide_parser.add_argument('author_id', type=str, required=True, help='Author ID of the slide')
+slide_parser.add_argument('slide_name', type=str, required=True, help='Title of the slide')
+slide_parser.add_argument('user_id', type=str, required=False, help='Author ID of the slide')
+slide_parser.add_argument('department_id', type=str, required=False, help='image of the slide')
+slide_parser.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
 slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
 
 # Define the fields for marshaling slide data in responses
@@ -45,14 +45,24 @@ class SlideList(Resource):
 			return slides, 200
 		else:
 			return {"message": "Departments not found"}, 404		
-		
+	
+	@marshal_with(slide_fields)
+	def post(self):
+		args = slide_parser.parse_args()
+		slide_name = args['slide_name']
+
+		slide = Slide(slide_name)
+
+		result = slide.create_database_entry
+		print(result)
+		return result
 
 	def post_deprecated(self):
 		"""
 		Create a new slide.
 		"""
 		args = slide_parser.parse_args()
-		title = args['title']
+		slide_name = args['title']
 		image_url = args['image_url']
 		slide_type = args['slide_type']
 		author_id = args['author_id']
