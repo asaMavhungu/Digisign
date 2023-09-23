@@ -12,11 +12,51 @@ department_parser.add_argument('slides', type=list, location='json', help='Depar
 department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
 # Define the fields for marshaling department data in responses
+
+
+slide_fields = {
+	'slide_id': fields.String,
+	'slide_name': fields.String,
+	'department_id': fields.String,
+	'current_user_id': fields.String,
+}
+
+# Define a marshal resource for the SharedSlide objects
+shared_slide_fields = {
+	'sharing_id': fields.String,
+	'from_department_id': fields.String,
+	'to_department_id': fields.String,
+	'slide_id': fields.String,
+}
+
+# Define a marshal resource for the Device objects
+device_fields = {
+	'device_id': fields.String,
+	'device_name': fields.String,
+	'department_id': fields.String,
+}
+
+# Define a marshal resource for the Department objects
 department_fields = {
-	'_id': fields.String(attribute='_id'),
-	'name': fields.String,
-	'slides': fields.List(fields.String),
-	'devices': fields.List(fields.String),
+	'department_id': fields.String,
+	'department_name': fields.String,
+	'slides': fields.List(fields.Nested(slide_fields)),
+	'shared_slides': fields.List(fields.Nested(shared_slide_fields)),
+	'devices': fields.List(fields.Nested(device_fields)),
+}
+
+department_fields2 = {
+	'department_id': fields.String,
+	'department_name': fields.String,
+	'slides': fields.List(fields.String),  # Assuming slide IDs are strings
+	'devices': fields.List(fields.String),  # Assuming device IDs are strings
+}
+
+department_fields3 = {
+	'department_id': fields.String,
+	'department_name': fields.String,
+	'slides': fields.List(fields.Nested({'id': fields.String, 'name': fields.String})),
+	'devices': fields.List(fields.Nested({'id': fields.String, 'name': fields.String})),
 }
 
 class DepartmentListResource(Resource):
@@ -24,7 +64,7 @@ class DepartmentListResource(Resource):
 	Resource class for managing collections of departments.
 	"""
 
-	@marshal_with(department_fields)
+	@marshal_with(department_fields3)
 	def get(self):
 		"""
 		Get a list of all departments.
@@ -34,7 +74,9 @@ class DepartmentListResource(Resource):
 		print("CHECK 1")
 		departments_data = Department.getAll()
 		if departments_data is not None:
-			departments = [Department.from_dict(department_data).to_dict() for department_data in departments_data]
+			print(departments_data)
+			#return departments_data, 200
+			departments = [Department.from_db_query(department_data) for department_data in departments_data]
 			return departments, 200
 		else:
 			return {"message": "Departments not found"}, 404	

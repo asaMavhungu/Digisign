@@ -20,19 +20,52 @@ department_fields = {
 	'devices': fields.List(fields.String),
 }
 
+department_fields3 = {
+    'department_id': fields.String,
+    'department_name': fields.String,
+    'slides': fields.List(fields.Nested({
+        'id': fields.String,
+        'name': fields.String
+    })),
+    'devices': fields.List(fields.Nested({
+        'id': fields.String,
+        'name': fields.String
+    })),
+    'shared_slides': fields.List(fields.Nested({
+        'sharing_id': fields.String,
+        'slide_id': fields.String,
+        'to_department': fields.Nested({
+            'department_id': fields.String,
+            'department_name': fields.String
+        }),
+        'from_department': fields.Nested({
+            'department_id': fields.String,
+            'department_name': fields.String
+        }),
+        # Add other fields as needed
+    }))
+}
+
+
+
+
 class DepartmentResource(Resource):
 	"""
 	Resource class for managing individual departments.
 	"""
 
 
-	@marshal_with(department_fields)
+	@marshal_with(department_fields3)
 	def get(self, department_name):
 		"""
 		Get details of a specific department by ID.
 		"""
 		department_dict = Department.find_by_name(department_name)
 		if department_dict:
+			print(department_dict)
+			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+			department = Department.from_db_query(department_dict)
+			return department, 200
 			return department_dict, 200
 		return {"message": "Department not found"}, 404
 
