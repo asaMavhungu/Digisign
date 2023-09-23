@@ -55,7 +55,7 @@ class SlideResource(Resource):
 		slide = Slide.from_dict(slide_dict)
 
 		if 'slide_name' in args:
-			new_name = args[slide_name]
+			new_name = args['slide_name']
 			old_name = slide.slide_name
 
 			message, code = slide.update_database_entry({"slide_name": new_name})

@@ -53,7 +53,7 @@ class SlideList(Resource):
 
 		slide = Slide(slide_name)
 
-		result = slide.create_database_entry
+		result = slide.create_database_entry()
 		print(result)
 		return result
 
