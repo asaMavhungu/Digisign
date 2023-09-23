@@ -8,7 +8,7 @@ from api.models.Device import Device
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
-department_parser.add_argument('name', type=str, required=True, help='Name of the department')
+department_parser.add_argument('department_name', type=str, required=True, help='Name of the department')
 department_parser.add_argument('slides', type=list, location='json', help='Departments associated with the slide')
 department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
@@ -21,29 +21,29 @@ department_fields = {
 }
 
 department_fields3 = {
-    'department_id': fields.String,
-    'department_name': fields.String,
-    'slides': fields.List(fields.Nested({
-        'id': fields.String,
-        'name': fields.String
-    })),
-    'devices': fields.List(fields.Nested({
-        'id': fields.String,
-        'name': fields.String
-    })),
-    'shared_slides': fields.List(fields.Nested({
-        'sharing_id': fields.String,
-        'slide_id': fields.String,
-        'to_department': fields.Nested({
-            'department_id': fields.String,
-            'department_name': fields.String
-        }),
-        'from_department': fields.Nested({
-            'department_id': fields.String,
-            'department_name': fields.String
-        }),
-        # Add other fields as needed
-    }))
+	'department_id': fields.String,
+	'department_name': fields.String,
+	'slides': fields.List(fields.Nested({
+		'id': fields.String,
+		'name': fields.String
+	})),
+	'devices': fields.List(fields.Nested({
+		'id': fields.String,
+		'name': fields.String
+	})),
+	'shared_slides': fields.List(fields.Nested({
+		'sharing_id': fields.String,
+		'slide_id': fields.String,
+		'to_department': fields.Nested({
+			'department_id': fields.String,
+			'department_name': fields.String
+		}),
+		'from_department': fields.Nested({
+			'department_id': fields.String,
+			'department_name': fields.String
+		}),
+		# Add other fields as needed
+	}))
 }
 
 
@@ -68,16 +68,50 @@ class DepartmentResource(Resource):
 			return department, 200
 			return department_dict, 200
 		return {"message": "Department not found"}, 404
-
+	
 	def patch(self, department_name):
 		"""
 		Update a specific department by ID (partial update).
 		"""
 		args = department_parser.parse_args()
-		department_dict = Department.find_by_name(department_name)
+		department_dict, code = Department.find_by_name(department_name)
 		
 
-		if not department_dict:
+		if code == 404:
+			return {"message": "Department not found"}, 404
+		
+		department = Department.from_dict(department_dict)
+		
+		if 'department_name' in args:
+
+			new_name = args['department_name']
+			old_name = department.department_name
+
+			department.update_database_entry({"department_name": new_name})
+
+			return {"message": f"Department name {old_name} updated to {new_name}"}, 200
+		
+	def delete(self, department_name):
+		department_dict, code = Department.find_by_name(department_name)
+		
+
+		if code == 404:
+			return {"message": "Department not found"}, 404
+		
+		department = Department.from_dict(department_dict)
+		result, code  = department.delete_database_entry()
+
+		return result, code
+
+	def patch_deprecated(self, department_name):
+		"""
+		Update a specific department by ID (partial update).
+		"""
+		args = department_parser.parse_args()
+		department_dict, code = Department.find_by_name(department_name)
+		
+
+		if code == 200:
 			return {"message": "Department not found"}, 404
 		
 
@@ -183,7 +217,7 @@ class DepartmentResource(Resource):
 
 		return {'message': 'Department updated', 'department_id': department_name}, 200
 
-	def delete(self, department_name):
+	def delete_depracated(self, department_name):
 		"""
 		Delete a department by its ID.
 

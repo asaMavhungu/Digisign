@@ -11,46 +11,6 @@ department_parser.add_argument('name', type=str, required=True, help='Name of th
 department_parser.add_argument('slides', type=list, location='json', help='Departments associated with the slide')
 department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
-# Define the fields for marshaling department data in responses
-
-
-slide_fields = {
-	'slide_id': fields.String,
-	'slide_name': fields.String,
-	'department_id': fields.String,
-	'current_user_id': fields.String,
-}
-
-# Define a marshal resource for the SharedSlide objects
-shared_slide_fields = {
-	'sharing_id': fields.String,
-	'from_department_id': fields.String,
-	'to_department_id': fields.String,
-	'slide_id': fields.String,
-}
-
-# Define a marshal resource for the Device objects
-device_fields = {
-	'device_id': fields.String,
-	'device_name': fields.String,
-	'department_id': fields.String,
-}
-
-# Define a marshal resource for the Department objects
-department_fields = {
-	'department_id': fields.String,
-	'department_name': fields.String,
-	'slides': fields.List(fields.Nested(slide_fields)),
-	'shared_slides': fields.List(fields.Nested(shared_slide_fields)),
-	'devices': fields.List(fields.Nested(device_fields)),
-}
-
-department_fields2 = {
-	'department_id': fields.String,
-	'department_name': fields.String,
-	'slides': fields.List(fields.String),  # Assuming slide IDs are strings
-	'devices': fields.List(fields.String),  # Assuming device IDs are strings
-}
 
 department_fields3 = {
 	'department_id': fields.String,
@@ -71,7 +31,6 @@ class DepartmentListResource(Resource):
 		Returns:
 			List[Department]: A list of all departments.
 		"""
-		print("CHECK 1")
 		departments_data = Department.getAll()
 		if departments_data is not None:
 			print(departments_data)
@@ -91,7 +50,6 @@ class DepartmentListResource(Resource):
 		department = Department(name)
 
 		result = department.create_database_entry()
-		print("ASASASDASDSADSADAS")
 		print(result)
 		return result
 

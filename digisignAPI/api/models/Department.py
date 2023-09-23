@@ -27,6 +27,24 @@ class Department:
 		} )
 
 		return result
+	
+	def update_database_entry(self, data: dict):
+
+		if 'department_name' in data:
+			self.department_name = data['department_name']
+		result = sql_client.update_entry('departments', 
+				filter_dict={'department_id': self.department_id},
+				data = data
+			)
+		
+		return result
+	
+	def delete_database_entry(self):
+		result = sql_client.delete_entry('departments', 
+				filter_dict={'department_id': self.department_id}
+			)
+		
+		return result
 
 	def add_slide(self, slide_name):
 		"""

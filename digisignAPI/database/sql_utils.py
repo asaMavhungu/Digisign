@@ -238,12 +238,12 @@ def delete_entry(table_name, filter_dict):
 			entry = session.query(table_class).filter_by(**filter_dict).one()
 			session.delete(entry)
 			session.commit()
-			return {"message": f"{table_name} entry deleted successfully."}
+			return {"message": f"{table_name} entry deleted successfully."} , 200
 		except NoResultFound:
-			return {"error": f"No {table_name} entry found matching the filter."}
+			return {"error": f"No {table_name} entry found matching the filter."} , 301
 	except Exception as e:
 		session.rollback()
-		return {"error": f"Failed to delete {table_name} entry: {str(e)}"}
+		return {"error": f"Failed to delete {table_name} entry: {str(e)}"}, 401
 	finally:
 		session.close()
 
