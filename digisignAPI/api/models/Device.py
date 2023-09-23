@@ -90,7 +90,7 @@ class Device:
 	
 	@classmethod
 	def extract_device_info(cls, data):
-
+		#TODO FIX DEVICES. the getone is showing slide_assignment id
 		device_id = data.get("device_id")
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")

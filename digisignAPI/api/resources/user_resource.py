@@ -9,6 +9,7 @@ from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from api.models.Device import Device
+from api.models.User import User
 import hashlib
 
 def hash_password(password):
@@ -34,17 +35,29 @@ user_parser.add_argument('password', type=str, required=True, help='Password')
 user_parser.add_argument('email', type=str, required=True, help='Email')
 user_parser.add_argument('verified', type=bool, required=False, default=False, help='User verification status')
 
+
+user_fields = {
+	'user_id': fields.String(attribute='user_id'),
+	'username': fields.String,
+	'email': fields.String,
+	'password': fields.String,
+}
+
+
 class UserResource(Resource):
 	
 	"""
 	Resource class for user registration, retrieval, update, and deletion.
 	"""
-	@jwt_required()
-	def get(self):
-		current_user = get_jwt_identity()
-		user_dict = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
-		if user_dict:
-			return user_dict, 200
+	#@jwt_required()
+	@marshal_with(user_fields)
+	def get(self, user_name):
+		#current_user = get_jwt_identity()
+		#user_dict = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
+		user_dict, code = User.find_by_name(user_name)
+		if code == 200:
+			user = User.from_dict(user_dict)
+			return user, 200
 		return {'message': 'User not found'}, 404
 	
 	def post(self):

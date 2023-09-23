@@ -11,26 +11,27 @@ user_parser.add_argument('verified', type=bool, required=False, default=False, h
 
 # Define the fields for marshaling user data in responses
 user_fields = {
-    'id': fields.String(attribute='_id'),
-    'username': fields.String,
-    'email': fields.String,
-    'verified': fields.Boolean,
+	'user_id': fields.String(attribute='user_id'),
+	'username': fields.String,
+	'email': fields.String,
+	'password': fields.String,
 }
+
 
 class UserListResource(Resource):
 
 
-    @marshal_with(user_fields)
-    def get(self):
-        """
-        Get a list of all users.
-        Returns:
-            List[User]: A list of all users.
-        """
+	@marshal_with(user_fields)
+	def get(self):
+		"""
+		Get a list of all users.
+		Returns:
+			List[User]: A list of all users.
+		"""
 
-        users_data = User.get_all()
-        if users_data:
-            users = [User.from_dict(user_data) for user_data in users_data]
-            return users, 200
-        else:
-            return {"message": "Users not found"}, 404
+		users_data = User.getAll()
+		if users_data:
+			users = [User.from_dict(user_data) for user_data in users_data]
+			return users, 200
+		else:
+			return {"message": "Users not found"}, 404

@@ -52,13 +52,7 @@ class Department:
 	
 	@staticmethod
 	def find_by_name(department_name: str):
-		"""
-		Finds a department by its name in the database.
 
-		:param department_name: The name of the department to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: An instance of the Department class or None if not found.
-		"""
 		result, code = sql_client.get_entry('departments', {'department_name': department_name,})
 
 		if code == 404:
@@ -79,21 +73,36 @@ class Department:
 	@classmethod
 	def extract_mult_departments_info(cls, data: list[dict]):
 		department_info = []
+		asa= True
 
-		for department_data in data:
-			department_id = department_data['department_id']
-			department_name = department_data['department_name']
-			slide_ids = [slide['slide_id'] for slide in department_data['slides']]
-			shared_slide_ids = [shared_slide['slide']['slide_id'] for shared_slide in department_data['shared_slides']]
-			device_ids = [device['device_id'] for device in department_data['devices']]
+		for entry in data:
+			department_id = entry['department_id']
+			department_name = entry['department_name']
 
-			department_info.append({
-				'department_id': department_id,
-				'department_name': department_name,
-				'device_ids': device_ids,
-				'slide_ids': slide_ids,
-				'shared_slide_ids': shared_slide_ids
-			})
+			# Collect slide IDs, shared slide IDs, and device IDs
+			slide_ids = []
+			shared_slide_ids = []
+			device_ids = []
+
+			for slide in entry['slides']:
+				slide_ids.append(slide['slide_id'])
+
+			for shared_slide in entry['shared_slides']:
+				shared_slide_ids.append(shared_slide['slide_id'])
+
+			for device in entry['devices']:
+				device_ids.append(device['device_id'])
+
+			# Create a department entry in the desired format
+			department_entry = {
+				"department_id": department_id,
+				"department_name": department_name,
+				"slide_ids": slide_ids,
+				"shared_slide_ids": shared_slide_ids,
+				"device_ids": device_ids
+			}
+
+			department_info.append(department_entry)
 
 		return department_info
 	
