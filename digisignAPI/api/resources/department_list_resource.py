@@ -7,7 +7,7 @@ from api.models.Device import Device
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()
-department_parser.add_argument('name', type=str, required=True, help='Name of the department')
+department_parser.add_argument('department_name', type=str, required=True, help='Name of the department')
 department_parser.add_argument('slides', type=list, location='json', help='Departments associated with the slide')
 department_parser.add_argument('devices', type=list, location='json', help='Devices associated with the slide')
 
@@ -45,7 +45,7 @@ class DepartmentListResource(Resource):
 		Create a new department.
 		"""
 		args = department_parser.parse_args()
-		name = args['name']
+		name = args['department_name']
 
 		department = Department(name)
 
