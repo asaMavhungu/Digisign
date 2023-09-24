@@ -29,6 +29,8 @@
         font-size: 20px;
       }
     </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   
   
   </head>
@@ -71,6 +73,25 @@
               </div>
           </div>
       </div>
+  </div>
+
+  <!-- Add a new confirmation modal -->
+  <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Delete Department</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                Are you sure you want to delete this department?
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
+                <button type="button" class="btn btn-danger" id="confirmDeleteButton">Yes</button>
+            </div>
+        </div>
+    </div>
   </div>
 
   <!-- Modal -->
@@ -133,21 +154,32 @@
                   const deleteButton = departmentCard.querySelector('.delete-button');
                   deleteButton.addEventListener('click', () => {
                       const departmentName = deleteButton.getAttribute('data-department-name');
-                      // Send the API call to delete the department using the departmentName
-                      fetch(`/api/departments/${encodeURIComponent(departmentName)}`, {
-                          method: 'DELETE',
-                      })
-                      .then(response => {
-                          if (response.ok) {
-                              // Remove the card from the UI if the API call is successful
-                              departmentCard.remove();
-                          } else {
-                              console.error('Failed to delete department.');
-                          }
-                      })
-                      .catch(error => {
-                          console.error('Error deleting department:', error);
+
+                      // Attach a click event listener to the confirmation modal's "Yes" button
+                      const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+                      confirmDeleteButton.addEventListener('click', () => {
+                          // Send the API call to delete the department using the departmentName
+                          fetch(`/api/departments/${encodeURIComponent(departmentName)}`, {
+                              method: 'DELETE',
+                          })
+                          .then(response => {
+                              if (response.ok) {
+                                  // Remove the card from the UI if the API call is successful
+                                  departmentCard.remove();
+                              } else {
+                                  console.error('Failed to delete department.');
+                              }
+                          })
+                          .catch(error => {
+                              console.error('Error deleting department:', error);
+                          });
+
+                          // Close the confirmation modal
+                          $('#deleteConfirmationModal').modal('hide');
                       });
+
+                      // Open the confirmation modal
+                      $('#deleteConfirmationModal').modal('show');
                   });
               });
           })
@@ -184,8 +216,8 @@
           })
           .then(response => {
               if (response.ok) {
-                alert("Department added successfully")
-                location.reload();
+                  alert("Department added successfully")
+                  location.reload();
               } else {
                   alert("Failed to add department.")
                   console.error('Failed to add department.');
@@ -196,5 +228,6 @@
           });
       });
   </script>
+
   </body>
 </html>
