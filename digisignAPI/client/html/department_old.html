@@ -84,18 +84,18 @@
               <div class="modal-body">
                   <!-- Form for adding a department -->
                   <form id="addDepartmentForm">
-                      <div class="mb-3">
-                          <label for="departmentName" class="form-label">Department Name</label>
-                          <input type="text" class="form-control" id="departmentName" name="department_name"
-                              required>
-                      </div>
-                      <button type="submit" class="btn btn-primary">Add</button>
+                    <div class="mb-3">
+                        <label for="departmentName" class="form-label">Department Name</label>
+                        <input type="text" class="form-control" id="departmentName" name="department_name"
+                            required>
+                    </div>
                   </form>
               </div>
               <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <button type="button" class="btn btn-primary">Understood</button>
-              </div>
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <!-- Move the "Add" button to the modal footer -->
+                <button type="submit" class="btn btn-primary" form="addDepartmentForm">Add</button>
+            </div>
           </div>
       </div>
   </div>
