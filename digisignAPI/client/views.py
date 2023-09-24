@@ -61,6 +61,10 @@ def upload():
 def serve_image(filename):
     return send_from_directory('uploads', filename)
 
+@views.route('statics/<filename>')
+def serve_static(filename):
+	return send_from_directory("client/statics", filename)
+
 @views.route('/upload', methods=['POST'])
 def upload_file():
 	uploaded_file = request.files['file']
