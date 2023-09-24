@@ -121,7 +121,7 @@
       // Get the container div for department cards
       const departmentCardsContainer = document.getElementById("department-cards");
 
-      // Fetch department data from the API
+      // Fetch department data from the API and add existing department cards
       fetch('/api/departments')
           .then(response => response.json())
           .then(data => {
@@ -163,6 +163,12 @@
           // Get the department name from the input field
           const departmentName = document.getElementById('departmentName').value;
 
+          // Check if the input field is empty
+          if (departmentName.trim() === '') {
+              alert('Please enter a department name.');
+              return;
+          }
+
           // Create a JSON object with the department name
           const departmentData = {
               department_name: departmentName
@@ -178,10 +184,10 @@
           })
           .then(response => {
               if (response.ok) {
-                  // Handle success, for example, close the modal
-                  $('#myModal').modal('hide');
-                  // You can also add code here to update the UI with the new department if needed.
+                alert("Department added successfully")
+                location.reload();
               } else {
+                  alert("Failed to add department.")
                   console.error('Failed to add department.');
               }
           })
