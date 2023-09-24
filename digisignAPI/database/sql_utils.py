@@ -198,6 +198,10 @@ def get_entry(table_name, filter_dict):
 				for shared_slide in entry_dict.get('shared_slides', []):
 					shared_slide['slide_name'] = get_slide_name_by_id(shared_slide['slide_id'])
 				pass
+			if hasattr(table_class, 'assignments'):
+				for assignment in entry_dict.get('assignments', []):
+					assignment['slide_name'] = get_slide_name_by_id(assignment['slide_id'])
+				pass
 
 			print(entry_dict)
 			return entry_dict , 200

@@ -24,6 +24,7 @@ device_fields = {
     'device_name': fields.String,
     'department_id': fields.String,
     'slide_ids': fields.List(fields.String),  # Assuming slide_id is a string
+	'slide_names': fields.List(fields.String),  # Assuming slide_id is a string
 }
 
 class DeviceResource(Resource):

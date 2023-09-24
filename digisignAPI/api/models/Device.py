@@ -5,7 +5,7 @@ import database.sql_utils as sql_client
 
 
 class Device:
-	def __init__(self, device_name, device_id=None, department_id=None, slide_ids=None):
+	def __init__(self, device_name, device_id=None, department_id=None, slide_ids=None, slide_names=None):
 		"""
 		Constructor for the Device class.
 
@@ -18,9 +18,10 @@ class Device:
 		self.device_name: str = device_name
 		self.department_id: str | None = department_id
 		self.slide_ids = slide_ids or []
+		self.slide_names = slide_names or []
 
 	def __repr__(self):
-		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slide_ids={self.slide_ids})>"
+		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slide_ids={self.slide_ids}, slide_names={self.slide_names})>"
 	
 	
 	@staticmethod
@@ -33,6 +34,8 @@ class Device:
 		:return: An instance of the Department class or None if not found.
 		"""
 		result, code = sql_client.get_entry('devices', {'device_name': device_name,})
+		print("XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX")
+		print(result)
 		if code == 404:
 			return result, code
 		
@@ -42,7 +45,8 @@ class Device:
 			'device_id': result['device_id'],
 			'device_name': result['device_name'],
 			'department_id': result['department_id'],
-			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']] #type: ignore
+			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']], #type: ignore
+			'slide_names': [assignment['slide_name'] for assignment in result['assignments']] #type: ignore
 		}
 
 		return device_dict, code
@@ -54,15 +58,17 @@ class Device:
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")
 		slide_ids = data.get("slide_ids", [])
+		slide_names = data.get("slide_names", [])
 
-		return cls(device_name, device_id, department_id, slide_ids)
+		return cls(device_name=device_name, device_id=device_id, department_id=department_id, slide_ids=slide_ids, slide_names=slide_names)
 
 	def to_dict(self):
 		return {
 			"device_id": self.device_id,
 			"device_name": self.device_name,
 			"department_id": self.department_id,
-			"slide_ids": self.slide_ids
+			"slide_ids": self.slide_ids,
+			"slide_names": self.slide_names
 		}
 	
 	@classmethod
@@ -95,12 +101,14 @@ class Device:
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")
 		slide_ids = data.get("slide_ids", [])
+		slide_names = data.get("slide_names", [])
 
 		device_info = {
 			"device_id": device_id,
 			"device_name": device_name,
 			"department_id": department_id,
-			"slide_ids": slide_ids
+			"slide_ids": slide_ids,
+			"slide_names": slide_names
 		}
 
 		return device_info
