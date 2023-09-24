@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, send_file, url_for, send_from_directory
+from flask import Blueprint, render_template, request, flash, send_file, url_for, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
 
@@ -90,6 +90,6 @@ def upload_file():
 
 		# Do any additional processing you need here
 
-		return 'File uploaded successfully!'
+		return jsonify({"message": "File uploaded successfully"})
 	else:
-		return 'No file selected.'
+		return jsonify({"message": "File uploaded successfully"})

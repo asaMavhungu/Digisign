@@ -145,7 +145,7 @@
                 </div>
                 <div class="modal-body">
                     <!-- Form for adding a slide -->
-                    <form id="addSlideForm" action="/upload" method="POST" enctype="multipart/form-data">
+                    <form id="addSlideForm" method="POST" enctype="multipart/form-data">
                         <div class="mb-3">
                             <label for="slideName" class="form-label">Slide Name</label>
                             <input type="text" class="form-control" id="slideName" name="slide_name" required>
@@ -251,13 +251,45 @@
             displayFileName(fileInput);
         });
 
-        // Add event listener for the "Add" button to trigger form submission
+        // Add event listener for the "Add" button to trigger file upload via AJAX
         const addButton = document.getElementById("addButton");
         addButton.addEventListener("click", function () {
             // Check if a file has been selected
             if (fileInput.files.length > 0) {
-                // Trigger form submission
-                document.getElementById("addSlideForm").submit();
+                // Create a FormData object to send the file via AJAX
+                const formData = new FormData();
+                formData.append("file", fileInput.files[0]);
+
+                // Send a POST request to your server to handle the file upload
+                $.ajax({
+                    url: "/upload",
+                    type: "POST",
+                    data: formData,
+                    processData: false, // Prevent jQuery from processing the data
+                    contentType: false, // Prevent jQuery from setting the content type
+                    success: function (response) {
+                        // Handle a successful upload response (e.g., show a success message)
+                        alert("File uploaded successfully: " + response);
+                            // Get the values from the input fields
+                        const slideNameInput = document.getElementById("slideName");
+                        const slideURLInput = document.getElementById("slideURL");
+
+                        const slideName = slideNameInput.value; // Get the slide name from the input field
+                        const slideURL = slideURLInput.value; // Get the slide URL from the input field
+
+                        // Create a slide card with the extracted slideName and slideURL
+                        const slideCard = createSlideCard(slideName, slideURL);
+
+                        // Append the slide card to a container in your web page
+                        const slideContainer = document.getElementById("slideContainer"); // Replace with your container ID
+                        slideContainer.appendChild(slideCard);
+                        // Clear the form or perform any additional actions as needed
+                    },
+                    error: function (xhr, status, error) {
+                        // Handle errors (e.g., show an error message)
+                        alert("Error uploading file: " + error);
+                    }
+                });
             } else {
                 // Handle case where no file is selected (show an alert or perform other actions)
                 alert("Please select a file before adding.");
@@ -384,7 +416,7 @@
 
       // Add a submit event listener to the "Add Slide" form
       const addSlideForm = document.getElementById('addSlideForm');
-      addSlideForm.addEventListener('submit', function (e) {
+      addButton.addEventListener('click', function (e) {
           e.preventDefault();
 
           // Get the slide name from the input field
