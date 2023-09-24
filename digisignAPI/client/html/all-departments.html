@@ -6,11 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
-    <title>UCT Slides</title>
-    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" type="image/x-icon">
+    <title>Bootstrap Example</title>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
   
     <style>
       .custom-btn{
@@ -32,35 +29,39 @@
         font-size: 20px;
       }
     </style>
+
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  
+  
   </head>
 
 
   <body class="p-3 m-0 border-0 bd-example">
 
      <!--Navbar Code -->
-    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-        <div class="container-fluid">
-          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
-          <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
-          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-              <a class="nav-link" href="/departments">Departments</a>
-              <a class="nav-link active" aria-current="page"  href="/devices">All Devices</a>
-              <a class="nav-link" href="slides.html">All Slides</a>
-              <a class="nav-link" href="uploadpage.html">Upload</a>
-            </div>
+     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+      <div class="container-fluid">
+        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
+        <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+          <div class="navbar-nav">
+            <a class="nav-link active" href="/departments">Departments</a>
+            <a class="nav-link" href="/devices">All Devices</a>
+            <a class="nav-link" href="slides.html">All Slides</a>
+            <a class="nav-link" aria-current="page"  href="/uploadPage">Upload</a>
           </div>
-          <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
         </div>
-    </nav>
-    
+        <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
+      </div>
+  </nav>
 
-    <!-- Devices cards -->
-    <div class="row row-cols-1 row-cols-md-2 g-4" id="device-cards">
-      <!-- Existing and dynamically created device cards will be added here -->
+
+    <!-- Department cards -->
+    <div class="row row-cols-1 row-cols-md-2 g-4" id="department-cards">
+      <!-- Existing and dynamically created department cards will be added here -->
       <div class="col sm-4">
           <div class="card h-100">
               <div class="card-body">
@@ -79,11 +80,11 @@
     <div class="modal-dialog">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="deleteConfirmationModalLabel">Delete Device</h5>
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">Delete Department</h5>
                 <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
             </div>
             <div class="modal-body">
-                Are you sure you want to delete this device?
+                Are you sure you want to delete this department?
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">No</button>
@@ -98,15 +99,15 @@
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Add Device</h5>
+                  <h5 class="modal-title" id="exampleModalLabel">Add Department</h5>
                   <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
               </div>
               <div class="modal-body">
-                  <!-- Form for adding a device -->
-                  <form id="addDeviceForm">
+                  <!-- Form for adding a department -->
+                  <form id="addDepartmentForm">
                       <div class="mb-3">
-                          <label for="deviceName" class="form-label">Device Name</label>
-                          <input type="text" class="form-control" id="deviceName" name="device_name" required>
+                          <label for="departmentName" class="form-label">Department Name</label>
+                          <input type="text" class="form-control" id="departmentName" name="department_name" required>
                       </div>
                       <!-- Message container within the modal -->
                       <div id="modalMessageContainer" class="alert" style="display: none;"></div>
@@ -115,7 +116,7 @@
               <div class="modal-footer">
                   <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
                   <!-- Move the "Add" button to the modal footer -->
-                  <button type="submit" class="btn btn-primary" form="addDeviceForm">Add</button>
+                  <button type="submit" class="btn btn-primary" form="addDepartmentForm">Add</button>
               </div>
           </div>
       </div>
@@ -124,11 +125,11 @@
 <!-- Existing HTML code ... -->
 
     <script>
-      // Function to create a new device card
-      function createDeviceCard(deviceName) {
-        // Create the device card element
-        const deviceCard = document.createElement('div');
-        deviceCard.className = 'col sm-4';
+      // Function to create a new department card
+      function createDepartmentCard(departmentName) {
+        // Create the department card element
+        const departmentCard = document.createElement('div');
+        departmentCard.className = 'col sm-4';
     
         // Create the card div
         const cardDiv = document.createElement('div');
@@ -138,15 +139,15 @@
         const cardBody = document.createElement('div');
         cardBody.className = 'card-body';
     
-        // Create the device name element
-        const deviceNameElement = document.createElement('h5');
-        deviceNameElement.className = 'card-title';
-        deviceNameElement.textContent = deviceName;
+        // Create the department name element
+        const departmentNameElement = document.createElement('h5');
+        departmentNameElement.className = 'card-title';
+        departmentNameElement.textContent = departmentName;
     
-        // Create the device description element
-        const deviceDescriptionElement = document.createElement('p');
-        deviceDescriptionElement.className = 'card-text';
-        deviceDescriptionElement.textContent = `Description for ${deviceName}.`;
+        // Create the department description element
+        const departmentDescriptionElement = document.createElement('p');
+        departmentDescriptionElement.className = 'card-text';
+        departmentDescriptionElement.textContent = `Description for ${departmentName}.`;
     
         // Create the "Go somewhere" link
         const goSomewhereLink = document.createElement('a');
@@ -158,7 +159,7 @@
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
         deleteButton.className = 'btn btn-danger delete-button';
-        deleteButton.setAttribute('data-device-name', deviceName);
+        deleteButton.setAttribute('data-department-name', departmentName);
 
 
         // Add margin/padding between the buttons (adjust as needed)
@@ -166,43 +167,39 @@
         deleteButton.style.marginRight = '10px'; // Add space to the right of the delete button
 
         
-        // Append device name, description, link, and delete button to the card body
-        cardBody.appendChild(deviceNameElement);
-        cardBody.appendChild(deviceDescriptionElement);
+        // Append department name, description, link, and delete button to the card body
+        cardBody.appendChild(departmentNameElement);
+        cardBody.appendChild(departmentDescriptionElement);
         cardBody.appendChild(goSomewhereLink);
         cardBody.appendChild(deleteButton);
     
         // Append the card body to the card div
         cardDiv.appendChild(cardBody);
     
-        // Append the card div to the device card
-        deviceCard.appendChild(cardDiv);
+        // Append the card div to the department card
+        departmentCard.appendChild(cardDiv);
     
         // Add click event listener to the delete button
         deleteButton.addEventListener('click', () => {
-
-            const deviceName = deleteButton.getAttribute('data-device-name');
+            const departmentName = deleteButton.getAttribute('data-department-name');
     
             // Attach a click event listener to the confirmation modal's "Yes" button
-
             const confirmDeleteButton = document.getElementById('confirmDeleteButton');
-
             confirmDeleteButton.addEventListener('click', () => {
-                // Send the API call to delete the device using the deviceName
-
-                fetch(`/api/devices/${encodeURIComponent(deviceName)}`, {
+                // Send the API call to delete the department using the departmentName
+                fetch(`/api/departments/${encodeURIComponent(departmentName)}`, {
                     method: 'DELETE',
                 })
                 .then(response => {
                     if (response.ok) {
                         // Remove the card from the UI if the API call is successful
-                        deviceCard.remove();
+                        departmentCard.remove();
                     } else {
-                        console.error('Failed to delete device.');
+                        console.error('Failed to delete department.');
                     }
                 })
                 .catch(error => {
-                    console.error('Error deleting device:', error);
+                    console.error('Error deleting department:', error);
                 });
     
                 // Close the confirmation modal
@@ -213,76 +210,76 @@
             $('#deleteConfirmationModal').modal('show');
         });
     
-        return deviceCard;
+        return departmentCard;
     }
     
 
-      // Get the container div for device cards
-      const deviceCardsContainer = document.getElementById("device-cards");
+      // Get the container div for department cards
+      const departmentCardsContainer = document.getElementById("department-cards");
 
-      // Fetch device data from the API and add existing device cards
-      fetch('/api/devices')
+      // Fetch department data from the API and add existing department cards
+      fetch('/api/departments')
           .then(response => response.json())
           .then(data => {
-              data.forEach(device => {
-                  const deviceCard = createDeviceCard(device.device_name);
-                  deviceCardsContainer.appendChild(deviceCard);
+              data.forEach(department => {
+                  const departmentCard = createDepartmentCard(department.department_name);
+                  departmentCardsContainer.appendChild(departmentCard);
 
               });
           })
           .catch(error => {
-              console.error('Error fetching device data:', error);
+              console.error('Error fetching department data:', error);
           });
 
-      // Add a submit event listener to the "Add Device" form
-      const addDeviceForm = document.getElementById('addDeviceForm');
-      addDeviceForm.addEventListener('submit', function (e) {
+      // Add a submit event listener to the "Add Department" form
+      const addDepartmentForm = document.getElementById('addDepartmentForm');
+      addDepartmentForm.addEventListener('submit', function (e) {
           e.preventDefault();
 
-          // Get the device name from the input field
-          const deviceName = document.getElementById('deviceName').value;
+          // Get the department name from the input field
+          const departmentName = document.getElementById('departmentName').value;
 
           // Check if the input field is empty
-          if (deviceName.trim() === '') {
+          if (departmentName.trim() === '') {
               // Show an error message within the modal
-              showInModalMessage('Please enter a device name.', 'error');
+              showInModalMessage('Please enter a department name.', 'error');
               return;
           }
 
-          // Create a JSON object with the device name
-          const deviceData = {
-              device_name: deviceName
+          // Create a JSON object with the department name
+          const departmentData = {
+              department_name: departmentName
           };
 
-          // Send an API call to add the device
-          fetch('/api/devices', {
+          // Send an API call to add the department
+          fetch('/api/departments', {
               method: 'POST',
               headers: {
                   'Content-Type': 'application/json'
               },
-              body: JSON.stringify(deviceData)
+              body: JSON.stringify(departmentData)
           })
           .then(response => response.json())
           .then(data => {
               if (data.success) {
                   // Show a success message within the modal
-                  showInModalMessage("Device \"" + deviceName + "\"added successfully", 'success');
+                  showInModalMessage("Department \"" + departmentName + "\"added successfully", 'success');
 
                   // Close the modal
                   //$('#myModal').modal('hide');
-                  // Reload the page or update the device list as needed
-                  const deviceCard = createDeviceCard(deviceName);
-                  deviceCardsContainer.appendChild(deviceCard);
+                  // Reload the page or update the department list as needed
+                  const departmentCard = createDepartmentCard(departmentName);
+                  departmentCardsContainer.appendChild(departmentCard);
               } else {
                   // Show an error message within the modal
-                  showInModalMessage("Failed to add device.", 'error');
-                  console.error('Failed to add device.');
+                  showInModalMessage("Failed to add department.", 'error');
+                  console.error('Failed to add department.');
               }
           })
           .catch(error => {
               // Show an error message within the modal
-              showInModalMessage('Error adding device: ' + error, 'error');
-              console.error('Error adding device:', error);
+              showInModalMessage('Error adding department: ' + error, 'error');
+              console.error('Error adding department:', error);
           });
       });
 
@@ -301,5 +298,7 @@
           modalMessageContainer.fadeIn();
       }
     </script>
+
+
   </body>
 </html>

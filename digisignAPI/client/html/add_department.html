@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Create Department</title>
+</head>
+<body>
+    <h1>Create Department</h1>
+    <form id="departmentForm">
+        <label for="departmentName">Department Name:</label>
+        <input type="text" id="departmentName" name="department_name" required>
+        <button type="submit">Create</button>
+    </form>
+
+    <script>
+        // Function to handle the form submission
+        function handleSubmit(event) {
+            event.preventDefault(); // Prevent the default form submission behavior
+
+            const form = event.target;
+            const formData = new FormData(form);
+
+            // Make a POST request to your API
+            fetch("/api/departments", {
+                method: "POST",
+                body: JSON.stringify(Object.fromEntries(formData)),
+                headers: {
+                    "Content-Type": "application/json",
+                },
+            })
+            .then((response) => {
+                if (response.ok) {
+                    return response.json();
+                } else {
+                    throw new Error("Failed to create department.");
+                }
+            })
+            .then((data) => {
+                // Handle the response data here
+                console.log(data);
+                alert("Department created successfully!");
+                form.reset(); // Clear the form
+            })
+            .catch((error) => {
+                // Handle errors here
+                console.error(error);
+                alert("Database already exists");
+            });
+        }
+
+        // Add a form submission event listener
+        const departmentForm = document.getElementById("departmentForm");
+        departmentForm.addEventListener("submit", handleSubmit);
+    </script>
+</body>
+</html>

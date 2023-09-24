@@ -1,130 +1,143 @@
 
 
 import database.Database_utils as db_client
-
+import database.sql_utils as sql_client
 
 
 class Device:
-	def __init__(self, name, description):
+	def __init__(self, device_name, device_id=None, department_id=None, slide_ids=None):
 		"""
 		Constructor for the Device class.
 
-		:param name: The name of the device.
+		:param device_id: The ID of the device.
+		:param device_name: The name of the device.
+		:param department_id: The ID of the department to which the device belongs.
+		:param slide_ids: List of slide IDs assigned to this device (optional).
 		"""
-		self._id = None  # MongoDB ObjectId (optional)
-		self.name = name
-		self.description = description
-		self.slides = []  # List to store associated slides
-		self.departments = []
+		self.device_id: str | None = device_id
+		self.device_name: str = device_name
+		self.department_id: str | None = department_id
+		self.slide_ids = slide_ids or []
 
-	def add_slide(self, slide_name):
+	def __repr__(self):
+		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slide_ids={self.slide_ids})>"
+	
+	
+	@staticmethod
+	def find_by_name(device_name: str):
 		"""
-		Add a slide to the device.
+		Finds a department by its name in the database.
 
-		:param slide: The Slide object to associate with the device.
+		:param department_name: The name of the department to search for.
+		:param mongo: An instance of Flask-PyMongo used for database operations.
+		:return: An instance of the Department class or None if not found.
 		"""
-		self.slides.append(slide_name)
-
-	def remove_slide(self, slide_name):
-		"""
-		Remove a slide from the device.
-
-		:param slide: The Slide object to disassociate from the device.
-		"""
-		self.slides.remove(slide_name)
+		result, code = sql_client.get_entry('devices', {'device_name': device_name,})
+		if code == 404:
+			return result, code
 		
-	def add_department(self, department_name):
-		"""
-		Add a device to the department.
+		#TODO 'result' is ALWAYS in an expected format
 
-		:param device: The department name to associate with the department.
-		"""
-		self.departments.append(department_name)
+		device_dict = {
+			'device_id': result['device_id'],
+			'device_name': result['device_name'],
+			'department_id': result['department_id'],
+			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']] #type: ignore
+		}
 
-	def remove_department(self, department_name):
-		"""
-		Remove a device from the department.
-
-		:param device: The department name to disassociate from the department.
-		"""
-		self.departments.remove(department_name)
-
+		return device_dict, code
+	
+	
 	@classmethod
-	def from_dict(cls, device_dict):
-		"""
-		Creates a Device instance from a dictionary.
+	def from_dict(cls, data):
+		device_id = data.get("device_id")
+		device_name = data.get("device_name")
+		department_id = data.get("department_id")
+		slide_ids = data.get("slide_ids", [])
 
-		:param device_dict: A dictionary containing device data.
-		:return: An instance of the Device class.
-		"""
-		device = cls(
-			name=device_dict['name'],
-			description=device_dict['description']
-		)
-		device._id = device_dict.get('_id')  # Optional ObjectId
-		device.slides = device_dict.get('slides', [])
-		device.departments = device_dict.get('departments', [])
-		return device
+		return cls(device_name, device_id, department_id, slide_ids)
 
 	def to_dict(self):
-		"""
-		Converts the Device instance to a dictionary.
-
-		:return: A dictionary representation of the device instance.
-		"""
-		device_dict = {
-			'_id': self._id,
-			'name': self.name,
-			'description': self.description,
-			'slides': self.slides,  # Include associated slide ObjectIds
-			'departments': self.departments
-		}
-		return device_dict
-	
-	def to_marshal_representation(self):
-		"""
-		Convert the Device object to a marshal-like representation.
-		"""
 		return {
-			'_id': self._id,
-			'name': self.name,
-			'description': self.description,
-			'slides': self.slides,
-			'departments': self.departments
+			"device_id": self.device_id,
+			"device_name": self.device_name,
+			"department_id": self.department_id,
+			"slide_ids": self.slide_ids
 		}
+	
+	@classmethod
+	def extract_mult_devices_info(cls, data_list):
+		devices = []
+
+		for data in data_list:
+			device_id = data.get("device_id")
+			device_name = data.get("device_name")
+			department_id = data.get("department_id")
+			assignments_data = data.get("assignments", [])
+
+			slide_ids = [str(assignment.get("slide_id")) for assignment in assignments_data]
+
+			device_info = {
+				"device_id": device_id,
+				"device_name": device_name,
+				"department_id": department_id,
+				"slide_ids": slide_ids
+			}
+
+			devices.append(device_info)
+
+		return devices
+	
+	@classmethod
+	def extract_device_info(cls, data):
+		#TODO FIX DEVICES. the getone is showing slide_assignment id
+		device_id = data.get("device_id")
+		device_name = data.get("device_name")
+		department_id = data.get("department_id")
+		slide_ids = data.get("slide_ids", [])
+
+		device_info = {
+			"device_id": device_id,
+			"device_name": device_name,
+			"department_id": department_id,
+			"slide_ids": slide_ids
+		}
+
+		return device_info
+	
 
 	@staticmethod
 	def getAll():
 		"""
 		Get all the slides in the db
 		"""
-		return db_client.get_table('devices')
+		result = sql_client.get_table_data('devices')
 
-	@staticmethod
-	def find_by_name(device_name):
-		"""
-		Finds devices by their name in the database.
-
-		:param name: The name of the device to search for.
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: A list of instances of the Device class matching the name or an empty list if not found.
-		"""
-		return db_client.get_one('devices', 'name', device_name)
-
-	def save(self):
-		"""
-		Saves the device instance to the database.
-
-		:param mongo: An instance of Flask-PyMongo used for database operations.
-		:return: The unique identifier (_id) of the inserted or updated device group document.
-		"""
-		device_data = self.to_dict()
-		if self._id:
-			# Update the existing device document
-			return db_client.update_entry('devices', 'name', self.name, device_data)
-		else:
-			# Insert a new device document
-			return db_client.insert_entry('devices', device_data)
+		if result:
+			return result
 	
-	def delete_me(self):
-		db_client.delete_entry('devices', 'name', self.name)
+	def create_database_entry(self):
+		result = sql_client.create_entry('devices', data = {
+			'device_name': self.device_name,  # Replace with your actual data
+			# Add other fields as needed
+		} )
+
+		return result
+	
+	def update_database_entry(self, data: dict):
+
+		if 'department_name' in data:
+			self.department_name = data['device_name']
+		result = sql_client.update_entry('devices', 
+				filter_dict={'device_name': self.device_name},
+				data = data
+			)
+		
+		return result
+	
+	def delete_database_entry(self):
+		result = sql_client.delete_entry('devices', 
+				filter_dict={'device_name': self.device_name}
+			)
+		
+		return result

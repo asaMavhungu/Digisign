@@ -9,6 +9,7 @@ from api.models.SlideFactory import SlideFactory
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from api.models.Device import Device
+from api.models.User import User
 import hashlib
 
 def hash_password(password):
@@ -30,130 +31,62 @@ from api.models.User import User  # Import your User model
 # Request parser for user registration and update
 user_parser = reqparse.RequestParser()
 user_parser.add_argument('username', type=str, required=True, help='Username')
-user_parser.add_argument('password', type=str, required=True, help='Password')
-user_parser.add_argument('email', type=str, required=True, help='Email')
+user_parser.add_argument('password', type=str, required=False, help='Password')
+user_parser.add_argument('email', type=str, required=False, help='Email')
 user_parser.add_argument('verified', type=bool, required=False, default=False, help='User verification status')
+
+
+user_fields = {
+	'user_id': fields.String(attribute='user_id'),
+	'username': fields.String,
+	'email': fields.String,
+	'password': fields.String,
+}
+
 
 class UserResource(Resource):
 	
 	"""
 	Resource class for user registration, retrieval, update, and deletion.
 	"""
-	@jwt_required()
-	def get(self):
-		current_user = get_jwt_identity()
-		user_dict = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
-		if user_dict:
-			return user_dict, 200
+	#@jwt_required()
+	@marshal_with(user_fields)
+	def get(self, user_name):
+		#current_user = get_jwt_identity()
+		#user_dict = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
+		user_dict, code = User.find_by_name(user_name)
+		if code == 200:
+			user = User.from_dict(user_dict)
+			return user, 200
 		return {'message': 'User not found'}, 404
 	
-	def post(self):
-		print("======================POST=======================")
+	def patch(self, user_name):
+		"""
+		Update a specific department by ID (partial update).
+		"""
 		args = user_parser.parse_args()
-		username = args['username']
-		password = args['password']
-		email = args['email']
-		verified = args['verified']
+		user_db_dict, code = User.find_by_name(user_name)
 
-		# Check if the user exists
-		existing_user = User.find_by_username(username)  # Replace 'database_client' with your actual database client
+		if code == 404:
+			return {"message": "User not found"}, 404
 
-		if existing_user:
-			return {'success': False, 'message': 'User with this username already exists'}, 400
+		user = User.from_dict(user_db_dict)
 
-		# Hash the password (you should use a password hashing library)
-		# Replace 'hash_password' with your actual password hashing function
-		hashed_password = hash_password(password)
-		#TODO Bring hashing back
-		hashed_password = password
+		if 'username' in args:
+			new_username = args['username']
+			message, code = user.update_database_entry({"username" : new_username})
 
-		# Create a new user
-		new_user = User(username, hashed_password, email, verified)
-
-		# Save the user to the database
-		user_id = new_user.save()  # Replace 'database_client' with your actual database client
-
-		return {'success': True, 'message': 'User registered successfully', 'user_id': user_id}, 201
-
-	@jwt_required()
-	def put(self):
-		current_user = get_jwt_identity()
-		args = user_parser.parse_args()
-		new_username = args['username']
-		new_password = args['password']
-		new_email = args['email']
-		verified = args['verified']
-
-		# Check if the new username exists
-		existing_user = User.find_by_username(new_username)  # Replace 'database_client' with your actual database client
-
-		if existing_user:
-			return {'message': 'User with this username already exists'}, 400
+			return message, code
+	
+	def delete(self, user_name):
+		user_db_dict, code = User.find_by_name(user_name)
 		
-		our_user = User.find_by_username(current_user)
-		this_user = User.from_dict(our_user)
 
-		# Hash the password (you should use a password hashing library)
-		# Replace 'hash_password' with your actual password hashing function
-		new_hashed_password = hash_password(new_password)
+		if code == 404:
+			return {"message": "User not found"}, 404
 
-		this_user.password = new_hashed_password
+		user = User.from_dict(user_db_dict)
 
-		# Create a new user
-		this_user.username = new_username
-		this_user.email = new_email
-		this_user.verified = verified
+		result, code  = user.delete_database_entry()
 
-		# Save the user to the database
-		user_id = this_user.save()  # Replace 'database_client' with your actual database client
-
-		me = User.find_by_username(new_username)
-
-		return this_user.to_dict(), 201
-
-	@jwt_required()
-	def patch(self):
-		current_user = get_jwt_identity()
-		args = user_parser.parse_args()
-		username = args['username']
-		password = args['password']
-		email = args['email']
-		verified = args['verified']
-
-		# Check if the user exists
-		existing_user = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
-		this_user = User.from_dict(existing_user)
-
-		if not existing_user:
-			return {'message': 'User not found'}, 404
-
-		# Hash the new password (if provided)
-		if password:
-			hashed_password = hash_password(password)
-			this_user.password = hashed_password
-
-		# if username:
-			# this_user.username = username
-		if email:
-			this_user.email = email
-		if verified:
-			this_user.verified = verified
-
-		# Update the user in the database
-		user_id = this_user.save()  # Replace 'database_client' with your actual database client
-
-		return {'message': 'User updated successfully', 'user_id': user_id}, 200
-
-	@jwt_required()
-	def delete(self):
-		current_user = get_jwt_identity()
-		existing_user = User.find_by_username(current_user)  # Replace 'database_client' with your actual database client
-		this_user = User.from_dict(existing_user)
-
-		if not existing_user:
-			return {'message': 'User not found'}, 404
-
-		this_user.delete()
-		return {'message': 'User deleted successfully'}, 200
-
-
+		return result, code

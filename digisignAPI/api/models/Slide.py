@@ -1,122 +1,153 @@
+from flask_pymongo import PyMongo
 from bson.objectid import ObjectId
 import database.Database_utils as db_client
-
+import database.sql_utils as sql_client
 
 class Slide:
-	def __init__(self, title: str, author_id: str, departments: list):
+	def __init__(self, slide_name, slide_id=None, department_id=None, current_user_id=None, device_ids=None):
 		"""
 		Constructor for the Slide class.
 
-		:param title: The title of the slide.
-		:param content: The content of the slide.
-		:param author_id: The unique identifier of the author (user) of the slide.
+		:param slide_name: The name of the slide.
+		:param slide_id: The slide ID (optional).
+		:param department_id: The department ID (optional).
+		:param current_user_id: The current user ID (optional).
+		:param device_ids: List of device IDs assigned to this slide (optional).
 		"""
-		self._id = None 
-		self.title = title
-		self.slide_type = "generic"
-		self.author_id = author_id
-		self.departments = departments
+		self.slide_id = slide_id
+		self.slide_name = slide_name
+		self.department_id = department_id
+		self.current_user_id = current_user_id
+		self.device_ids = device_ids or []
 
-	def add_department(self, department_name):
-		"""
-		Add a department ObjectId to the slide's list of associated departments.
-
-		:param department_id: The ObjectId of the department to be associated with the slide.
-		"""
-		if department_name not in self.departments:
-			self.departments.append(department_name)
-
-	def remove_department(self, department_name):
-		"""
-		Remove a department ObjectId from the slide's list of associated departments.
-
-		:param department_id: The ObjectId of the department to be disassociated from the slide.
-		"""
-		if department_name in self.departments:
-			self.departments.remove(department_name)
-
-	def clear_departments(self):
-		self.departments = []
-
-	@classmethod
-	def from_dict(cls, slide_dict):
-		"""
-		Creates a Slide instance from a dictionary.
-
-		:param slide_dict: A dictionary containing slide data.
-		:return: An instance of the Slide or VideoSlide class, depending on content_type.
-		"""
-		slide = cls(
-			title=slide_dict['title'],
-			author_id=slide_dict['author_id'],
-			departments = slide_dict.get('departments', [])
-		)
-		slide._id = slide_dict.get('_id')  # Optional ObjectId
-		return slide
+	def __repr__(self):
+		return f"<Slide(slide_id={self.slide_id}, slide_name='{self.slide_name}', department_id={self.department_id}, current_user_id={self.current_user_id}, device_ids={self.device_ids})>"
 
 	def to_dict(self):
-		"""
-		Converts the Slide instance to a dictionary.
-
-		:return: A dictionary representation of the slide instance.
-		"""
-		slide_dict = {
-			'title': self.title,
-			'slide_type': self.slide_type,
-			'author_id': self.author_id,
-			'departments': self.departments,
-		}
-		return slide_dict
-
-	def to_marshal_representation(self) -> dict[str, str | list[str] | None]:
-		"""
-		Convert the Slide object to a marshal-like representation.
-		"""
 		return {
-			'_id': self._id,
-			'title': self.title,
-			'slide_type': self.slide_type,
-			'author_id': self.author_id,
-			'departments': self.departments,
+			'slide_id': self.slide_id,
+			'slide_name': self.slide_name,
+			'department_id': self.department_id,
+			'current_user_id': self.current_user_id,
+			'device_ids': self.device_ids
+		}
+	
+	@classmethod
+	def from_dict(cls, data):
+		slide_id = data.get('slide_id')
+		slide_name = data.get('slide_name')
+		department_id = data.get('department_id')
+		current_user_id = data.get('current_user_id')
+		device_ids = data.get('device_ids', [])
+
+		print()
+		print(slide_id)
+		print(slide_name)
+		print(department_id)
+		print(current_user_id)
+		print(device_ids)
+		print("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")
+
+		# Create a new Slide instance with the extracted data
+		return cls(
+			slide_id=slide_id,
+			slide_name=slide_name,
+			department_id=department_id,
+			current_user_id=current_user_id,
+			device_ids=device_ids
+		)	
+
+	@classmethod
+	def extract_slide_info(cls, data):
+		slide_id = data.get("slide_id")
+		slide_name = data.get("slide_name")
+		department_id = data.get("department_id")
+		current_user_id = data.get("current_user_id")
+		
+		# Extract the device IDs from the 'assignments' list
+		assignments_data = data.get("assignments", [])
+		device_ids = [str(assignment.get("device_id")) for assignment in assignments_data]
+
+		return {
+			'slide_id': slide_id,
+			'slide_name': slide_name,
+			'department_id': department_id,
+			'current_user_id': current_user_id,
+			'device_ids': device_ids,  # Store the list of assigned device IDs
 		}
 
-	@staticmethod
-	def find_by_title(title: str) -> (dict | None):
-		print("==========================")
-		# TODO Remove redundancy of creating Slide object
-		# TODO Bring back redundancy
-		"""
-		Finds slides by their title in the database.
-
-		:param title: The title of the slide to search for.
-		:param client: An instance of SlideClient used for database operations.
-		:return: slide dict
-		"""
-		return db_client.get_one('slides', 'title', title) # type: ignore
-
-	def save(self):
-		"""
-		Saves the slide instance to the database.
-
-		:param slides_table: The table to update.
-		:return: The unique identifier (_id) of the inserted or updated slide document.
-		"""
-		slide_data = self.to_dict()
-		if self._id:
-			return db_client.update_entry('slides', 'title', self.title, slide_data)
-		else:
-			return db_client.insert_entry('slides', slide_data)
-		
 	
+	@classmethod
+	def extract_mult_slide_info(cls, data: list[dict]):
+		department_info = []
+
+		for slide_data in data:
+			slide_id = slide_data.get("slide_id")
+			slide_name = slide_data.get("slide_name")
+			department_id = slide_data.get("department_id")
+			current_user_id = slide_data.get("current_user_id")
+			
+			# Extract the device IDs from the 'assignments' list
+			assignments_data = slide_data.get("assignments", [])
+			device_ids = [str(assignment.get("device_id")) for assignment in assignments_data]
+
+			department_info.append({
+			'slide_id': slide_id,
+			'slide_name': slide_name,
+			'department_id': department_id,
+			'current_user_id': current_user_id,
+			'device_ids': device_ids,  # Store the list of assigned device IDs
+		})
+
+		return department_info
+	
+
 	@staticmethod
 	def getAll():
 		"""
 		Get all the slides in the db
 		"""
-		return db_client.get_table('slides')
-	
-	def get_departments(self):
-		return self.departments
+		result = sql_client.get_table_data('slides')
+		if result:
+			#print(result)
+			return result
 		
-	def delete_me(self):
-		db_client.delete_entry('slides', 'title', self.title)
+	@staticmethod
+	def find_by_name(slide_name: str):
+		result, code = sql_client.get_entry('slides', {'slide_name': slide_name,})
+
+		if code == 404:
+			return result, code
+		
+		# TODO 'result' is ALWAYS in an expected format
+		print("TTTTTTTTTTTTTTTTTTTTTTTTTTT")
+		print(result)
+		print("TTTTTTTTTTTTTTTTTTTTTTTTTTT")
+
+		return result, code
+	
+	def create_database_entry(self):
+		result = sql_client.create_entry('slides', data = {
+			'slide_name': self.slide_name,  # Replace with your actual data
+			# Add other fields as needed
+		} )
+
+		return result
+	
+	def update_database_entry(self, data: dict):
+
+		if 'slide_name' in data:
+			self.department_name = data['slide_name']
+		result = sql_client.update_entry('slides', 
+				filter_dict={'slide_id': self.slide_id},
+				data = data
+			)
+		
+		return result
+	
+	def delete_database_entry(self):
+		result = sql_client.delete_entry('slides', 
+				filter_dict={'slide_id': self.slide_id}
+			)
+		
+		return result

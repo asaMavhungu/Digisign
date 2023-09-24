@@ -6,73 +6,220 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://getbootstrap.com/docs/5.2/assets/css/docs.css" rel="stylesheet">
-    <title>Bootstrap Example</title>
+    <title>UCT Slides</title>
+    <link rel="icon" href="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" type="image/x-icon">
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"></script>
+  
+    <style>
+      .custom-btn{
+        border: 2px dashed currentColor;
+        transition: border-color 0.3s;
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+      }
+
+      .custom-btn:hover{
+        border-color: #007bff;
+        text-decoration: none;
+      }
+
+      .plus-icon{
+        font-size: 20px;
+      }
+
+      .modal-header{
+        background-color: #007bff;
+        color: white;
+      }
+
+      .required:after{
+        content: "*";
+        color: red;
+      }
+
+      .custom-input-width {
+        width: 100%;
+      }
+
+      .close-button {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+        background: none;
+        border: 1px solid transparent;
+        font-size: 20px;
+        cursor: pointer;
+        color: red;
+        border-color: red;
+        border-radius: 4px;
+        width: 30px;
+        height: 30px;
+        text-align: center;
+        line-height: 0.1px;
+      }
+
+      .close-button:hover {
+        color: white; 
+        background-color: red;
+      }
+
+      .red-text{
+        color: red;
+      }
+
+    </style>
   </head>
 
 
   <body class="p-3 m-0 border-0 bd-example">
 
      <!--Navbar Code -->
-     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
-      <div class="container-fluid">
-        <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
-        <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <div class="navbar-nav">
-            <a class="nav-link active" href="department.html">Departments</a>
-            <a class="nav-link" href="all-devices.html">All Devices</a>
-            <a class="nav-link" href="slides.html">All Slides</a>
-            <a class="nav-link" aria-current="page"  href="/uploadPage">Upload</a>
+    <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
+        <div class="container-fluid">
+          <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
+          <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
+          <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+              <a class="nav-link active" aria-current="page" href="department.html">Departments</a>
+              <a class="nav-link" href="all-devices.html">All Devices</a>
+              <a class="nav-link" href="slides.html">All Slides</a>
+              <a class="nav-link" href="uploadpage.html">Upload</a>
+            </div>
           </div>
+          <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
         </div>
-        <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
-      </div>
-  </nav>
+    </nav>
     
     <!--Department cards-->
-    <div class="row row-cols-1 row-cols-md-2 g-4" id="department-cards">
-      <!-- Existing and dynamically created department cards will be added here -->
+    <div class="row">
+
+      <div class="col-sm-4">
+        <div class="card">
+          <div class="card-body">
+            <h5 class="card-title">UCT General</h5>
+            <p class="card-text">Devices that are not in a department.</p>
+            <a href="devices-department.html" class="btn btn-primary">Go Slides.html for now</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="card">
+          <button class="close-button" data-bs-toggle="modal" data-bs-target="#deleteModal">X</button>
+          <div class="modal" id = "deleteModal">
+            <div class="modal-dialog">
+              <div class="modal-content">
+
+                <div class="modal-header">
+                  
+                  <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                </div>
+
+                <div class="modal-body">
+                  <h3 class="red-text">DELETE THIS DEPARTMENT?</h3>
+                </div>
+
+                <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                  <button type="button" class="btn btn-danger" >Delete</button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+          <div class="card-body">
+            <h5 class="card-title">Computer Science</h5>
+            <p class="card-text">Computer Science Department Devices.</p>
+            <a href="devices-department.html" class="btn btn-primary">Go somewhere</a>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-sm-4">
+        <div class="card h-100">
+          <div class="card-body">
+            <button type="button" class="btn btn-outline-primary custom-btn btn-block" data-bs-toggle="modal" data-bs-target="#myModal"><span class="plus-icon">+</span></button>
+            <div class="modal" id = "myModal">
+              <div class="modal-dialog">
+                <div class="modal-content">
+
+                  <div class="modal-header">
+                    <h5 class="modal-title">Add Department</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                  </div>
+
+                  <div class="modal-body">
+                    <form id="departmentForm">
+                      <div class="mb-3">
+                        <label class="form-label required">Department Name</label>
+                        <input type="text" id="departmentName" class="form-control custom-input-width">
+                      </div>
+
+                      <button type="submit" class="btn btn-primary">submit</button>
+                    </form>
+                  </div>
+
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div id="responseDiv"></div>
+
+        </div>
+      </div>
+
+
     </div>
 
-
-  
     <script>
-      // Function to create a new department card
-      function createDepartmentCard(title) {
-          const cardDiv = document.createElement("div");
-          cardDiv.className = "col mb-4";
-          cardDiv.innerHTML = `
-              <div class="card">
-                  <div class="card-body">
-                      <h5 class="card-title">${title}</h5>
-                      <p class="card-text">Description for ${title}.</p>
-                      <a href="slides.html" class="btn btn-primary">Go somewhere</a>
-                  </div>
-              </div>
-          `;
-          return cardDiv;
-      }
-
-      // Get the container div for department cards
-      const departmentCardsContainer = document.getElementById("department-cards");
-
-      // Fetch department titles from the API
-      fetch('/api/departments')
-          .then(response => response.json())
-          .then(data => {
-              data.forEach(department => {
-                  const departmentCard = createDepartmentCard(department.name);
-                  departmentCardsContainer.appendChild(departmentCard);
-              });
+      document.addEventListener("DOMContentLoaded", function () {
+        const departmentForm = document.getElementById("departmentForm");
+        const departmentNameInput = document.getElementById("departmentName");
+        const responseDiv = document.getElementById("responseDiv");
+      
+        departmentForm.addEventListener("submit", function (event) {
+          event.preventDefault();
+      
+          const departmentName = departmentNameInput.value;
+      
+          // Replace 'YOUR_API_ENDPOINT' with the actual API endpoint URL
+          const apiUrl = "http://127.0.0.1:5000/api/departments";
+      
+          fetch(apiUrl, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              department_name: departmentName,
+            }),
           })
-          .catch(error => {
-              console.error('Error fetching department titles:', error);
-          });
-  </script>
+            .then((response) => {
+              // Display the HTTP status code in the responseDiv with color coding
+              responseDiv.innerHTML = `HTTP Status Code: ${response.status}`;
+              responseDiv.style.color = response.status >= 200 && response.status < 300 ? "green" : "red";
+      
+              return response.json();
+            })
+            .then((data) => {
+              // You can update the responseDiv with the API response data as needed
+              responseDiv.innerHTML += `<br>Response Data: ${JSON.stringify(data)}`;
+            })
+            .catch((error) => {
+              console.error("Error:", error);
+            });
+        });
+      });
+      </script>
+      
 
   </body>
 </html>
