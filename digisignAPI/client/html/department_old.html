@@ -60,45 +60,47 @@
     <!-- Department cards -->
     <div class="row row-cols-1 row-cols-md-2 g-4" id="department-cards">
       <!-- Existing and dynamically created department cards will be added here -->
-      <div class="col-sm-4">
-        <div class="card h-100">
-          <div class="card-body">
-            <a href="#" class="btn btn-outline-primary custom-btn btn-block" data-bs-toggle="modal" data-bs-target="#myModal">
-              <span class="plus-icon">+</span>
-            </a>
+      <div class="col sm-4">
+          <div class="card h-100">
+              <div class="card-body">
+                  <!-- Replace href with data-bs-toggle and data-bs-target -->
+                  <a href="#" class="btn btn-outline-primary custom-btn btn-block" data-bs-toggle="modal"
+                      data-bs-target="#myModal">
+                      <span class="plus-icon">+</span>
+                  </a>
+              </div>
           </div>
-        </div>
       </div>
-    </div>
-
-    <!-- Modal -->
-    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-    <div class="modal-dialog">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="staticBackdropLabel">Add Department</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <!-- Form for adding a department -->
-          <form id="addDepartmentForm">
-            <div class="mb-3">
-                <label for="departmentName" class="form-label">Department Name</label>
-                <input type="text" class="form-control" id="departmentName" name="department_name"
-                    required>
-            </div>
-            <button type="submit" class="btn btn-primary">Add</button>
-          </form>
-        </div>
-        <div class="modal-footer">
-          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-          <button type="button" class="btn btn-primary">Understood</button>
-        </div>
-      </div>
-    </div>
   </div>
 
-    <script>
+  <!-- Modal -->
+  <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+          <div class="modal-content">
+              <div class="modal-header">
+                  <h5 class="modal-title" id="exampleModalLabel">Add Department</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+              </div>
+              <div class="modal-body">
+                  <!-- Form for adding a department -->
+                  <form id="addDepartmentForm">
+                      <div class="mb-3">
+                          <label for="departmentName" class="form-label">Department Name</label>
+                          <input type="text" class="form-control" id="departmentName" name="department_name"
+                              required>
+                      </div>
+                      <button type="submit" class="btn btn-primary">Add</button>
+                  </form>
+              </div>
+              <div class="modal-footer">
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <button type="button" class="btn btn-primary">Understood</button>
+              </div>
+          </div>
+      </div>
+  </div>
+
+  <script>
       // Function to create a new department card
       function createDepartmentCard(title) {
           const cardDiv = document.createElement("div");
@@ -152,6 +154,41 @@
           .catch(error => {
               console.error('Error fetching department data:', error);
           });
+
+        // Add a submit event listener to the "Add Department" form
+        const addDepartmentForm = document.getElementById('addDepartmentForm');
+        addDepartmentForm.addEventListener('submit', function (e) {
+            e.preventDefault();
+
+            // Get the department name from the input field
+            const departmentName = document.getElementById('departmentName').value;
+
+            // Create a JSON object with the department name
+            const departmentData = {
+                department_name: departmentName
+            };
+
+            // Send an API call to add the department
+            fetch('/api/departments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(departmentData)
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Handle success, for example, close the modal
+                    $('#myModal').modal('hide');
+                    // You can also add code here to update the UI with the new department if needed.
+                } else {
+                    console.error('Failed to add department.');
+                }
+            })
+            .catch(error => {
+                console.error('Error adding department:', error);
+            });
+        });
     </script>
   </body>
 </html>
