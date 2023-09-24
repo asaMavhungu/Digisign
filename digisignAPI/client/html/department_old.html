@@ -126,21 +126,93 @@
 
     <script>
       // Function to create a new department card
-      function createDepartmentCard(title) {
-          const cardDiv = document.createElement("div");
-          cardDiv.className = "col sm-4";
-          cardDiv.innerHTML = `
-              <div class="card">
-                  <div class="card-body">
-                      <h5 class="card-title">${title}</h5>
-                      <p class="card-text">Description for ${title}.</p>
-                      <a href="slides.html" class="btn btn-primary">Go somewhere</a>
-                      <button class="btn btn-danger delete-button" data-department-name="${title}">Delete</button>
-                  </div>
-              </div>
-          `;
-          return cardDiv;
-      }
+      function createDepartmentCard(departmentName) {
+        // Create the department card element
+        const departmentCard = document.createElement('div');
+        departmentCard.className = 'col sm-4';
+    
+        // Create the card div
+        const cardDiv = document.createElement('div');
+        cardDiv.className = 'card';
+    
+        // Create the card body
+        const cardBody = document.createElement('div');
+        cardBody.className = 'card-body';
+    
+        // Create the department name element
+        const departmentNameElement = document.createElement('h5');
+        departmentNameElement.className = 'card-title';
+        departmentNameElement.textContent = departmentName;
+    
+        // Create the department description element
+        const departmentDescriptionElement = document.createElement('p');
+        departmentDescriptionElement.className = 'card-text';
+        departmentDescriptionElement.textContent = `Description for ${departmentName}.`;
+    
+        // Create the "Go somewhere" link
+        const goSomewhereLink = document.createElement('a');
+        goSomewhereLink.href = 'slides.html';
+        goSomewhereLink.className = 'btn btn-primary';
+        goSomewhereLink.textContent = 'Go somewhere';
+    
+        // Create the delete button
+        const deleteButton = document.createElement('button');
+        deleteButton.textContent = 'Delete';
+        deleteButton.className = 'btn btn-danger delete-button';
+        deleteButton.setAttribute('data-department-name', departmentName);
+
+
+        // Add margin/padding between the buttons (adjust as needed)
+        goSomewhereLink.style.marginRight = '10px'; // Add space to the right of "Go somewhere" link
+        deleteButton.style.marginRight = '10px'; // Add space to the right of the delete button
+
+        
+        // Append department name, description, link, and delete button to the card body
+        cardBody.appendChild(departmentNameElement);
+        cardBody.appendChild(departmentDescriptionElement);
+        cardBody.appendChild(goSomewhereLink);
+        cardBody.appendChild(deleteButton);
+    
+        // Append the card body to the card div
+        cardDiv.appendChild(cardBody);
+    
+        // Append the card div to the department card
+        departmentCard.appendChild(cardDiv);
+    
+        // Add click event listener to the delete button
+        deleteButton.addEventListener('click', () => {
+            const departmentName = deleteButton.getAttribute('data-department-name');
+    
+            // Attach a click event listener to the confirmation modal's "Yes" button
+            const confirmDeleteButton = document.getElementById('confirmDeleteButton');
+            confirmDeleteButton.addEventListener('click', () => {
+                // Send the API call to delete the department using the departmentName
+                fetch(`/api/departments/${encodeURIComponent(departmentName)}`, {
+                    method: 'DELETE',
+                })
+                .then(response => {
+                    if (response.ok) {
+                        // Remove the card from the UI if the API call is successful
+                        departmentCard.remove();
+                    } else {
+                        console.error('Failed to delete department.');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error deleting department:', error);
+                });
+    
+                // Close the confirmation modal
+                $('#deleteConfirmationModal').modal('hide');
+            });
+    
+            // Open the confirmation modal
+            $('#deleteConfirmationModal').modal('show');
+        });
+    
+        return departmentCard;
+    }
+    
 
       // Get the container div for department cards
       const departmentCardsContainer = document.getElementById("department-cards");
@@ -153,37 +225,6 @@
                   const departmentCard = createDepartmentCard(department.department_name);
                   departmentCardsContainer.appendChild(departmentCard);
 
-                  // Add click event listener to the delete button
-                  const deleteButton = departmentCard.querySelector('.delete-button');
-                  deleteButton.addEventListener('click', () => {
-                      const departmentName = deleteButton.getAttribute('data-department-name');
-
-                      // Attach a click event listener to the confirmation modal's "Yes" button
-                      const confirmDeleteButton = document.getElementById('confirmDeleteButton');
-                      confirmDeleteButton.addEventListener('click', () => {
-                          // Send the API call to delete the department using the departmentName
-                          fetch(`/api/departments/${encodeURIComponent(departmentName)}`, {
-                              method: 'DELETE',
-                          })
-                          .then(response => {
-                              if (response.ok) {
-                                  // Remove the card from the UI if the API call is successful
-                                  departmentCard.remove();
-                              } else {
-                                  console.error('Failed to delete department.');
-                              }
-                          })
-                          .catch(error => {
-                              console.error('Error deleting department:', error);
-                          });
-
-                          // Close the confirmation modal
-                          $('#deleteConfirmationModal').modal('hide');
-                      });
-
-                      // Open the confirmation modal
-                      $('#deleteConfirmationModal').modal('show');
-                  });
               });
           })
           .catch(error => {
@@ -222,10 +263,13 @@
           .then(data => {
               if (data.success) {
                   // Show a success message within the modal
-                  showInModalMessage("Department added successfully", 'success');
+                  showInModalMessage("Department \"" + departmentName + "\" added successfully", 'success');
+
                   // Close the modal
-                  $('#myModal').modal('hide');
+                  //$('#myModal').modal('hide');
                   // Reload the page or update the department list as needed
+                  const departmentCard = createDepartmentCard(departmentName);
+                  departmentCardsContainer.appendChild(departmentCard);
               } else {
                   // Show an error message within the modal
                   showInModalMessage("Failed to add department.", 'error');
