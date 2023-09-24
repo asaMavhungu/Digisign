@@ -28,6 +28,10 @@ def devices():
 def departments2():
 	return send_file("client/html/all-departments.html")
 
+@views.route('/department/', methods=['GET'])
+def department():
+	return send_file("client/html/department-devices.html")
+
 @views.route('/signup', methods=['GET'])
 def test():
 	return send_file("client/html/signup.html")

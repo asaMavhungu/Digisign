@@ -1,5 +1,5 @@
 from flask import request
-from flask_restful import Resource, reqparse, marshal_with, fields
+from flask_restful import Resource, reqparse, marshal_with, fields, marshal
 from bson.objectid import ObjectId
 from api.models.Department import Department
 from api.models.Slide import Slide
@@ -30,7 +30,7 @@ class DepartmentResource(Resource):
 	"""
 
 
-	@marshal_with(department_fields)
+	#@marshal_with(department_fields)
 	def get(self, department_name):
 		"""
 		Get details of a specific department by ID.
@@ -40,7 +40,8 @@ class DepartmentResource(Resource):
 		if code == 200:
 			department_json = Department.extract_department_info(department_dict)
 			department = Department.from_dict(department_json)
-			return department, 200
+			responce  = marshal(department.to_dict(), department_fields)
+			return responce, 200
 		return {"message": "Department not found"}, 404
 	
 	def patch(self, department_name):
