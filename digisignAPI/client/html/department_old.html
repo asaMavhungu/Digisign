@@ -94,8 +94,8 @@
     </div>
   </div>
 
-  <!-- Modal -->
-  <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
       <div class="modal-dialog">
           <div class="modal-content">
               <div class="modal-header">
@@ -105,21 +105,24 @@
               <div class="modal-body">
                   <!-- Form for adding a department -->
                   <form id="addDepartmentForm">
-                    <div class="mb-3">
-                        <label for="departmentName" class="form-label">Department Name</label>
-                        <input type="text" class="form-control" id="departmentName" name="department_name"
-                            required>
-                    </div>
+                      <div class="mb-3">
+                          <label for="departmentName" class="form-label">Department Name</label>
+                          <input type="text" class="form-control" id="departmentName" name="department_name" required>
+                      </div>
+                      <!-- Message container within the modal -->
+                      <div id="modalMessageContainer" class="alert" style="display: none;"></div>
                   </form>
               </div>
               <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                <!-- Move the "Add" button to the modal footer -->
-                <button type="submit" class="btn btn-primary" form="addDepartmentForm">Add</button>
-            </div>
+                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                  <!-- Move the "Add" button to the modal footer -->
+                  <button type="submit" class="btn btn-primary" form="addDepartmentForm">Add</button>
+              </div>
           </div>
       </div>
-  </div>
+    </div>
+
+<!-- Existing HTML code ... -->
 
     <script>
       // Function to create a new department card
@@ -197,7 +200,8 @@
 
           // Check if the input field is empty
           if (departmentName.trim() === '') {
-              alert('Please enter a department name.');
+              // Show an error message within the modal
+              showInModalMessage('Please enter a department name.', 'error');
               return;
           }
 
@@ -214,20 +218,43 @@
               },
               body: JSON.stringify(departmentData)
           })
-          .then(response => {
-              if (response.ok) {
-                  alert("Department added successfully")
-                  location.reload();
+          .then(response => response.json())
+          .then(data => {
+              if (data.success) {
+                  // Show a success message within the modal
+                  showInModalMessage("Department added successfully", 'success');
+                  // Close the modal
+                  $('#myModal').modal('hide');
+                  // Reload the page or update the department list as needed
               } else {
-                  alert("Failed to add department.")
+                  // Show an error message within the modal
+                  showInModalMessage("Failed to add department.", 'error');
                   console.error('Failed to add department.');
               }
           })
           .catch(error => {
+              // Show an error message within the modal
+              showInModalMessage('Error adding department: ' + error, 'error');
               console.error('Error adding department:', error);
           });
       });
-  </script>
+
+      // Function to display messages within the modal using jQuery
+      function showInModalMessage(message, type) {
+          const modalMessageContainer = $('#modalMessageContainer');
+          modalMessageContainer.html(message);
+
+          if (type === 'success') {
+              modalMessageContainer.removeClass('alert-danger').addClass('alert-success');
+          } else if (type === 'error') {
+              modalMessageContainer.removeClass('alert-success').addClass('alert-danger');
+          }
+
+          // Show the message within the modal
+          modalMessageContainer.fadeIn();
+      }
+    </script>
+
 
   </body>
 </html>
