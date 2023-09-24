@@ -42,6 +42,9 @@ def login():
 def departments():
 	return send_file("client/html/department.html")
 
+@views.route('/deps_1', methods=['GET'])
+def departments2():
+	return send_file("client/html/department_old.html")
 @views.route('/deps/addDep', methods=['GET'])
 def add_department():
 	return send_file("client/html/add_department.html")
