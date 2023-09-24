@@ -4,7 +4,7 @@ import database.Database_utils as db_client
 import database.sql_utils as sql_client
 
 class Department:
-	def __init__(self, department_name, department_id=None, slide_ids=None, device_ids=None, shared_slide_ids=None):
+	def __init__(self, department_name, department_id=None, slide_ids=None, slide_names=None, device_ids=None, device_names=None, shared_slide_ids=None, shared_slide_names=None):
 		"""
 		Constructor for the Department class.
 
@@ -17,29 +17,39 @@ class Department:
 		self.department_id: str | None = department_id
 		self.department_name: str = department_name
 		self.slide_ids = slide_ids or []
+		self.slide_names = slide_names or []
 		self.device_ids = device_ids or []
+		self.device_names = device_names or []
 		self.shared_slide_ids = shared_slide_ids or []
+		self.shared_slide_names = shared_slide_names or []
 
 	@classmethod
 	def from_dict(cls, data):
 		department_id = data.get("department_id")
 		department_name = data.get("department_name")
 		slide_ids = data.get("slide_ids", [])
+		slide_names = data.get("slide_names", [])
 		shared_slide_ids = data.get("shared_slide_ids", [])
+		shared_slide_names = data.get("shared_slide_names", [])
 		device_ids = data.get("device_ids", [])
-		return cls(department_name, department_id=department_id, slide_ids=slide_ids, shared_slide_ids=shared_slide_ids, device_ids=device_ids)
+		device_names = data.get("device_names", [])
+		
+		return cls(department_name, department_id=department_id, slide_ids=slide_ids, slide_names=slide_names, device_names=device_names, shared_slide_ids=shared_slide_ids, shared_slide_names=shared_slide_names, device_ids=device_ids)
 
 	def to_dict(self):
 		return {
 			"department_id": self.department_id,
 			"department_name": self.department_name,
 			"slide_ids": self.slide_ids,
+			"slide_names": self.slide_names,
 			"shared_slide_ids": self.shared_slide_ids,
-			"device_ids": self.device_ids
+			"shared_slide_names": self.shared_slide_names,
+			"device_ids": self.device_ids,
+			"device_names": self.device_names
 		}
 
 	def __repr__(self):
-		return f"Department(department_id={self.department_id}, department_name='{self.department_name}', slide_ids={self.slide_ids}, shared_slide_ids={self.shared_slide_ids}, device_ids={self.device_ids})"
+		return f"Department(department_id={self.department_id}, department_name='{self.department_name}', slide_names={self.slide_names}, shared_slide_names={self.shared_slide_names}, device_ids={self.device_ids}, device_names={self.device_names})"
 
 	@staticmethod
 	def getAll():
@@ -64,8 +74,11 @@ class Department:
 			'department_id': result['department_id'],
 			'department_name': result['department_name'],
 			'slide_ids': [slide['slide_id'] for slide in result['slides']], # type: ignore
+			'slide_names': [slide['slide_name'] for slide in result['slides']], # type: ignore
 			'shared_slide_ids': [shared_slide['slide_id'] for shared_slide in result['shared_slides']], # type: ignore
-			'device_ids': [device['device_id'] for device in result['devices']] # type: ignore
+			'shared_slide_names': [shared_slide['slide_name'] for shared_slide in result['shared_slides']], # type: ignore
+			'device_ids': [device['device_id'] for device in result['devices']], # type: ignore
+			'device_names': [device['device_name'] for device in result['devices']] # type: ignore
 		}
 		
 		return department_dict, code
@@ -113,15 +126,24 @@ class Department:
 		department_name = data.get("department_name")
 
 		slide_ids = data.get("slide_ids", [])
+		slide_names = data.get("slide_names", [])
 		shared_slide_ids = data.get("shared_slide_ids", [])
+		shared_slide_names = data.get("shared_slide_names", [])
 		device_ids = data.get("device_ids", [])
+		device_names = data.get("device_names", [])
+
+		print("QQQQQQQQQQQQQQQQQQQQQQQ")
+		print(data)
 
 		return {
 			"department_id": department_id,
 			"department_name": department_name,
 			"slide_ids": slide_ids,
+			"slide_names": slide_names,
 			"shared_slide_ids": shared_slide_ids,
-			"device_ids": device_ids
+			"shared_slide_names": shared_slide_names,
+			"device_ids": device_ids,
+			"device_names": device_names
 		}
 	
 	def create_database_entry(self):

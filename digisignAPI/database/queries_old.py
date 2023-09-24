@@ -187,91 +187,91 @@ def share_slides_with_departments(from_department_id, to_department_id, slide_id
 if __name__ == "__main__":
 	# Replace with your actual data as needed
 	print()
-create_user("john_doe", "john@example.com", "password123")
+	create_user("john_doe", "john@example.com", "password123")
 
-department_names = ["Department 1", "Department 2"]
-create_departments(department_names)
+	department_names = ["Department 1", "Department 2"]
+	create_departments(department_names)
 
-device_names = ["Device 1", "Device 2", "Device 3"]
-create_devices(device_names)
+	device_names = ["Device 1", "Device 2", "Device 3"]
+	create_devices(device_names)
 
-slide_data = [
-	{"name": "Slide 1", "department_id": 1, "user_id": 1},
-	{"name": "Slide 2", "department_id": 2, "user_id": 1},
-	{"name": "Slide 3", "department_id": 1, "user_id": 1}
-]
-create_slides(slide_data)
+	slide_data = [
+		{"name": "Slide 1", "department_id": 1, "user_id": 1},
+		{"name": "Slide 2", "department_id": 2, "user_id": 1},
+		{"name": "Slide 3", "department_id": 1, "user_id": 1}
+	]
+	create_slides(slide_data)
 
-# Assign devices to departments
-assign_devices_to_departments(1, [1, 2])  # Assign Device 1 and Device 2 to Department 1
-assign_devices_to_departments(2, [3])     # Assign Device 3 to Department 2
+	# Assign devices to departments
+	assign_devices_to_departments(1, [1, 2])  # Assign Device 1 and Device 2 to Department 1
+	assign_devices_to_departments(2, [3])     # Assign Device 3 to Department 2
 
-# Share slides with other departments
-share_slides_with_departments(1, 2, [1])  # Share Slide 1 from Department 1 with Department 2
-share_slides_with_departments(2, 1, [2])  # Share Slide 2 from Department 2 with Department 1
+	# Share slides with other departments
+	share_slides_with_departments(1, 2, [1])  # Share Slide 1 from Department 1 with Department 2
+	share_slides_with_departments(2, 1, [2])  # Share Slide 2 from Department 2 with Department 1
 
 
-device_id = 1
-slide_ids = [1, 2, 3]
+	device_id = 1
+	slide_ids = [1, 2, 3]
 
-assign_slides_to_device(device_id, slide_ids)
+	assign_slides_to_device(device_id, slide_ids)
 
-device_id = 2
-slide_ids = [2, 3]
-assign_slides_to_device(device_id, slide_ids)
-# Close the connection
-#engine.dispose()
+	device_id = 2
+	slide_ids = [2, 3]
+	assign_slides_to_device(device_id, slide_ids)
+	# Close the connection
+	#engine.dispose()
 
-# Create an engine and session as usual
-engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
-Session = sessionmaker(bind=engine)
-session = Session()
+	# Create an engine and session as usual
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
 
-# Query the departments and retrieve their associated devices
-departments_with_devices = session.query(Department).all()
+	# Query the departments and retrieve their associated devices
+	departments_with_devices = session.query(Department).all()
 
-for department in departments_with_devices:
-	print(f"Department: {department.department_name}")
-	print("Devices:")
-	for device in department.devices:
-		print(f"- {device.device_name}")
+	for department in departments_with_devices:
+		print(f"Department: {department.department_name}")
+		print("Devices:")
+		for device in department.devices:
+			print(f"- {device.device_name}")
 
-devices = session.query(Device).all()
-print()
-print()
-for device in devices:
-	print(f"Device: {device.device_name}")
-	print("Deps:")
-	#for dep in device.department:
-	print(f"- {device.department.department_name}")
+	devices = session.query(Device).all()
+	print()
+	print()
+	for device in devices:
+		print(f"Device: {device.device_name}")
+		print("Deps:")
+		#for dep in device.department:
+		print(f"- {device.department.department_name}")
 
-print()
-print()
-# Define the device name you want to query for
-device_name_to_query = "Device 1"
+	print()
+	print()
+	# Define the device name you want to query for
+	device_name_to_query = "Device 1"
 
-# Query for the device by its unique attribute (device_name)
-device = session.query(Device).filter(Device.device_name == device_name_to_query).first()
+	# Query for the device by its unique attribute (device_name)
+	device = session.query(Device).filter(Device.device_name == device_name_to_query).first()
 
-if device:
-	# Access the associated slides through the 'assignments' relationship
-	associated_slides = device.assignments
+	if device:
+		# Access the associated slides through the 'assignments' relationship
+		associated_slides = device.assignments
 
-	if associated_slides:
-		print(f"Slides associated with {device_name_to_query}:")
-		for slide_assignment in associated_slides:
-			slide = slide_assignment.slide
-			if slide is None:
-				print(f"Error: Associated slide does not exist in Slides Table")
-			else:
-				print(f"Slide ID: {slide.slide_id}, Slide Name: {slide.slide_name}")
+		if associated_slides:
+			print(f"Slides associated with {device_name_to_query}:")
+			for slide_assignment in associated_slides:
+				slide = slide_assignment.slide
+				if slide is None:
+					print(f"Error: Associated slide does not exist in Slides Table")
+				else:
+					print(f"Slide ID: {slide.slide_id}, Slide Name: {slide.slide_name}")
+		else:
+			print(f"No slides associated with {device_name_to_query}")
 	else:
-		print(f"No slides associated with {device_name_to_query}")
-else:
-	print(f"No device found with the name {device_name_to_query}")
+		print(f"No device found with the name {device_name_to_query}")
 
-# Close the session
-session.close()
-# Close the session and engine
-session.close()
-engine.dispose()
+	# Close the session
+	session.close()
+	# Close the session and engine
+	session.close()
+	engine.dispose()

@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, request, flash, send_file, url_for, send_from_directory
+from flask import Blueprint, render_template, request, flash, send_file, url_for, send_from_directory, jsonify
 from werkzeug.utils import secure_filename
 import os
 
@@ -27,6 +27,10 @@ def devices():
 @views.route('/departments', methods=['GET'])
 def departments2():
 	return send_file("client/html/all-departments.html")
+
+@views.route('/department/', methods=['GET'])
+def department():
+	return send_file("client/html/department-devices.html")
 
 @views.route('/signup', methods=['GET'])
 def test():
@@ -61,6 +65,10 @@ def upload():
 def serve_image(filename):
     return send_from_directory('uploads', filename)
 
+@views.route('statics/<filename>')
+def serve_static(filename):
+	return send_from_directory("client/statics", filename)
+
 @views.route('/upload', methods=['POST'])
 def upload_file():
 	uploaded_file = request.files['file']
@@ -90,6 +98,6 @@ def upload_file():
 
 		# Do any additional processing you need here
 
-		return 'File uploaded successfully!'
+		return jsonify({"message": "File uploaded successfully"})
 	else:
-		return 'No file selected.'
+		return jsonify({"message": "File uploaded successfully"})

@@ -4,7 +4,7 @@ import database.Database_utils as db_client
 import database.sql_utils as sql_client
 
 class Slide:
-	def __init__(self, slide_name, slide_id=None, department_id=None, current_user_id=None, device_ids=None):
+	def __init__(self, slide_name, slide_url=None, slide_id=None, department_id=None, current_user_id=None, device_ids=None):
 		"""
 		Constructor for the Slide class.
 
@@ -16,17 +16,19 @@ class Slide:
 		"""
 		self.slide_id = slide_id
 		self.slide_name = slide_name
+		self.slide_url = slide_url
 		self.department_id = department_id
 		self.current_user_id = current_user_id
 		self.device_ids = device_ids or []
 
 	def __repr__(self):
-		return f"<Slide(slide_id={self.slide_id}, slide_name='{self.slide_name}', department_id={self.department_id}, current_user_id={self.current_user_id}, device_ids={self.device_ids})>"
+		return f"<Slide(slide_id={self.slide_id}, slide_name='{self.slide_name}', slide_url='{self.slide_url}', department_id={self.department_id}, current_user_id={self.current_user_id}, device_ids={self.device_ids})>"
 
 	def to_dict(self):
 		return {
 			'slide_id': self.slide_id,
 			'slide_name': self.slide_name,
+			'slide_url': self.slide_url,
 			'department_id': self.department_id,
 			'current_user_id': self.current_user_id,
 			'device_ids': self.device_ids
@@ -36,22 +38,17 @@ class Slide:
 	def from_dict(cls, data):
 		slide_id = data.get('slide_id')
 		slide_name = data.get('slide_name')
+		slide_url = data.get('slide_url')
 		department_id = data.get('department_id')
 		current_user_id = data.get('current_user_id')
 		device_ids = data.get('device_ids', [])
 
-		print()
-		print(slide_id)
-		print(slide_name)
-		print(department_id)
-		print(current_user_id)
-		print(device_ids)
-		print("CCCCCCCCCCCCCCCCCCCCCCCCCCCC")
 
 		# Create a new Slide instance with the extracted data
 		return cls(
 			slide_id=slide_id,
 			slide_name=slide_name,
+			slide_url=slide_url,
 			department_id=department_id,
 			current_user_id=current_user_id,
 			device_ids=device_ids
@@ -61,6 +58,7 @@ class Slide:
 	def extract_slide_info(cls, data):
 		slide_id = data.get("slide_id")
 		slide_name = data.get("slide_name")
+		slide_url = data.get("slide_url")
 		department_id = data.get("department_id")
 		current_user_id = data.get("current_user_id")
 		
@@ -71,6 +69,7 @@ class Slide:
 		return {
 			'slide_id': slide_id,
 			'slide_name': slide_name,
+			'slide_url': slide_url,
 			'department_id': department_id,
 			'current_user_id': current_user_id,
 			'device_ids': device_ids,  # Store the list of assigned device IDs
@@ -84,6 +83,7 @@ class Slide:
 		for slide_data in data:
 			slide_id = slide_data.get("slide_id")
 			slide_name = slide_data.get("slide_name")
+			slide_url = slide_data.get("slide_url")
 			department_id = slide_data.get("department_id")
 			current_user_id = slide_data.get("current_user_id")
 			
@@ -94,6 +94,7 @@ class Slide:
 			department_info.append({
 			'slide_id': slide_id,
 			'slide_name': slide_name,
+			'slide_url': slide_url,
 			'department_id': department_id,
 			'current_user_id': current_user_id,
 			'device_ids': device_ids,  # Store the list of assigned device IDs
@@ -129,7 +130,7 @@ class Slide:
 	def create_database_entry(self):
 		result = sql_client.create_entry('slides', data = {
 			'slide_name': self.slide_name,  # Replace with your actual data
-			# Add other fields as needed
+			'slide_url': self.slide_url,
 		} )
 
 		return result
