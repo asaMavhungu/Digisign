@@ -24,6 +24,10 @@ def signin():
 def devices():
 	return send_file("client/html/all-devices.html")
 
+@views.route('/departments', methods=['GET'])
+def departments2():
+	return send_file("client/html/all-departments.html")
+
 @views.route('/signup', methods=['GET'])
 def test():
 	return send_file("client/html/signup.html")
@@ -38,13 +42,12 @@ def login():
 
 
 
-@views.route('/deps', methods=['GET'])
+@views.route('/deps_num', methods=['GET'])
 def departments():
 	return send_file("client/html/department.html")
 
-@views.route('/deps_1', methods=['GET'])
-def departments2():
-	return send_file("client/html/department_old.html")
+
+
 @views.route('/deps/addDep', methods=['GET'])
 def add_department():
 	return send_file("client/html/add_department.html")
