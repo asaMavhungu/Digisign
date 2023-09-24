@@ -176,3 +176,8 @@ class Department:
 		result = sql_client.assign_devices_to_departments(department_id=self.department_id, device_ids=device_ids)
 
 		return result
+
+	def unassign_device(self, device_id: str):
+		result = sql_client.disassociate_device_from_department(department_id=self.department_id, device_id=device_id)
+
+		return result

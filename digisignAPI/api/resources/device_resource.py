@@ -103,7 +103,40 @@ class DeviceResource(Resource):
 
 		device_json = Device.extract_device_info(device_dict)
 		device = Device.from_dict(device_json)
+		# TODO ADD departnment name to device
 
-		message, code = device.delete_database_entry()
+		responce, code = device.delete_database_entry()
 
-		return message, code
+		print(responce)
+		print(device)
+		print("WWWWWWWWWWWWWWWWWWWWWWWWW")
+		department_name = device_json['department_name']
+
+		responce['success'] = False
+
+
+		# Couldnt create, abort
+		if code != 200:
+			return responce, code
+
+		responce['success'] = True #type: ignore
+		#TODO connect this device to the department
+		print(responce['department_name'])
+		department_dict, code = Department.find_by_name(department_name)
+		print(department_dict)
+
+		if code == 404:
+			return responce, code
+		
+		department_json = Department.extract_department_info(department_dict)
+		department = Department.from_dict(department_json)
+
+		print(device)
+		responce_for_assign, code = department.unassign_device(device.device_id)
+
+		print(responce, code)
+
+		if code == 404:
+			return responce_for_assign, code
+		
+		return responce
