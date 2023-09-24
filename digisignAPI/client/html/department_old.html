@@ -100,7 +100,7 @@
       </div>
   </div>
 
-  <script>
+    <script>
       // Function to create a new department card
       function createDepartmentCard(title) {
           const cardDiv = document.createElement("div");
@@ -155,40 +155,40 @@
               console.error('Error fetching department data:', error);
           });
 
-        // Add a submit event listener to the "Add Department" form
-        const addDepartmentForm = document.getElementById('addDepartmentForm');
-        addDepartmentForm.addEventListener('submit', function (e) {
-            e.preventDefault();
+      // Add a submit event listener to the "Add Department" form
+      const addDepartmentForm = document.getElementById('addDepartmentForm');
+      addDepartmentForm.addEventListener('submit', function (e) {
+          e.preventDefault();
 
-            // Get the department name from the input field
-            const departmentName = document.getElementById('departmentName').value;
+          // Get the department name from the input field
+          const departmentName = document.getElementById('departmentName').value;
 
-            // Create a JSON object with the department name
-            const departmentData = {
-                department_name: departmentName
-            };
+          // Create a JSON object with the department name
+          const departmentData = {
+              department_name: departmentName
+          };
 
-            // Send an API call to add the department
-            fetch('/api/departments', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify(departmentData)
-            })
-            .then(response => {
-                if (response.ok) {
-                    // Handle success, for example, close the modal
-                    $('#myModal').modal('hide');
-                    // You can also add code here to update the UI with the new department if needed.
-                } else {
-                    console.error('Failed to add department.');
-                }
-            })
-            .catch(error => {
-                console.error('Error adding department:', error);
-            });
-        });
-    </script>
+          // Send an API call to add the department
+          fetch('/api/departments', {
+              method: 'POST',
+              headers: {
+                  'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(departmentData)
+          })
+          .then(response => {
+              if (response.ok) {
+                  // Handle success, for example, close the modal
+                  $('#myModal').modal('hide');
+                  // You can also add code here to update the UI with the new department if needed.
+              } else {
+                  console.error('Failed to add department.');
+              }
+          })
+          .catch(error => {
+              console.error('Error adding department:', error);
+          });
+      });
+  </script>
   </body>
 </html>
