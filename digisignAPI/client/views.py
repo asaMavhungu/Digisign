@@ -34,7 +34,7 @@ def test():
 
 @views.route('/slides', methods=['GET'])
 def slides():
-	return send_file("client/html/slides.html")
+	return send_file("client/html/all-slides.html")
 
 @views.route('/login', methods=['GET'])
 def login():
