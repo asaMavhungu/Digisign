@@ -172,3 +172,7 @@ class Department:
 		
 		return result
 
+	def assign_devices(self, device_ids:list):
+		result = sql_client.assign_devices_to_departments(department_id=self.department_id, device_ids=device_ids)
+
+		return result

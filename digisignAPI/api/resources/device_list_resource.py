@@ -10,6 +10,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
 device_parser.add_argument('device_name', type=str, required=True, help='Name of the device')
+device_parser.add_argument('department_name', type=str, required=True, help='Name of the department')
 device_parser.add_argument('description', type=str, required=False, help='Description of the device')
 device_parser.add_argument('slides', type=list, location='json', help='Slides associated with the device')
 
@@ -56,16 +57,71 @@ class DeviceListResource(Resource):
 			dict: The created device information.
 			int: HTTP status code.
 		"""
+		print(" ard 1 ZZZZZZZZZZZZZZZZZZZZZZZZZZ")
 		args = device_parser.parse_args()
+		print("ard 2 ZZZZZZZZZZZZZZZZZZZZZZZZZZ")
 		name = args['device_name']
+		department_name = args['department_name']
 
 		device = Device(name)
 
 		responce, code = device.create_database_entry()
 
+		responce['success'] = False
+
+
+		# Couldnt create, abort
+		if code== 401:
+			return responce, code
+
+		device, code = Device.device_from_name(device.device_name)
+
+
+		responce['success'] = True #type: ignore
+		#TODO connect this device to the department
+		department_dict, code = Department.find_by_name(department_name)
+		print(department_dict)
+
+		if code == 404:
+			return responce, code
+		
+		department_json = Department.extract_department_info(department_dict)
+		department = Department.from_dict(department_json)
+
+		print(device)
+		responce_for_assign, code = department.assign_devices([device.device_id])
+
+		print(responce, code)
+
+		if code == 404:
+			return responce_for_assign, code
+		
+		return responce
+
+
+
 		#TODO Send success bool to front-end, ignore error for typed python error
 		if code == 200:
+			print("gg ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
 			responce['success'] = True #type: ignore
+			#TODO connect this device to the department
+			department_dict, code = Department.find_by_name(department_name)
+			print(department_dict)
+			print("2 ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+			if code == 200:
+				department_json = Department.extract_department_info(department_dict)
+				department = Department.from_dict(department_json)
+				print("3 ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
+				print(device)
+				responce_for_assign, code = department.assign_devices([device.device_id]) #type: ignore
+
+				if code == 400:
+					return responce_for_assign
+
+				print(responce)
+
+				return responce
+
 		else:
 			responce['success'] = False #type: ignore
 		return responce

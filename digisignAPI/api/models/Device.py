@@ -53,6 +53,18 @@ class Device:
 
 		return device_dict, code
 	
+	@classmethod
+	def device_from_name(cls, device_name):
+		device_dict, code = Device.find_by_name(device_name)
+		if code == 200:
+			print(device_dict)
+			device_json = Device.extract_device_info(device_dict)
+			print(device_json)
+			device = Device.from_dict(device_json)
+			print(device)
+			return device, 200
+		return None, code
+	
 	
 	@classmethod
 	def from_dict(cls, data):

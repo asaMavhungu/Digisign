@@ -152,16 +152,24 @@ def get_table_data(table_name):
 
 from sqlalchemy.orm import Session
 
-def create_entry(table_name, data):
+def create_entry(table_name:str, data):
 	"""Create a new entry in the specified table with the provided data."""
 	session = Session(bind=engine)
+	low = table_name.lower()[:-1]
 	try:
 		table_class = get_table_class(table_name)
 		new_entry = table_class(**data)
 		session.add(new_entry)
 		session.commit()
+		print("DDDDDDDDDDDDDDDDDDDDDDDDDDDD")
+		return {
+            "message": f"{table_name} entry created successfully.",
+            "entry_id": eval(f"new_entry.{low}_id"),  # Include the ID in the response
+            "entry": model_instance_to_json(new_entry)
+        }, 200
 		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
 	except Exception as e:
+		print("EEEEEEEEEEEEEEEEEEEEEEEEEE")
 		session.rollback()
 		return {"error": f"Failed to create {table_name} entry: {str(e)}"}, 401
 	finally:
@@ -272,6 +280,104 @@ def delete_entry(table_name, filter_dict):
 		return {"error": f"Failed to delete {table_name} entry: {str(e)}"}, 401
 	finally:
 		session.close()
+
+# Function to assign devices to departments
+def assign_devices_to_departments(department_id, device_ids):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	department = session.query(Department).filter_by(department_id=department_id).first()
+	if department:
+		devices = session.query(Device).filter(Device.device_id.in_(device_ids)).all()
+		department.devices.extend(devices)
+		session.commit()
+		
+		# Refresh the department object to reflect the updated devices relationship
+		session.refresh(department)
+		return {"success" : True, "message" : f"Successfully connected {[device.device_name for device in devices]} to {department.department_name}"}, 200
+	else:
+		print("Department not found.")
+		return {"success" : False,"message" : f"Department not found"}, 404
+
+	session.close()
+	engine.dispose()
+
+# Function to assign slides to a device
+def assign_slides_to_device(device_id, slide_ids):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	for slide_id in slide_ids:
+		slide_assignment = SlideAssignment(slide_id=slide_id, device_id=device_id)
+		session.add(slide_assignment)
+
+	session.commit()
+	engine.dispose()
+
+def disassociate_device_from_department(device_id, department_id):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	try:
+		# Retrieve the device and department objects
+		device = session.query(Device).filter_by(device_id=device_id).first()
+		department = session.query(Department).filter_by(department_id=department_id).first()
+
+		if device and department:
+			# Remove the device from the department's list of devices
+			department.devices.remove(device)
+
+			# Commit the changes to the database
+			session.commit()
+			return True
+		else:
+			return False  # Device or department not found
+	except Exception as e:
+		session.rollback()
+		raise e
+	finally:
+		session.close()
+
+def disassociate_slide_from_device(slide_id, device_id):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	try:
+		# Retrieve the slide and device objects
+		slide = session.query(Slide).filter_by(slide_id=slide_id).first()
+		device = session.query(Device).filter_by(device_id=device_id).first()
+
+		if slide and device:
+			# Remove the slide from the device's list of assigned slides
+			device.assignments = [assignment for assignment in device.assignments if assignment.slide_id != slide_id]
+
+			# Commit the changes to the database
+			session.commit()
+			return True
+		else:
+			return False  # Slide or device not found
+	except Exception as e:
+		session.rollback()
+		raise e
+	finally:
+		session.close()
+
+# Function to share slides with other departments
+def share_slides_with_departments(from_department_id, to_department_id, slide_ids):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	for slide_id in slide_ids:
+		shared_slide = SharedSlide(from_department_id=from_department_id, to_department_id=to_department_id, slide_id=slide_id)
+		session.add(shared_slide)
+
+	session.commit()
+	engine.dispose()
 
 
 # Example usage:

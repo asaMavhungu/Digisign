@@ -269,7 +269,8 @@
 
           // Create a JSON object with the device name
           const deviceData = {
-              device_name: deviceName
+              device_name: deviceName,
+              department_name: department
           };
 
           // Send an API call to add the device
@@ -282,6 +283,8 @@
           })
           .then(response => response.json())
           .then(data => {
+            console.log(data);
+            console.log(data.success)
               if (data.success) {
                   // Show a success message within the modal
                   showInModalMessage("Device \"" + deviceName + "\"added successfully", 'success');
