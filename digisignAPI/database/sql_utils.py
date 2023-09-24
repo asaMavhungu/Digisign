@@ -147,7 +147,7 @@ def create_entry(table_name, data):
 		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
 	except Exception as e:
 		session.rollback()
-		return {"error": f"Failed to create {table_name} entry: {str(e)}"}, 301
+		return {"error": f"Failed to create {table_name} entry: {str(e)}"}, 401
 	finally:
 		session.close()
 

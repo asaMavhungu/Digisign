@@ -8,7 +8,7 @@ from api.models.SlideFactory import SlideFactory
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
 device_parser.add_argument('device_name', type=str, required=True, help='Name of the device')
-device_parser.add_argument('description', type=str, required=True, help='Description of the device')
+device_parser.add_argument('description', type=str, required=False, help='Description of the device')
 device_parser.add_argument('slides', type=list, location='json', help='Slides associated with the device')
 device_parser.add_argument('departments', type=list, location='json', help='departments associated with the device')
 

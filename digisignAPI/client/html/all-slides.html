@@ -32,6 +32,48 @@
         font-size: 20px;
       }
     </style>
+
+    <style>
+        .container {
+            display: flex;
+            flex-direction: column;
+            justify-content: center; /* Center vertically */
+            align-items: center; /* Center horizontally */
+            height: 70%; /* 100% of the viewport height to center vertically */
+        }
+
+        .file-upload {
+            text-align: center; /* Center the file input and label text */
+        }
+
+        .input {
+            /* Customize the size as needed */
+            width: 70%;
+            height: 50%;
+            display: none;
+        }
+
+        .label {
+            /* Customize the size as needed */
+
+            border-radius: 6px;
+            border: 1px dashed black;
+            text-align: center;
+
+            cursor: pointer;
+            margin-bottom: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .label:hover {
+            color: #007bff;
+            border: 1px dashed #007bff;
+        }
+
+    </style>
   </head>
 
 
@@ -95,34 +137,119 @@
 
     <!-- Modal -->
     <div class="modal fade" id="myModal" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-          <div class="modal-content">
-              <div class="modal-header">
-                  <h5 class="modal-title" id="exampleModalLabel">Add Slide</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-              </div>
-              <div class="modal-body">
-                  <!-- Form for adding a slide -->
-                  <form id="addSlideForm">
-                      <div class="mb-3">
-                          <label for="slideName" class="form-label">Slide Name</label>
-                          <input type="text" class="form-control" id="slideName" name="slide_name" required>
-                      </div>
-                      <!-- Message container within the modal -->
-                      <div id="modalMessageContainer" class="alert" style="display: none;"></div>
-                  </form>
-              </div>
-              <div class="modal-footer">
-                  <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                  <!-- Move the "Add" button to the modal footer -->
-                  <button type="submit" class="btn btn-primary" form="addSlideForm">Add</button>
-              </div>
-          </div>
-      </div>
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="exampleModalLabel">Add Slide</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <!-- Form for adding a slide -->
+                    <form id="addSlideForm">
+                        <div class="mb-3">
+                            <label for="slideName" class="form-label">Slide Name</label>
+                            <input type="text" class="form-control" id="slideName" name="slide_name" required>
+                        </div>
+                        <!-- Message container within the modal -->
+                        <div id="modalMessageContainer" class="alert" style="display: none;"></div>
+
+                        <!-- Extra content for file upload -->
+                        <div class="container">
+                            <form action="/upload" method="POST" enctype="multipart/form-data">
+                                <div class="file-upload">
+                                    <label for="file-input" class="label label-container">Click or Drag &amp; Drop
+                                        <img id="thumbnail-preview" src="" alt="Thumbnail Preview"
+                                            style="max-width: 100%; max-height: 200px; display: none;">
+                                    </label>
+                                    <input type="file" id="file-input" class="input" name="file"
+                                        accept=".txt, .pdf, .png, .jpg, .jpeg, .gif">
+                                </div>
+
+                                <p id="file-name" style="display: none;"></p>
+
+                                <img id="file-preview" src="" alt="File Preview"
+                                    style="max-width: 100%; max-height: 300px; display: none;">
+
+                                <input type="submit" value="Upload" class="btn btn-primary">
+                            </form>
+                        </div>
+                    </form>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    <!-- Move the "Add" button to the modal footer -->
+                    <button type="submit" class="btn btn-primary" form="addSlideForm">Add</button>
+                </div>
+            </div>
+        </div>
     </div>
+
 
 <!-- Existing HTML code ... -->
 
+    <!-- JavaScript -->
+    <script>
+        // Get references to DOM elements
+        const fileInput = document.getElementById("file-input");
+        const label = document.querySelector(".label");
+        const thumbnailPreview = document.getElementById("thumbnail-preview");
+
+        // Function to display the selected file name and thumbnail preview
+        function displayFileName(input) {
+            const fileNameElement = document.getElementById("file-name");
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+
+                // Display the selected file name
+                const fileName = file.name;
+                fileNameElement.textContent = "Selected file: " + fileName;
+                fileNameElement.style.display = "block";
+
+                // Display the image thumbnail preview (if it's an image)
+                if (file.type.startsWith("image/")) {
+                    const reader = new FileReader();
+                    reader.onload = function (e) {
+                        thumbnailPreview.src = e.target.result;
+                        thumbnailPreview.style.display = "block";
+                    };
+                    reader.readAsDataURL(file);
+                } else {
+                    thumbnailPreview.style.display = "none";
+                }
+            } else {
+                fileNameElement.textContent = "";
+                fileNameElement.style.display = "none";
+                thumbnailPreview.style.display = "none";
+            }
+        }
+
+        // Event listener for file input change (click option)
+        fileInput.addEventListener("change", function () {
+            // Call the displayFileName function to show both the selected file name and thumbnail
+            displayFileName(fileInput);
+        });
+
+        label.addEventListener("dragover", function (e) {
+            e.preventDefault();
+            label.classList.add("drag-over");
+        });
+
+        label.addEventListener("dragleave", function () {
+            label.classList.remove("drag-over");
+        });
+
+        label.addEventListener("drop", function (e) {
+            e.preventDefault();
+            label.classList.remove("drag-over");
+
+            // Set the file input's files property to the dropped files
+            fileInput.files = e.dataTransfer.files;
+
+            // Call the displayFileName function to show both the selected file name and thumbnail
+            displayFileName(fileInput);
+        });
+    </script>
     <script>
       // Function to create a new slide card
       function createSlideCard(slideName) {

@@ -49,6 +49,11 @@ class DepartmentListResource(Resource):
 
 		department = Department(name)
 
-		result = department.create_database_entry()
-		print(result)
-		return result
+		responce , code = department.create_database_entry()
+
+		#TODO Send success bool to front-end, ignore error for typed python error
+		if code == 200:
+			responce['success'] = True #type: ignore
+		else:
+			responce['success'] = False #type: ignore
+		return responce

@@ -46,13 +46,17 @@ class SlideList(Resource):
 		else:
 			return {"message": "Departments not found"}, 404		
 	
-	@marshal_with(slide_fields)
+	#@marshal_with(slide_fields)
 	def post(self):
 		args = slide_parser.parse_args()
 		slide_name = args['slide_name']
 
 		slide = Slide(slide_name)
 
-		result = slide.create_database_entry()
-		print(result)
-		return result
+		responce, code = slide.create_database_entry()
+		#TODO Send success bool to front-end, ignore error for typed python error
+		if code == 200:
+			responce['success'] = True #type: ignore
+		else:
+			responce['success'] = False #type: ignore
+		return responce

@@ -10,7 +10,7 @@ from flask_jwt_extended import create_access_token, jwt_required, get_jwt_identi
 # Request parsers for creating and updating devices
 device_parser = reqparse.RequestParser()
 device_parser.add_argument('device_name', type=str, required=True, help='Name of the device')
-device_parser.add_argument('description', type=str, required=True, help='Description of the device')
+device_parser.add_argument('description', type=str, required=False, help='Description of the device')
 device_parser.add_argument('slides', type=list, location='json', help='Slides associated with the device')
 
 device_parser_patch = reqparse.RequestParser()
@@ -61,6 +61,11 @@ class DeviceListResource(Resource):
 
 		device = Device(name)
 
-		result = device.create_database_entry()
+		responce, code = device.create_database_entry()
 
-		return result
+		#TODO Send success bool to front-end, ignore error for typed python error
+		if code == 200:
+			responce['success'] = True #type: ignore
+		else:
+			responce['success'] = False #type: ignore
+		return responce
