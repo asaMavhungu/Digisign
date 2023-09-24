@@ -149,6 +149,8 @@
                         <div class="mb-3">
                             <label for="slideName" class="form-label">Slide Name</label>
                             <input type="text" class="form-control" id="slideName" name="slide_name" required>
+                            <label for="slideURL" class="form-label">Slide URL</label>
+                            <input type="text" class="form-control" id="slideURL" name="slide_url" required>
                         </div>
                         <!-- Message container within the modal -->
                         <div id="modalMessageContainer" class="alert" style="display: none;"></div>
@@ -252,7 +254,7 @@
     </script>
     <script>
       // Function to create a new slide card
-      function createSlideCard(slideName) {
+      function createSlideCard(slideName, slideURL) {
         // Create the slide card element
         const slideCard = document.createElement('div');
         slideCard.className = 'col sm-4';
@@ -273,13 +275,19 @@
         // Create the slide description element
         const slideDescriptionElement = document.createElement('p');
         slideDescriptionElement.className = 'card-text';
-        slideDescriptionElement.textContent = `Description for ${slideName}.`;
+        slideDescriptionElement.textContent = `${slideURL}`;
     
         // Create the "Go somewhere" link
         const goSomewhereLink = document.createElement('a');
         goSomewhereLink.href = 'slides.html';
         goSomewhereLink.className = 'btn btn-primary';
         goSomewhereLink.textContent = 'Go somewhere';
+
+        // Create an image element for the slide image
+        const slideImage = document.createElement('img');
+        slideImage.src = slideURL; // Set the image source to the slideURL
+        slideImage.className = 'img-fluid'; // Optional: You can add additional classes for styling
+    
     
         // Create the delete button
         const deleteButton = document.createElement('button');
@@ -296,6 +304,7 @@
         // Append slide name, description, link, and delete button to the card body
         cardBody.appendChild(slideNameElement);
         cardBody.appendChild(slideDescriptionElement);
+        cardBody.appendChild(slideImage);
         cardBody.appendChild(goSomewhereLink);
         cardBody.appendChild(deleteButton);
     
@@ -352,7 +361,7 @@
           .then(response => response.json())
           .then(data => {
               data.forEach(slide => {
-                  const slideCard = createSlideCard(slide.slide_name);
+                  const slideCard = createSlideCard(slide.slide_name, slide.slide_url);
                   slideCardsContainer.appendChild(slideCard);
 
               });
@@ -368,6 +377,7 @@
 
           // Get the slide name from the input field
           const slideName = document.getElementById('slideName').value;
+          const slideURL = document.getElementById('slideURL').value;
 
           // Check if the input field is empty
           if (slideName.trim() === '') {
@@ -378,7 +388,8 @@
 
           // Create a JSON object with the slide name
           const slideData = {
-              slide_name: slideName
+              slide_name: slideName,
+              slide_url: slideURL
           };
 
           // Send an API call to add the slide
@@ -398,7 +409,7 @@
                   // Close the modal
                   //$('#myModal').modal('hide');
                   // Reload the page or update the slide list as needed
-                  const slideCard = createSlideCard(slideName);
+                  const slideCard = createSlideCard(slideName, slideURL);
                   slideCardsContainer.appendChild(slideCard);
               } else {
                   // Show an error message within the modal
