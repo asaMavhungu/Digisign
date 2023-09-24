@@ -76,7 +76,7 @@ def get_table_class_deprecated(table_name, base):
 def get_table_class(table_name: str):
 	return eval(table_name.capitalize()[:-1])
 
-def get_slide_name_by_id(slide_id):
+def get_slide_name_and_url_by_id(slide_id):
 	# Create a session
 	Session = sessionmaker(bind=engine)
 	session = Session()
@@ -86,9 +86,9 @@ def get_slide_name_by_id(slide_id):
 		slide = session.query(Slide).filter_by(slide_id=slide_id).first()
 
 		if slide:
-			return slide.slide_name
+			return slide.slide_name, slide.slide_url
 		else:
-			return None  # Return None if no slide with the given slide_id is found
+			return None, None  # Return None if no slide with the given slide_id is found
 	finally:
 		session.close()  # Close the session to release resources
 
@@ -196,11 +196,11 @@ def get_entry(table_name, filter_dict):
 			print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
 			if hasattr(table_class, 'shared_slides'):
 				for shared_slide in entry_dict.get('shared_slides', []):
-					shared_slide['slide_name'] = get_slide_name_by_id(shared_slide['slide_id'])
+					shared_slide['slide_name'], _ = get_slide_name_and_url_by_id(shared_slide['slide_id'])
 				pass
 			if hasattr(table_class, 'assignments'):
 				for assignment in entry_dict.get('assignments', []):
-					assignment['slide_name'] = get_slide_name_by_id(assignment['slide_id'])
+					assignment['slide_name'], assignment['slide_url'] = get_slide_name_and_url_by_id(assignment['slide_id'])
 				pass
 
 			print(entry_dict)

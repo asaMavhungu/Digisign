@@ -25,12 +25,16 @@ def devices():
 	return send_file("client/html/all-devices.html")
 
 @views.route('/departments', methods=['GET'])
-def departments2():
+def departments_all():
 	return send_file("client/html/all-departments.html")
 
 @views.route('/department/', methods=['GET'])
 def department():
 	return send_file("client/html/department-devices.html")
+
+@views.route('/slides/', methods=['GET'])
+def device_slides():
+	return send_file("client/html/device-slides.html")
 
 @views.route('/signup', methods=['GET'])
 def test():
@@ -62,8 +66,10 @@ def upload():
 
 
 @views.route('/uploads/<filename>')
-def serve_image(filename):
-    return send_from_directory('uploads', filename)
+def serve_image(filename: str):
+	print(filename)
+	filename = filename.replace(" ", "_")
+	return send_from_directory('uploads', filename)
 
 @views.route('statics/<filename>')
 def serve_static(filename):

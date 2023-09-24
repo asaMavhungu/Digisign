@@ -83,7 +83,7 @@
     <nav class="navbar fixed-top navbar-expand-lg navbar-dark bg-dark">
         <div class="container-fluid">
           <img src="https://upload.wikimedia.org/wikipedia/en/thumb/7/7c/University_of_Cape_Town_logo.svg/1200px-University_of_Cape_Town_logo.svg.png" alt="Logo" width="80" height="80" class="d-flex align-items-center ms-2">
-          <a class="navbar-brand" href="base.html">&nbsp;&nbsp;UCT Slides</a>
+          <a class="navbar-brand" href="/">&nbsp;&nbsp;UCT Slides</a>
           <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
             <span class="navbar-toggler-icon"></span>
           </button>
@@ -183,6 +183,19 @@
 
     <!-- JavaScript -->
     <script>
+
+        const currentUrl = window.location.href;
+
+        const url = new URL(currentUrl);
+
+        var device = url.searchParams.get("device");
+
+        if (device) {
+            console.log(device);
+        } else {
+            alert('Department parameter not found in the URL.');
+        }
+
         // Get references to DOM elements
         const fileInput = document.getElementById("file-input");
         const label = document.querySelector(".label");
@@ -401,19 +414,24 @@
       const slideCardsContainer = document.getElementById("slide-cards");
 
       // Fetch slide data from the API and add existing slide cards
-      fetch('/api/slides')
-          .then(response => response.json())
-          .then(data => {
-              data.forEach(slide => {
-                  const slideCard = createSlideCard(slide.slide_name, slide.slide_url);
-                  slideCardsContainer.appendChild(slideCard);
-
-              });
-          })
-          .catch(error => {
-              console.error('Error fetching slide data:', error);
-          });
-
+      fetch('/api/devices/' + device)
+        .then(response => response.json())
+        .then(deviceData => {
+            // Check if the response contains the expected data structure
+            if (deviceData && deviceData.slide_names && Array.isArray(deviceData.slide_names) && deviceData.slide_urls && Array.isArray(deviceData.slide_urls)) {
+            // Iterate through the slide names and slide URLs to create slide cards
+            deviceData.slide_names.forEach((slideName, index) => {
+                // Assuming you have a function createSlideCard(slideName, slideUrl)
+                const slideCard = createSlideCard(slideName, deviceData.slide_urls[index]);
+                slideCardsContainer.appendChild(slideCard);
+            });
+            } else {
+            console.error('Invalid device data:', deviceData);
+            }
+        })
+        .catch(error => {
+            console.error('Error fetching device data:', error);
+        });
       // Add a submit event listener to the "Add Slide" form
       const addSlideForm = document.getElementById('addSlideForm');
       addButton.addEventListener('click', function (e) {
