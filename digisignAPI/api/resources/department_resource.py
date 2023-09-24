@@ -16,9 +16,12 @@ department_parser.add_argument('devices', type=list, location='json', help='Devi
 department_fields = {
     "department_id": fields.String,
     "department_name": fields.String,
-    "slide_ids": fields.List(fields.String),
-    "device_ids": fields.List(fields.String),
-    "shared_slide_ids": fields.List(fields.String),
+    #"slide_ids": fields.List(fields.String),
+	"slide_names": fields.List(fields.String),
+    #"device_ids": fields.List(fields.String),
+	"device_names": fields.List(fields.String),
+    #"shared_slide_ids": fields.List(fields.String),
+	"shared_slide_names": fields.List(fields.String),
 }
 
 class DepartmentResource(Resource):
@@ -33,6 +36,7 @@ class DepartmentResource(Resource):
 		Get details of a specific department by ID.
 		"""
 		department_dict, code = Department.find_by_name(department_name)
+		print(department_dict)
 		if code == 200:
 			department_json = Department.extract_department_info(department_dict)
 			department = Department.from_dict(department_json)
