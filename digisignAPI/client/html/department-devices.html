@@ -59,7 +59,7 @@
     
 
     <!-- Devices cards -->
-    <div class="row row-cols-1 row-cols-md-2 g-4" id="device-cards">
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="device-cards">
       <!-- Existing and dynamically created device cards will be added here -->
       <div class="col sm-4">
           <div class="card h-100">
@@ -174,7 +174,7 @@
         // Create the "play" link
         const playLink = document.createElement('a');
         playLink.href = '/device-slide-test/?device=' + deviceName;
-        playLink.className = 'btn btn-primary';
+        playLink.className = 'btn btn-success';
         playLink.textContent = 'Play';
 
 
