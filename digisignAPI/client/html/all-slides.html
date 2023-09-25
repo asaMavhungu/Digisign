@@ -31,47 +31,42 @@
       .plus-icon{
         font-size: 20px;
       }
-    </style>
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; 
+        align-items: center; 
+        height: 70%; 
+    }
 
-    <style>
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center vertically */
-            align-items: center; /* Center horizontally */
-            height: 70%; /* 100% of the viewport height to center vertically */
-        }
+    .file-upload {
+        text-align: center;
+    }
 
-        .file-upload {
-            text-align: center; /* Center the file input and label text */
-        }
+    .input {
+        width: 70%;
+        height: 50%;
+        display: none;
+    }
 
-        .input {
-            /* Customize the size as needed */
-            width: 70%;
-            height: 50%;
-            display: none;
-        }
+    .label {
+        border-radius: 6px;
+        border: 1px dashed black;
+        text-align: center;
 
-        .label {
-            /* Customize the size as needed */
+        cursor: pointer;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
-            border-radius: 6px;
-            border: 1px dashed black;
-            text-align: center;
-
-            cursor: pointer;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .label:hover {
-            color: #007bff;
-            border: 1px dashed #007bff;
-        }
+    .label:hover {
+        color: #007bff;
+        border: 1px dashed #007bff;
+    }
 
     </style>
   </head>
@@ -280,7 +275,7 @@
                         const slideCard = createSlideCard(slideName, slideURL);
 
                         // Append the slide card to a container in your web page
-                        const slideContainer = document.getElementById("slideContainer"); // Replace with your container ID
+                        const slideContainer = document.getElementById("slide-cards"); // Replace with your container ID
                         slideContainer.appendChild(slideCard);
                         // Clear the form or perform any additional actions as needed
                     },
@@ -318,6 +313,9 @@
         // Create the slide description element
         const slideDescriptionElement = document.createElement('p');
         slideDescriptionElement.className = 'card-text';
+        slideDescriptionElement.style.whiteSpace = 'nowrap';
+        slideDescriptionElement.style.overflow = 'hidden';
+        slideDescriptionElement.style.textOverflow = 'ellipsis';
         slideDescriptionElement.textContent = `${slideURL}`;
     
         // Create the "Go somewhere" link
