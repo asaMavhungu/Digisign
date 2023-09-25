@@ -49,7 +49,7 @@
           <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
               <a class="nav-link" href="/departments">Departments</a>
-              <a class="nav-link active" aria-current="page"  href="/devices">All Devices</a>
+              <a class="nav-link" href="/devices">All Devices</a>
               <a class="nav-link" href="/slides">All Slides</a>
             </div>
           </div>
@@ -163,7 +163,7 @@
         const goSomewhereLink = document.createElement('a');
         goSomewhereLink.href = '/slides/?device=' + deviceName;
         goSomewhereLink.className = 'btn btn-primary';
-        goSomewhereLink.textContent = 'Go somewhere';
+        goSomewhereLink.textContent = 'Device slides';
     
         // Create the delete button
         const deleteButton = document.createElement('button');
