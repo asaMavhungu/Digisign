@@ -26,6 +26,7 @@ device_fields = {
     'slide_ids': fields.List(fields.String),  # Assuming slide_id is a string
 	'slide_names': fields.List(fields.String),  # Assuming slide_id is a string
 	'slide_urls': fields.List(fields.String),  # Assuming slide_id is a string
+	'slide_durations': fields.List(fields.String),
 }
 
 class DeviceResource(Resource):

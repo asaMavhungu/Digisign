@@ -80,6 +80,7 @@
 			deviceData.slide_ids.forEach((slide_id, index) => {
 				const slideName = deviceData.slide_names[index];
 				const slideURL = deviceData.slide_urls[index];
+				const slideDuration = deviceData.slide_durations[index];
 
 				const carouselItem = document.createElement('div');
 				carouselItem.classList.add('carousel-item');
@@ -96,6 +97,10 @@
 
 				carouselItem.innerHTML = slideContent;
 				carouselInner.appendChild(carouselItem);
+
+				console.log(String(slideDuration))
+				carouselItem.setAttribute('data-bs-interval', String(slideDuration));
+
 			});
 		}
 

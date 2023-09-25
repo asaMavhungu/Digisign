@@ -14,10 +14,7 @@ slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('slide_name', type=str, required=True, help='Title of the slide')
 slide_parser.add_argument('slide_url', type=str, required=True, help='URL of the slide')
 slide_parser.add_argument('device_name', type=str, required=True, help='Name of associated device')
-slide_parser.add_argument('user_id', type=str, required=False, help='Author ID of the slide')
-slide_parser.add_argument('department_id', type=str, required=False, help='image of the slide')
-slide_parser.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
-slide_parser.add_argument('departments', type=list, location='json', help='Departments associated with the slide')
+slide_parser.add_argument('slide_duration', type=str, required=True, help='Duration of the slide')
 
 # Define the fields for marshaling slide data in responses
 slide_fields = {
@@ -57,8 +54,9 @@ class SlideList(Resource):
 		slide_name = args['slide_name']
 		slide_url = args['slide_url']
 		device_name = args['device_name']
+		slide_durarion = args['slide_duration']
 
-		slide = Slide(slide_name=slide_name, slide_url=slide_url)
+		slide = Slide(slide_name=slide_name, slide_url=slide_url, slide_duration=slide_durarion)
 
 		responce, code = slide.create_database_entry()
 
