@@ -210,9 +210,13 @@ def get_entry(table_name, filter_dict):
 	"""Get an entry from the specified table based on a filter dictionary."""
 	session = Session(bind=engine)
 	try:
+		print("1 GGGGGGGGG")
 		table_class = get_table_class(table_name)
 		try:
+			print("1 GGGGGGGGG")
 			entry = session.query(table_class).filter_by(**filter_dict).one()
+
+			print("2 GGGGGGGGG")
 			# Create a dictionary representation of the entry
 			entry_dict = model_instance_to_json(entry)
 

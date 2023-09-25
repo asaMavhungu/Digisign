@@ -39,10 +39,12 @@ class User:
 	@staticmethod
 	def get_user_identity(username, password):
 
-		user_data, code = sql_client.get_entry('users', {'username': username, 'password': password})
+		user_dict, code = sql_client.get_entry('users', {'username': username,})
 
 		if code == 200:
-			return User.from_dict(user_data)  
+			return User.from_dict(user_dict)  
+		
+		print(user_dict, code)
 
 		return None
 
