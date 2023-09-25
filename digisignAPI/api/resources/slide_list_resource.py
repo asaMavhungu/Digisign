@@ -5,6 +5,7 @@ from api.models.Slide import Slide
 from api.models.Department import Department
 from api.models.SlideFactory import SlideFactory
 from api.models.User import User
+from api.models.Device import Device
 import json
 
 
@@ -12,6 +13,7 @@ import json
 slide_parser = reqparse.RequestParser()
 slide_parser.add_argument('slide_name', type=str, required=True, help='Title of the slide')
 slide_parser.add_argument('slide_url', type=str, required=True, help='URL of the slide')
+slide_parser.add_argument('device_name', type=str, required=True, help='Name of associated device')
 slide_parser.add_argument('user_id', type=str, required=False, help='Author ID of the slide')
 slide_parser.add_argument('department_id', type=str, required=False, help='image of the slide')
 slide_parser.add_argument('slide_type', type=str, required=False, help='Type of content of the slide') 
@@ -54,10 +56,46 @@ class SlideList(Resource):
 		args = slide_parser.parse_args()
 		slide_name = args['slide_name']
 		slide_url = args['slide_url']
+		device_name = args['device_name']
 
 		slide = Slide(slide_name=slide_name, slide_url=slide_url)
 
 		responce, code = slide.create_database_entry()
+
+		responce['success'] = False # type: ignore
+
+		# Couldnt create, abort
+		if code== 401:
+			return responce, code
+		
+		# Slide is bound to be found as it was succesfully entered
+		slide, code = Slide.slide_from_name(slide.slide_name)
+
+		# slide will be found
+		responce['success'] = True # type: ignore
+
+		device_dict, code = Device.find_by_name(device_name=device_name)
+		
+		device = Device.from_dict(device_dict)
+
+		print(device)
+		print(slide)
+
+		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+		responce_for_assign, code = slide.assign_to_device(device_id=device.device_id) #type: ignore
+		print(responce_for_assign, code)
+		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+		slide = Slide.slide_from_name(slide.slide_name) #type: ignore
+		print(responce, code)
+		print(slide)
+
+		if code == 404:
+			return responce_for_assign, code
+		
+		return responce
+
+
+		
 		#TODO Send success bool to front-end, ignore error for typed python error
 		if code == 200:
 			responce['success'] = True #type: ignore

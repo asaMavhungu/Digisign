@@ -73,6 +73,15 @@ class SlideResource(Resource):
 
 		slide = Slide.from_dict(slide_dict)
 
+		# Dissassociate the slide from its devices
+		for device_id in slide.device_ids:
+			responce = slide.unassign_from_device(device_id)
+			print(responce)
+
+		# delete the device
 		result, code  = slide.delete_database_entry()
+		print("AAAAAAAAAAAAAAAAAAAAAAAAAA")
+		print(slide)
+
 
 		return result, code

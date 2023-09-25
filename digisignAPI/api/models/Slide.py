@@ -55,6 +55,18 @@ class Slide:
 		)	
 
 	@classmethod
+	def slide_from_name(cls, slide_name):
+		slide_db_dict, code = Slide.find_by_name(slide_name)
+		if code == 404:
+			return None, 404
+		slide_dict = Slide.extract_slide_info(slide_db_dict)
+		slide = Slide.from_dict(slide_dict)
+
+		return slide, code
+
+
+
+	@classmethod
 	def extract_slide_info(cls, data):
 		slide_id = data.get("slide_id")
 		slide_name = data.get("slide_name")
@@ -151,4 +163,16 @@ class Slide:
 				filter_dict={'slide_id': self.slide_id}
 			)
 		
+		return result
+	
+	def assign_to_device(self, device_id):
+		print("HERERERERERERERE")
+		result = sql_client.assign_slides_to_device(slide_ids=[self.slide_id], device_id=device_id)
+		print("2 HERERERERERERERE")
+		print(result)
+		return result
+
+	def unassign_from_device(self, device_id: str):
+		result = sql_client.unassign_slide_from_device(slide_id=self.slide_id, device_id=device_id)
+		#result = sql_client.disassociate_slide_from_device(slide_id=self.slide_id, device_id=device_id)
 		return result

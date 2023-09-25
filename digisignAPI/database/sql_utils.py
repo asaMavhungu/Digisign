@@ -92,6 +92,21 @@ def get_slide_name_and_url_by_id(slide_id):
 	finally:
 		session.close()  # Close the session to release resources
 
+def get_device_name_by_id(device_id):
+	# Create a session
+	Session = sessionmaker(bind=engine)
+	session = Session()
+
+	try:
+		# Query the Slide table for the slide_name based on slide_id
+		device = session.query(Device).filter_by(device_id=device_id).first()
+
+		if device:
+			return device.device_name
+		else:
+			return None  # Return None if no slide with the given slide_id is found
+	finally:
+		session.close()  # Close the session to release resources
 
 def get_table_data(table_name):
 	# Create the SQLite database engine
@@ -163,10 +178,10 @@ def create_entry(table_name:str, data):
 		session.commit()
 		print("DDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 		return {
-            "message": f"{table_name} entry created successfully.",
-            "entry_id": eval(f"new_entry.{low}_id"),  # Include the ID in the response
-            "entry": model_instance_to_json(new_entry)
-        }, 200
+			"message": f"{table_name} entry created successfully.",
+			"entry_id": eval(f"new_entry.{low}_id"),  # Include the ID in the response
+			"entry": model_instance_to_json(new_entry)
+		}, 200
 		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
 	except Exception as e:
 		print("EEEEEEEEEEEEEEEEEEEEEEEEEE")
@@ -209,6 +224,7 @@ def get_entry(table_name, filter_dict):
 			if hasattr(table_class, 'assignments'):
 				for assignment in entry_dict.get('assignments', []):
 					assignment['slide_name'], assignment['slide_url'] = get_slide_name_and_url_by_id(assignment['slide_id'])
+					assignment['device_name'] = get_device_name_by_id(assignment['device_id'])
 				pass
 
 			print(entry_dict)
@@ -295,13 +311,16 @@ def assign_devices_to_departments(department_id, device_ids):
 		
 		# Refresh the department object to reflect the updated devices relationship
 		session.refresh(department)
-		return {"success" : True, "message" : f"Successfully connected {[device.device_name for device in devices]} to {department.department_name}"}, 200
+		print(f"Successfully connected devices {[device.device_name for device in devices]} to department:{department.department_name}")
+		responce = {"success" : True, "message" : f"Successfully connected {[device.device_name for device in devices]} to {department.department_name}"}, 200
 	else:
 		print("Department not found.")
-		return {"success" : False,"message" : f"Department not found"}, 404
+		responce = {"success" : False,"message" : f"Department not found"}, 404
 
 	session.close()
 	engine.dispose()
+
+	return responce
 
 # Function to assign slides to a device
 def assign_slides_to_device(device_id, slide_ids):
@@ -315,6 +334,8 @@ def assign_slides_to_device(device_id, slide_ids):
 
 	session.commit()
 	engine.dispose()
+
+	return {"success" : True}, 200
 
 def disassociate_device_from_department(device_id, department_id):
 	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
@@ -332,16 +353,23 @@ def disassociate_device_from_department(device_id, department_id):
 
 			# Commit the changes to the database
 			session.commit()
+			print(f"Successfully disconnected {device.device_name} from {department.department_name}")
+			return {"success" : True, "message" : f"Successfully disconnected {device.device_name} from {department.department_name}"}, 200
 			return True
 		else:
+			print("Department not found")
+			return {"success" : False,"message" : f"Department not found"}, 404
 			return False  # Device or department not found
 	except Exception as e:
 		session.rollback()
+		f"Error in disconnect"
 		raise e
+		return {"success" : False,"message" : f"Error in disconnect"}, 301
 	finally:
 		session.close()
 
-def disassociate_slide_from_device(slide_id, device_id):
+
+def disassociate_slide_from_device_deprecated(slide_id, device_id):
 	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
 	Session = sessionmaker(bind=engine)
 	session = Session()
@@ -350,21 +378,66 @@ def disassociate_slide_from_device(slide_id, device_id):
 		# Retrieve the slide and device objects
 		slide = session.query(Slide).filter_by(slide_id=slide_id).first()
 		device = session.query(Device).filter_by(device_id=device_id).first()
+		print("0 rrrrrrrrrrrrrrrrrrrrrrr")
+		print(slide)
+		print(device)
 
 		if slide and device:
+			print("1 rrrrrrrrrrrrrrrrrrrrrrr")
 			# Remove the slide from the device's list of assigned slides
 			device.assignments = [assignment for assignment in device.assignments if assignment.slide_id != slide_id]
 
+			print("2 rrrrrrrrrrrrrrrrrrrrrrr")
 			# Commit the changes to the database
 			session.commit()
+			return {"success" : True, "message" : f"Successfully disassociate slide {slide.slide_name} from {device.device_name}"}, 200
 			return True
 		else:
+			return {"success" : False, "message" : f"failed to disassociate slides"}, 200
 			return False  # Slide or device not found
 	except Exception as e:
 		session.rollback()
+		print(e)
 		raise e
 	finally:
 		session.close()
+		return {"success" : False,"message" : f"Error in dissassociation"}, 400
+
+
+
+def assign_slide_to_device(slide_id, device_id):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+	# Check if the slide and device exist
+	slide = session.query(Slide).filter_by(slide_id=slide_id).first()
+	device = session.query(Device).filter_by(device_id=device_id).first()
+
+	if slide is None or device is None:
+		return False  # Slide or device not found
+
+	# Create a new SlideAssignment
+	assignment = SlideAssignment(slide_id=slide_id, device_id=device_id)
+
+	# Add the assignment to the session and commit it to the database
+	session.add(assignment)
+	session.commit()
+	return True  # Slide assigned successfully
+
+def unassign_slide_from_device(slide_id, device_id):
+	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	Session = sessionmaker(bind=engine)
+	session = Session()
+	# Find the SlideAssignment entry for the given slide and device
+	assignment = session.query(SlideAssignment).filter_by(slide_id=slide_id, device_id=device_id).first()
+
+	if assignment is None:
+		return {"success" : False,"message" : f"Error in dissassociation"}, 400
+
+	# Remove the assignment from the session and commit the change
+	session.delete(assignment)
+	session.commit()
+	return {"success" : True, "message" : f"Successfully disassociate slide"}, 200
 
 # Function to share slides with other departments
 def share_slides_with_departments(from_department_id, to_department_id, slide_ids):

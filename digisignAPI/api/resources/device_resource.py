@@ -99,44 +99,42 @@ class DeviceResource(Resource):
 		device_dict, code = Device.find_by_name(device_name)
 
 		if code == 404:
-			return {"message": "Department not found"}, 404
-
+			return {"message": "Device not found"}, 404
+		
+		# TODO device json has dep name
 		device_json = Device.extract_device_info(device_dict)
 		device = Device.from_dict(device_json)
 		# TODO ADD departnment name to device
 
-		responce, code = device.delete_database_entry()
 
-		print(responce)
-		print(device)
-		print("WWWWWWWWWWWWWWWWWWWWWWWWW")
-		department_name = device_json['department_name']
-
-		responce['success'] = False
-
-
-		# Couldnt create, abort
-		if code != 200:
-			return responce, code
-
-		responce['success'] = True #type: ignore
-		#TODO connect this device to the department
-		print(responce['department_name'])
-		department_dict, code = Department.find_by_name(department_name)
+		department_dict, code = Department.find_by_name(device.department_name) # type:ignore
 		print(department_dict)
 
 		if code == 404:
-			return responce, code
+			return {"success": False, "message": "Department not found"}, code
 		
 		department_json = Department.extract_department_info(department_dict)
 		department = Department.from_dict(department_json)
 
 		print(device)
-		responce_for_assign, code = department.unassign_device(device.device_id)
+		responce_for_assign, code = department.unassign_device(device.device_id) # type:ignore
 
-		print(responce, code)
-
-		if code == 404:
+		responce_for_assign['success'] = False
+		if code != 200:
 			return responce_for_assign, code
+
+		responce, code = device.delete_database_entry()
+
+		print(responce)
+		print(device)
+		print(device_json)
+
+
+		responce['success'] = False # type:ignore
+
+
+		# Couldnt create, abort
+		if code != 200:
+			return responce, code
 		
 		return responce
