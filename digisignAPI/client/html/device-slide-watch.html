@@ -42,18 +42,21 @@
 		.carousel {
 			max-width: 100%; /* Ensure the carousel scales with the device width */
 		}
-
 		.carousel img {
-			object-fit: cover; /* Stretch the image to cover the carousel while maintaining aspect ratio */
-			object-position: center; /* Center the image within the carousel */
+			object-fit: contain; /* Fit the image within the carousel, maintaining aspect ratio */
 			max-width: 100%; /* Ensure the image does not exceed the width of the carousel */
 			max-height: 100vh; /* Limit the image height to the viewport height (100% of viewport height) */
+			width: auto; /* Allow the image to adjust its width to maintain the aspect ratio */
+			height: auto; /* Allow the image to adjust its height to maintain the aspect ratio */
+			margin: 0 auto; /* Center the image horizontally within the carousel */
+			display: block; /* Remove any extra spacing that might affect the layout */
+			background-color: white; /* Set the background color to white for the borders */
 		}
 
 	</style>
 
 
-	<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel">
+	<div id="carouselExampleCaptions" class="carousel slide" data-bs-ride="carousel" data-bs-pause="false">
 		<div class="carousel-inner" id="carouselInner">
 			<!-- Carousel items will be populated here -->
 		</div>
