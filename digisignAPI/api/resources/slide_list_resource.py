@@ -67,7 +67,8 @@ class SlideList(Resource):
 		# Couldnt create, abort
 		if code== 401:
 			return responce, code
-
+		
+		# Slide is bound to be found as it was succesfully entered
 		slide, code = Slide.slide_from_name(slide.slide_name)
 
 		# slide will be found
@@ -81,10 +82,10 @@ class SlideList(Resource):
 		print(slide)
 
 		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-		responce_for_assign, code = slide.assign_to_device(device_id=device.device_id) 
+		responce_for_assign, code = slide.assign_to_device(device_id=device.device_id) #type: ignore
 		print(responce_for_assign, code)
 		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
-		slide = Slide.slide_from_name(slide.slide_name)
+		slide = Slide.slide_from_name(slide.slide_name) #type: ignore
 		print(responce, code)
 		print(slide)
 
