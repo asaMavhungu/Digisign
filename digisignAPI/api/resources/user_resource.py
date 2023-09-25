@@ -28,6 +28,12 @@ def hash_password(password):
 # Your User model or authentication logic (replace with your actual implementation)
 from api.models.User import User  # Import your User model
 
+
+signup_parser = reqparse.RequestParser()
+signup_parser.add_argument('username', type=str, required=True, help='Username')
+signup_parser.add_argument('email', type=str, required=True, help='Email')
+signup_parser.add_argument('password', type=str, required=True, help='Password')
+
 # Request parser for user registration and update
 user_parser = reqparse.RequestParser()
 user_parser.add_argument('username', type=str, required=True, help='Username')
@@ -60,6 +66,7 @@ class UserResource(Resource):
 			return user, 200
 		return {'message': 'User not found'}, 404
 	
+
 	def patch(self, user_name):
 		"""
 		Update a specific department by ID (partial update).

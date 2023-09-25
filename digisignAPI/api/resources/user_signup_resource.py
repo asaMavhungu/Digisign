@@ -10,24 +10,31 @@ signup_parser.add_argument('email', type=str, required=True, help='Email')
 signup_parser.add_argument('password', type=str, required=True, help='Password')
 
 class UserSignupResource(Resource):
-    def post(self):
-        data = signup_parser.parse_args()
-        username = data['username']
-        email = data['email']
-        password = data['password']
+	def post(self):
 
-        # Check if the username or email is already in use
-        if User.find_by_name(username)[0]:
-            return {'message': 'Username or email already in use'}, 400
+		print("XXXX")
+		data = signup_parser.parse_args()
+		username = data['username']
+		email = data['email']
+		password = data['password']
 
-        # Create a new user
-        new_user = User(username=username, email=email, password=password)
-        result = new_user.create_database_entry()
+		print("2XXXX")
 
-        if result:
-            #access_token = create_access_token(identity=new_user.user_id)
+		user_dict, code = User.find_by_name(username)
+		# Check if the username or email is already in use
+		if code == 200:
+			return {'message': 'Username or email already in use'}, 400
 
-            # Return the token and a success message
-            return {'success': True, 'message': 'User registration successful'}, 201
-        else:
-            return {'success': False, 'message': 'User registration failed'}, 500
+		# Create a new user
+		new_user = User(username=username, email=email, password=password)
+		result = new_user.create_database_entry()
+		
+		print(result)
+
+		if result:
+			#access_token = create_access_token(identity=new_user.user_id)
+
+			# Return the token and a success message
+			return {'success': True, 'message': 'User registration successful'}, 201
+		else:
+			return {'success': False, 'message': 'User registration failed'}, 500
