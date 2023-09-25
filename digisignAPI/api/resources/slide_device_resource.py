@@ -59,7 +59,7 @@ class SlideDeviceResource(Resource):
 		
 		return responce, code
 
-	def delete(self, slide_name):
+	def delete(self):
 
 		args = slide_parser.parse_args()
 		slide_name = args['slide_name']
@@ -69,8 +69,7 @@ class SlideDeviceResource(Resource):
 		
 		if code == 404:
 			return {"message": "Slide not found"}, 404
-		
-	
+
 		slide_dict = Slide.extract_slide_info(slide_db_dict)
 
 		slide = Slide.from_dict(slide_dict)
@@ -79,7 +78,7 @@ class SlideDeviceResource(Resource):
 		
 		device = Device.from_dict(device_dict)
 
-		# Device will HAVE id
+		# Device WILL have id
 		result, code = slide.unassign_from_device(device.device_id) #type: ignore
 
 		print(slide)

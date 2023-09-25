@@ -80,6 +80,10 @@ def createApi(app: Flask):
 	from .resources.department_list_resource import DepartmentListResource
 	api.add_resource(DepartmentListResource, '/api/departments')
 
+	# Register DepartmentListResource with endpoint /departments
+	from .resources.slide_device_resource import SlideDeviceResource
+	api.add_resource(SlideDeviceResource, '/api/slide-device')
+
 
 
 	return app
