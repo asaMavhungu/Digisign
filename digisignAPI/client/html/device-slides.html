@@ -367,7 +367,9 @@
         const slideImage = document.createElement('img');
         slideImage.src = slideURL; // Set the image source to the slideURL
         slideImage.className = 'img-fluid'; // Optional: You can add additional classes for styling
-    
+        // Apply CSS styles to make the image responsive (16:9 aspect ratio)
+        slideImage.style.width = '100%'; // 100% width of its parent
+        slideImage.style.height = 'auto'; // Maintain aspect ratio
     
         // Create the delete button
         const deleteButton = document.createElement('button');
