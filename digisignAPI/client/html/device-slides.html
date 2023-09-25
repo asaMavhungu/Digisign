@@ -91,8 +91,7 @@
             <div class="navbar-nav">
               <a class="nav-link" href="/departments">Departments</a>
               <a class="nav-link" href="/devices">All Devices</a>
-              <a class="nav-link active" aria-current="page"  href="/slides">All Slides</a>
-              <a class="nav-link" href="uploadpage.html">Upload</a>
+              <a class="nav-link" href="/slides">All Slides</a>
             </div>
           </div>
           <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
@@ -101,7 +100,7 @@
     
 
     <!-- Slides cards -->
-    <div class="row row-cols-1 row-cols-md-2 g-4" id="slide-cards">
+    <div class="row row-cols-1 row-cols-md-3 g-4" id="slide-cards">
       <!-- Existing and dynamically created slide cards will be added here -->
       <div class="col sm-4">
           <div class="card h-100">
@@ -355,13 +354,16 @@
         // Create the slide description element
         const slideDescriptionElement = document.createElement('p');
         slideDescriptionElement.className = 'card-text';
+        slideDescriptionElement.style.whiteSpace = 'nowrap';
+        slideDescriptionElement.style.overflow = 'hidden';
+        slideDescriptionElement.style.textOverflow = 'ellipsis';
         slideDescriptionElement.textContent = `${slideURL}`;
     
         // Create the "Go somewhere" link
         const goSomewhereLink = document.createElement('a');
         goSomewhereLink.href = 'slides.html';
         goSomewhereLink.className = 'btn btn-primary';
-        goSomewhereLink.textContent = 'Go somewhere';
+        goSomewhereLink.textContent = 'Copy slide';
 
         // Create an image element for the slide image
         const slideImage = document.createElement('img');
@@ -379,8 +381,8 @@
 
 
         // Add margin/padding between the buttons (adjust as needed)
-        goSomewhereLink.style.marginRight = '10px'; // Add space to the right of "Go somewhere" link
-        deleteButton.style.marginRight = '10px'; // Add space to the right of the delete button
+        goSomewhereLink.style.margin = '10px 10px 0px 0px'; // Add space to the right of "Go somewhere" link
+        deleteButton.style.margin = '10px 0px 0px 0px'; // Add space to the right of the delete button
 
         
         // Append slide name, description, link, and delete button to the card body
