@@ -148,7 +148,7 @@
     
         // Create the "Go somewhere" link
         const goSomewhereLink = document.createElement('a');
-        goSomewhereLink.href = 'slides.html';
+        goSomewhereLink.href = '/slides/?device=' + deviceName;
         goSomewhereLink.className = 'btn btn-primary';
         goSomewhereLink.textContent = 'Go somewhere';
     
@@ -160,7 +160,7 @@
 
         // Create the "play" link
         const playLink = document.createElement('a');
-        playLink.href = 'play-slides.html';
+        playLink.href = '/device-slide-test/?device=' + deviceName;
         playLink.className = 'btn btn-success';
         playLink.textContent = 'Play';
 
