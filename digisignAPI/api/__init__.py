@@ -47,6 +47,10 @@ def createApi(app: Flask):
 	from .resources.user_resource import UserResource
 	api.add_resource(UserResource, '/api/users/<string:user_name>')
 
+	# Register UserResource with endpoint /api/users
+	from .resources.user_signup_resource import UserSignupResource
+	api.add_resource(UserSignupResource, '/api/signup')
+
 	# Register UserResource with endpoint /api/userslist
 	from .resources.user_list_resource import UserListResource
 	api.add_resource(UserListResource, '/api/userslist')

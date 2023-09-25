@@ -35,6 +35,16 @@ class User:
 		email = data.get('email')
 		password = data.get('password')
 		return cls(username, user_id=user_id, email=email, password=password)
+	
+	@staticmethod
+	def get_user_identity(username, password):
+
+		user_data, code = sql_client.get_entry('users', {'username': username, 'password': password})
+
+		if code == 200:
+			return User.from_dict(user_data)  
+
+		return None
 
 	@staticmethod
 	def getAll():
