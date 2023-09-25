@@ -1,9 +1,6 @@
-from flask import request
 from flask_restful import Resource, reqparse, marshal_with, fields
-from bson.objectid import ObjectId
 from api.models.Department import Department
-from api.models.Slide import Slide
-from api.models.Device import Device
+
 
 # Request parsers for department data
 department_parser = reqparse.RequestParser()

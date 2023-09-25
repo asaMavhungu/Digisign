@@ -43,16 +43,12 @@ class SlideDeviceResource(Resource):
 		
 		device = Device.from_dict(device_dict)
 
-		print(device)
-		print(slide)
 
-		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+
 		responce, code = slide.assign_to_device(device_id=device.device_id) #type: ignore
 		print(responce, code)
-		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+
 		slide = Slide.slide_from_name(slide.slide_name) #type: ignore
-		print(responce, code)
-		print(slide)
 
 		if code == 404:
 			return responce, code

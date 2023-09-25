@@ -43,17 +43,15 @@ class DeviceResource(Resource):
 			dict: The device information.
 			int: HTTP status code.
 		"""
-		print("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+
 		device_dict, code = Device.find_by_name(device_name)
-		print("========================")
+
 		if code == 200:
-			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-			print(device_dict)
-			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+
 			device_json = Device.extract_device_info(device_dict)
-			print(device_json)
+
 			device = Device.from_dict(device_json)
-			print(device)
+			
 			return device, 200
 		return {"message": "Device not found"}, 404
 
@@ -85,13 +83,11 @@ class DeviceResource(Resource):
 
 			return message, code
 		if code == 200:
-			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
-			print(device_dict)
-			print("FFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF")
+
 			device_json = Device.extract_device_info(device_dict)
-			print(device_json)
+
 			device = Device.from_dict(device_json)
-			print(device)
+
 			
 			return device, 200
 		return {"message": "Device not found"}, 404
@@ -105,7 +101,6 @@ class DeviceResource(Resource):
 		# TODO device json has dep name
 		device_json = Device.extract_device_info(device_dict)
 		device = Device.from_dict(device_json)
-		# TODO ADD departnment name to device
 
 
 		department_dict, code = Department.find_by_name(device.department_name) # type:ignore
@@ -125,11 +120,6 @@ class DeviceResource(Resource):
 			return responce_for_assign, code
 
 		responce, code = device.delete_database_entry()
-
-		print(responce)
-		print(device)
-		print(device_json)
-
 
 		responce['success'] = False # type:ignore
 

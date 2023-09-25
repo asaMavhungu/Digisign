@@ -39,7 +39,7 @@ class SlideList(Resource):
 			List[Slide]: A list of all slides.
 		"""
 		slides_data = Slide.getAll()
-		#return {"message": "Departments not found"}, 400
+
 		if slides_data is not None:
 			slide_dicts = Slide.extract_mult_slide_info(slides_data)
 			slides = [Slide.from_dict(slide_dict) for slide_dict in slide_dicts]
@@ -48,7 +48,7 @@ class SlideList(Resource):
 		else:
 			return {"message": "Departments not found"}, 404		
 	
-	#@marshal_with(slide_fields)
+
 	def post(self):
 		args = slide_parser.parse_args()
 		slide_name = args['slide_name']
@@ -66,7 +66,7 @@ class SlideList(Resource):
 		if code== 401:
 			return responce, code
 		
-		# Slide is bound to be found as it was succesfully entered
+		# Slide is WILL be found as it was succesfully entered
 		slide, code = Slide.slide_from_name(slide.slide_name)
 
 		# slide will be found
@@ -79,10 +79,10 @@ class SlideList(Resource):
 		print(device)
 		print(slide)
 
-		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+
 		responce_for_assign, code = slide.assign_to_device(device_id=device.device_id) #type: ignore
 		print(responce_for_assign, code)
-		print("UUUUUUUUUUUUUUUUUUUUUUUUUUUU")
+
 		slide = Slide.slide_from_name(slide.slide_name) #type: ignore
 		print(responce, code)
 		print(slide)
@@ -95,8 +95,3 @@ class SlideList(Resource):
 
 		
 		#TODO Send success bool to front-end, ignore error for typed python error
-		if code == 200:
-			responce['success'] = True #type: ignore
-		else:
-			responce['success'] = False #type: ignore
-		return responce

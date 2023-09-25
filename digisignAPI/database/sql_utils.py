@@ -28,16 +28,14 @@ from sqlalchemy import create_engine, inspect
 # Create the SQLite database engine
 engine = create_engine('sqlite:///my_database.db')
 
-# Create an Inspector to inspect the database structure
 inspector = inspect(engine)
 
-# Get the table name of the Department model
 table_name = Department.__table__.name
 
 # Get information about the Department table
 table_info = inspector.get_columns(table_name)
 
-# Print the attributes (columns) of the Department table
+
 print(f"Attributes of table '{table_name}':")
 for column in table_info:
 	print(column['name'])
@@ -73,11 +71,12 @@ def get_table_class_deprecated(table_name, base):
 	else:
 		raise ValueError(f"Table '{table_name}' not found in the database.")
 	
+# TODO now using eval to get class :)
 def get_table_class(table_name: str):
 	return eval(table_name.capitalize()[:-1])
 
 def get_slide_name_url_duration_by_id(slide_id):
-	# Create a session
+	
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
@@ -88,9 +87,9 @@ def get_slide_name_url_duration_by_id(slide_id):
 		if slide:
 			return slide.slide_name, slide.slide_url, slide.slide_duration
 		else:
-			return None, None, None  # Return None if no slide with the given slide_id is found
+			return None, None, None  
 	finally:
-		session.close()  # Close the session to release resources
+		session.close()  
 
 def get_device_name_by_id(device_id):
 	# Create a session
@@ -98,7 +97,7 @@ def get_device_name_by_id(device_id):
 	session = Session()
 
 	try:
-		# Query the Slide table for the slide_name based on slide_id
+		
 		device = session.query(Device).filter_by(device_id=device_id).first()
 
 		if device:
@@ -112,11 +111,9 @@ def get_table_data(table_name):
 	# Create the SQLite database engine
 	engine = create_engine('sqlite:///my_database.db')
 
-	# Create a session
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
-	# Get the corresponding table class based on the table name
 	table_class = get_table_class(table_name)
 
 	if table_class is None:
@@ -124,22 +121,17 @@ def get_table_data(table_name):
 		print({"error": f"Table '{table_name}' not found."})
 		return
 
-	# List of known relationship attributes (customize as needed)
 	KNOWN_RELATIONSHIPS = ['slides', 'shared_slides', 'devices', 'department', 'assignments', 'current_user']
 	KNOWN_RELATIONSHIPS = ['slides', 'shared_slides', 'devices', 'assignments', 'shared_departments', 'department', 'current_user']
 
-	# Query all entries from the table
 	table_class = get_table_class(table_name)
 	entries = session.query(table_class).all()
 
-
-	# Serialize the entries to a list of dictionaries
 	entry_dicts = []
 	for entry in entries:
 		entry_dict = model_instance_to_json(entry)
 
 
-		# Include information about relationships
 		for attr_name in KNOWN_RELATIONSHIPS:
 			if hasattr(table_class, attr_name):
 				related_records = getattr(entry, attr_name)
@@ -151,10 +143,9 @@ def get_table_data(table_name):
 
 		entry_dicts.append(entry_dict)
 
-	# Convert the list of dictionaries to JSON
+
 	table_data = json.dumps(entry_dicts, default=str, indent=2)
 
-	# Close the session
 	session.close()
 
 	#print("XXXXXXXXXXXXXXXXXXXXXXXXXXX")
@@ -179,7 +170,7 @@ def create_entry(table_name:str, data):
 		print("DDDDDDDDDDDDDDDDDDDDDDDDDDDD")
 		return {
 			"message": f"{table_name} entry created successfully.",
-			"entry_id": eval(f"new_entry.{low}_id"),  # Include the ID in the response
+			"entry_id": eval(f"new_entry.{low}_id"), 
 			"entry": model_instance_to_json(new_entry)
 		}, 200
 		return {"message": f"{table_name} entry created successfully.", "entry": model_instance_to_json(new_entry)} , 200
@@ -196,10 +187,8 @@ def get_entry_deprecated(table_name, filter_dict):
 	try:
 		table_class = get_table_class(table_name)
 		try:
-			print("found $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 			print(filter_dict)
 			entry = session.query(table_class).filter_by(**filter_dict).one()
-			print("found $$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$$")
 			return model_instance_to_json(entry)
 		except NoResultFound:
 			return {"error": f"No {table_name} entry found matching the filter."}
@@ -210,17 +199,15 @@ def get_entry(table_name, filter_dict):
 	"""Get an entry from the specified table based on a filter dictionary."""
 	session = Session(bind=engine)
 	try:
-		print("1 GGGGGGGGG")
+
 		table_class = get_table_class(table_name)
 		try:
-			print("1 GGGGGGGGG")
+
 			entry = session.query(table_class).filter_by(**filter_dict).one()
 
-			print("2 GGGGGGGGG")
-			# Create a dictionary representation of the entry
 			entry_dict = model_instance_to_json(entry)
 
-			print("&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&&")
+
 			if hasattr(table_class, 'shared_slides'):
 				for shared_slide in entry_dict.get('shared_slides', []):
 					shared_slide['slide_name'], _, _ = get_slide_name_url_duration_by_id(shared_slide['slide_id'])
@@ -301,7 +288,7 @@ def delete_entry(table_name, filter_dict):
 	finally:
 		session.close()
 
-# Function to assign devices to departments
+
 def assign_devices_to_departments(department_id, device_ids):
 	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
 	Session = sessionmaker(bind=engine)
@@ -313,7 +300,6 @@ def assign_devices_to_departments(department_id, device_ids):
 		department.devices.extend(devices)
 		session.commit()
 		
-		# Refresh the department object to reflect the updated devices relationship
 		session.refresh(department)
 		print(f"Successfully connected devices {[device.device_name for device in devices]} to department:{department.department_name}")
 		responce = {"success" : True, "message" : f"Successfully connected {[device.device_name for device in devices]} to {department.department_name}"}, 200
@@ -326,9 +312,8 @@ def assign_devices_to_departments(department_id, device_ids):
 
 	return responce
 
-# Function to assign slides to a device
 def assign_slides_to_device(device_id, slide_ids):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db') 
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
@@ -342,17 +327,17 @@ def assign_slides_to_device(device_id, slide_ids):
 	return {"success" : True}, 200
 
 def disassociate_device_from_department(device_id, department_id):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db') 
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
 	try:
-		# Retrieve the device and department objects
+
 		device = session.query(Device).filter_by(device_id=device_id).first()
 		department = session.query(Department).filter_by(department_id=department_id).first()
 
 		if device and department:
-			# Remove the device from the department's list of devices
+			
 			department.devices.remove(device)
 
 			# Commit the changes to the database
@@ -374,7 +359,7 @@ def disassociate_device_from_department(device_id, department_id):
 
 
 def disassociate_slide_from_device_deprecated(slide_id, device_id):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db') 
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
@@ -382,17 +367,12 @@ def disassociate_slide_from_device_deprecated(slide_id, device_id):
 		# Retrieve the slide and device objects
 		slide = session.query(Slide).filter_by(slide_id=slide_id).first()
 		device = session.query(Device).filter_by(device_id=device_id).first()
-		print("0 rrrrrrrrrrrrrrrrrrrrrrr")
-		print(slide)
-		print(device)
+
 
 		if slide and device:
-			print("1 rrrrrrrrrrrrrrrrrrrrrrr")
-			# Remove the slide from the device's list of assigned slides
+
 			device.assignments = [assignment for assignment in device.assignments if assignment.slide_id != slide_id]
 
-			print("2 rrrrrrrrrrrrrrrrrrrrrrr")
-			# Commit the changes to the database
 			session.commit()
 			return {"success" : True, "message" : f"Successfully disassociate slide {slide.slide_name} from {device.device_name}"}, 200
 			return True
@@ -410,7 +390,7 @@ def disassociate_slide_from_device_deprecated(slide_id, device_id):
 
 
 def assign_slide_to_device(slide_id, device_id):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db')
 	Session = sessionmaker(bind=engine)
 	session = Session()
 	# Check if the slide and device exist
@@ -426,10 +406,10 @@ def assign_slide_to_device(slide_id, device_id):
 	# Add the assignment to the session and commit it to the database
 	session.add(assignment)
 	session.commit()
-	return True  # Slide assigned successfully
+	return True 
 
 def unassign_slide_from_device(slide_id, device_id):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db')  
 	Session = sessionmaker(bind=engine)
 	session = Session()
 	# Find the SlideAssignment entry for the given slide and device
@@ -445,7 +425,7 @@ def unassign_slide_from_device(slide_id, device_id):
 
 # Function to share slides with other departments
 def share_slides_with_departments(from_department_id, to_department_id, slide_ids):
-	engine = create_engine('sqlite:///my_database.db')  # Replace with your actual database URL
+	engine = create_engine('sqlite:///my_database.db') 
 	Session = sessionmaker(bind=engine)
 	session = Session()
 
@@ -459,7 +439,8 @@ def share_slides_with_departments(from_department_id, to_department_id, slide_id
 
 # Example usage:
 if __name__ == "__main__":
-	table_name_to_query = "devices"  # Replace with the table name you want to query
+	# TODO For testing
+	table_name_to_query = "devices"  
 	result = get_table_data(table_name_to_query)
 	print(result)
 
@@ -467,10 +448,10 @@ if __name__ == "__main__":
 	# Define the data for the new device
 	new_device_data = {
 		"device_name": "New Device Name",
-		"department_id": 1,  # Replace with the actual department ID to which this device belongs
+		"department_id": 1, 
 	}
 
-	# Call the create_entry function to create the new device
+
 	result = create_entry("devices", new_device_data)
 
 	result = get_table_data(table_name_to_query)
@@ -478,23 +459,22 @@ if __name__ == "__main__":
 	# Print the result
 	print(result)
 
-	# Specify the ID of the device you want to retrieve
-	device_id_to_retrieve = 1  # Replace with the actual device ID you want to retrieve
 
-	# Call the get_entry function to retrieve the device by ID
-	# Example usage of get_entry with a filter dictionary
-	filter_dict = {"device_name": "Device 2"}  # Replace with your filter criteria
+	device_id_to_retrieve = 1  
+
+
+	filter_dict = {"device_name": "Device 2"}  
 	result = get_entry("devices", filter_dict)
 	print(result)
 
-	# Example usage of update_entry with a filter dictionary
-	filter_dict = {"device_name": "Device 2"}  # Replace with your filter criteria
-	update_data = {"device_name": "updated device name"}  # Replace with the data you want to update
+
+	filter_dict = {"device_name": "Device 2"}  
+	update_data = {"device_name": "updated device name"} 
 	result = update_entry("devices", filter_dict, update_data)
 	print(result)
 
-	# Example usage of delete_entry with a filter dictionary
+
 	print("asa")
-	filter_dict = {"device_name": "Device 2"}  # Replace with your filter criteria
+	filter_dict = {"device_name": "Device 2"} 
 	result = delete_entry("devices", filter_dict)
 	print(result)

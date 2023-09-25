@@ -80,8 +80,7 @@ class SlideResource(Resource):
 
 		# delete the device
 		result, code  = slide.delete_database_entry()
-		print("AAAAAAAAAAAAAAAAAAAAAAAAAA")
-		print(slide)
+
 
 
 		return result, code

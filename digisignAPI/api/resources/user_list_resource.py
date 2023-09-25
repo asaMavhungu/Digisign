@@ -42,7 +42,7 @@ class UserListResource(Resource):
 			return {"message": "Users not found"}, 404
 		
 	def post(self):
-		print("XXXXXX")
+
 		data = signup_parser.parse_args()
 		username = data['username']
 		email = data['email']

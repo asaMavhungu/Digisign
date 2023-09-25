@@ -97,31 +97,3 @@ class DeviceListResource(Resource):
 			return responce_for_assign, code
 		
 		return responce
-
-
-
-		#TODO Send success bool to front-end, ignore error for typed python error
-		if code == 200:
-			print("gg ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-			responce['success'] = True #type: ignore
-			#TODO connect this device to the department
-			department_dict, code = Department.find_by_name(department_name)
-			print(department_dict)
-			print("2 ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-			if code == 200:
-				department_json = Department.extract_department_info(department_dict)
-				department = Department.from_dict(department_json)
-				print("3 ZZZZZZZZZZZZZZZZZZZZZZZZZZZZ")
-				print(device)
-				responce_for_assign, code = department.assign_devices([device.device_id]) #type: ignore
-
-				if code == 400:
-					return responce_for_assign
-
-				print(responce)
-
-				return responce
-
-		else:
-			responce['success'] = False #type: ignore
-		return responce

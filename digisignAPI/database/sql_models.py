@@ -14,7 +14,7 @@ class Department(Base):
 	shared_slides = relationship("SharedSlide", 
 								 primaryjoin="Department.department_id == SharedSlide.from_department_id",
 								 back_populates="from_department")
-	# Define the relationship between Department and Device
+
 	devices = relationship("Device", back_populates="department")
 
 class User(Base):
@@ -23,8 +23,7 @@ class User(Base):
 	user_id = Column(Integer, primary_key=True)
 	username = Column(String, unique=True)
 	email = Column(String)
-	password = Column(String)  # Note: You should store hashed passwords securely.
-	# Add other user-related attributes as needed
+	password = Column(String)  
 
 class Slide(Base):
 	__tablename__ = 'slides'
@@ -34,8 +33,7 @@ class Slide(Base):
 	slide_url = Column(String)
 	slide_duration = Column(Integer)
 	department_id = Column(Integer, ForeignKey('departments.department_id'))
-	current_user_id = Column(Integer, ForeignKey('users.user_id'))  # New column
-	# Add other slide-related attributes as needed
+	current_user_id = Column(Integer, ForeignKey('users.user_id')) 
 	department = relationship("Department", back_populates="slides")
 	assignments = relationship("SlideAssignment", back_populates="slide")
 	current_user = relationship("User")  # Relationship to the user who owns the slide
@@ -45,9 +43,9 @@ class Device(Base):
 
 	device_id = Column(Integer, primary_key=True)
 	device_name = Column(String, unique=True)
-	department_id = Column(Integer, ForeignKey('departments.department_id'))  # Add this line
+	department_id = Column(Integer, ForeignKey('departments.department_id'))  
 	assignments = relationship("SlideAssignment", back_populates="device")
-	department = relationship("Department", back_populates="devices")  # Add this line
+	department = relationship("Department", back_populates="devices") 
 
 class SlideAssignment(Base):
 	__tablename__ = 'slide_assignment'
@@ -82,7 +80,7 @@ class UserSlide(Base):
 	slide = relationship("Slide")
 
 # Create the SQLite database and tables
-engine = create_engine('sqlite:///my_database.db')  # Creates an SQLite database named my_database.db
+engine = create_engine('sqlite:///my_database.db') 
 Base.metadata.create_all(engine)
 
 # Close the connection
