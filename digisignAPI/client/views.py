@@ -40,6 +40,11 @@ def device_slides():
 def device_slides_test():
 	return send_file("client/html/device-slide-testview.html")
 
+@views.route('/watch/', methods=['GET'])
+def device_watch():
+	return send_file("client/html/device-slide-watch.html")
+
+
 @views.route('/signup', methods=['GET'])
 def test():
 	return send_file("client/html/signup.html")

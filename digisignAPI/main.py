@@ -2,6 +2,7 @@ from client import createClient
 from api import createApi
 from database import createDatabase
 from flask import Flask
+from flask_cors import CORS
 
 import argparse
 
@@ -41,6 +42,8 @@ if __name__ == "__main__":
 	#app = createApp(database)
 
 	app = Flask(__name__)
+
+	CORS(app, origins="*", supports_credentials=True, allow_headers="*")
 
 	createDatabase()
 

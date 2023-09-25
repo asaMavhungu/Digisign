@@ -32,6 +32,7 @@ class Slide(Base):
 	slide_id = Column(Integer, primary_key=True)
 	slide_name = Column(String, unique=True)
 	slide_url = Column(String)
+	slide_duration = Column(Integer)
 	department_id = Column(Integer, ForeignKey('departments.department_id'))
 	current_user_id = Column(Integer, ForeignKey('users.user_id'))  # New column
 	# Add other slide-related attributes as needed
