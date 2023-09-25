@@ -31,47 +31,42 @@
       .plus-icon{
         font-size: 20px;
       }
-    </style>
+    
+    .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center; 
+        align-items: center; 
+        height: 70%; 
+    }
 
-    <style>
-        .container {
-            display: flex;
-            flex-direction: column;
-            justify-content: center; /* Center vertically */
-            align-items: center; /* Center horizontally */
-            height: 70%; /* 100% of the viewport height to center vertically */
-        }
+    .file-upload {
+        text-align: center;
+    }
 
-        .file-upload {
-            text-align: center; /* Center the file input and label text */
-        }
+    .input {
+        width: 70%;
+        height: 50%;
+        display: none;
+    }
 
-        .input {
-            /* Customize the size as needed */
-            width: 70%;
-            height: 50%;
-            display: none;
-        }
+    .label {
+        border-radius: 6px;
+        border: 1px dashed black;
+        text-align: center;
 
-        .label {
-            /* Customize the size as needed */
+        cursor: pointer;
+        margin-bottom: 10px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
 
-            border-radius: 6px;
-            border: 1px dashed black;
-            text-align: center;
-
-            cursor: pointer;
-            margin-bottom: 10px;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .label:hover {
-            color: #007bff;
-            border: 1px dashed #007bff;
-        }
+    .label:hover {
+        color: #007bff;
+        border: 1px dashed #007bff;
+    }
 
     </style>
   </head>
@@ -92,7 +87,6 @@
               <a class="nav-link" href="/departments">Departments</a>
               <a class="nav-link" href="/devices">All Devices</a>
               <a class="nav-link active" aria-current="page"  href="/slides">All Slides</a>
-              <a class="nav-link" href="uploadpage.html">Upload</a>
             </div>
           </div>
           <a class="btn btn-outline-success me-2" href= "signin.html" type="button">Login</a>
@@ -281,7 +275,7 @@
                         const slideCard = createSlideCard(slideName, slideURL);
 
                         // Append the slide card to a container in your web page
-                        const slideContainer = document.getElementById("slideContainer"); // Replace with your container ID
+                        const slideContainer = document.getElementById("slide-cards"); // Replace with your container ID
                         slideContainer.appendChild(slideCard);
                         // Clear the form or perform any additional actions as needed
                     },
@@ -319,13 +313,16 @@
         // Create the slide description element
         const slideDescriptionElement = document.createElement('p');
         slideDescriptionElement.className = 'card-text';
+        slideDescriptionElement.style.whiteSpace = 'nowrap';
+        slideDescriptionElement.style.overflow = 'hidden';
+        slideDescriptionElement.style.textOverflow = 'ellipsis';
         slideDescriptionElement.textContent = `${slideURL}`;
     
         // Create the "Go somewhere" link
         const goSomewhereLink = document.createElement('a');
         goSomewhereLink.href = 'slides.html';
         goSomewhereLink.className = 'btn btn-primary';
-        goSomewhereLink.textContent = 'Go somewhere';
+        goSomewhereLink.textContent = 'Copy slide';
 
         // Create an image element for the slide image
         const slideImage = document.createElement('img');
@@ -336,13 +333,13 @@
         // Create the delete button
         const deleteButton = document.createElement('button');
         deleteButton.textContent = 'Delete';
-        deleteButton.className = 'btn btn-danger delete-button';
+        deleteButton.className = 'btn btn-danger delete-button float-right';
         deleteButton.setAttribute('data-slide-name', slideName);
 
 
         // Add margin/padding between the buttons (adjust as needed)
-        goSomewhereLink.style.marginRight = '10px'; // Add space to the right of "Go somewhere" link
-        deleteButton.style.marginRight = '10px'; // Add space to the right of the delete button
+        goSomewhereLink.style.margin = '10px 10px 0px 0px';
+        deleteButton.style.margin = '10px 0px 0px 0px'; 
 
         
         // Append slide name, description, link, and delete button to the card body
