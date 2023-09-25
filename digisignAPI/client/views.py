@@ -36,6 +36,10 @@ def department():
 def device_slides():
 	return send_file("client/html/device-slides.html")
 
+@views.route('/device-slide-test/', methods=['GET'])
+def device_slides_test():
+	return send_file("client/html/device-slide-testview.html")
+
 @views.route('/signup', methods=['GET'])
 def test():
 	return send_file("client/html/signup.html")

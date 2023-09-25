@@ -38,6 +38,17 @@
 			left: 0;
 			top: 0;
 		}
+		/* CSS for the carousel */
+		.carousel {
+			max-width: 100%; /* Ensure the carousel scales with the device width */
+		}
+
+		.carousel img {
+			object-fit: cover; /* Stretch the image to cover the carousel while maintaining aspect ratio */
+			object-position: center; /* Center the image within the carousel */
+			max-width: 100%; /* Ensure the image does not exceed the width of the carousel */
+			max-height: 100vh; /* Limit the image height to the viewport height (100% of viewport height) */
+		}
 
 	</style>
 
@@ -60,10 +71,25 @@
 	</div>
 	
 	<script>
+
+		const currentUrl = window.location.href;
+
+        const url = new URL(currentUrl);
+
+        var device = url.searchParams.get("device");
+
+        if (device) {
+            console.log(device);
+        } else {
+            alert('Department parameter not found in the URL.');
+        }
+
+		// Function to create custom styled carousel indicators (buttons)
+		// Function to create custom styled carousel indicators (buttons)
 		// Function to create custom styled carousel indicators (buttons)
 		function createCarouselIndicators(slides) {
 			const carouselIndicators = document.getElementById('carouselIndicators');
-	
+
 			slides.forEach((slide, index) => {
 				const indicatorButton = document.createElement('li');
 				indicatorButton.classList.add('indicator-button'); // Add custom styling class
@@ -76,61 +102,60 @@
 				carouselIndicators.appendChild(indicatorButton);
 			});
 		}
-	
+
 		// Function to create carousel items
-		function createCarouselItems(slides) {
+		function createCarouselItems(deviceData) {
 			const carouselInner = document.getElementById('carouselInner');
 
-			slides.forEach((slide, index) => {
+			deviceData.slide_ids.forEach((slide_id, index) => {
+				const slideName = deviceData.slide_names[index];
+				const slideURL = deviceData.slide_urls[index];
+
 				const carouselItem = document.createElement('div');
 				carouselItem.classList.add('carousel-item');
 				if (index === 0) {
 					carouselItem.classList.add('active');
 				}
 
-				let slideContent;
-
-				if (index === slides.length) {
-					// For the last item, include a video instead of an image
-					slideContent = `
-						<div class="embed-responsive embed-responsive-16by9">
-							<iframe class="embed-responsive-item" src="https://www.youtube.com/embed/iggBne5kuvU" allowfullscreen></iframe>
-						</div>
-						<div class="carousel-caption d-none d-md-block">
-							<h5>${slide.title}</h5>
-							<p>${slide.description}</p>
-						</div>
-					`;
-				} else {
-					// For other items, include an image
-					slideContent = `
-						<img src="${slide.image_url}" class="d-block w-100" alt="...">
-						<div class="carousel-caption d-none d-md-block">
-							<h5>${slide.title}</h5>
-							<p>${slide.description}</p>
-						</div>
-					`;
-				}
+				const slideContent = `
+					<img src="${slideURL}" class="d-block w-100" alt="...">
+					<div class="carousel-caption d-none d-md-block">
+						<h5>${slideName}</h5>
+					</div>
+				`;
 
 				carouselItem.innerHTML = slideContent;
 				carouselInner.appendChild(carouselItem);
 			});
 		}
-	
-		// Fetch data from the API and populate the carousel
-		fetch('/api/slides', {
-			method: 'GET',
-			// Additional options like headers can be provided here
-		})
-			.then(response => response.json())
-			.then(data => {
-				const slides = data; // Assuming data is an array of slide objects
-				createCarouselIndicators(slides);
-				createCarouselItems(slides);
+
+		// Function to fetch device data from the API
+		function fetchDeviceData(device) {
+			const apiUrl = '/api/devices/' + device; // Replace with your API endpoint URL
+
+			return fetch(apiUrl)
+				.then((response) => {
+					if (!response.ok) {
+						throw new Error('Network response was not ok');
+					}
+					return response.json();
+				});
+		}
+
+		// Fetch device data and create the carousel when the data is available
+		fetchDeviceData(device) // Replace 'device' with the actual device identifier
+			.then((deviceData) => {
+				// Assuming the response contains the device data
+				// Call the function to create custom carousel indicators
+				createCarouselIndicators(deviceData.slide_ids);
+
+				// Call the function to create carousel items
+				createCarouselItems(deviceData);
 			})
-			.catch(error => {
-				console.error('Error:', error);
+			.catch((error) => {
+				console.error('There was a problem with the fetch operation:', error);
 			});
+
 	</script>
 	
 	
