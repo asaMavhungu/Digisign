@@ -5,7 +5,7 @@ import database.sql_utils as sql_client
 
 
 class Device:
-	def __init__(self, device_name, device_id=None, department_id=None, slide_ids=None, slide_names=None, slide_urls=None):
+	def __init__(self, device_name, device_id=None, department_id=None, department_name=None, slide_ids=None, slide_names=None, slide_urls=None):
 		"""
 		Constructor for the Device class.
 
@@ -17,12 +17,13 @@ class Device:
 		self.device_id: str | None = device_id
 		self.device_name: str = device_name
 		self.department_id: str | None = department_id
+		self.department_name: str | None = department_name
 		self.slide_ids = slide_ids or []
 		self.slide_names = slide_names or []
 		self.slide_urls = slide_urls or []
 
 	def __repr__(self):
-		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, slide_ids={self.slide_ids}, slide_names={self.slide_names}, slide_urls={self.slide_urls})>"
+		return f"<Device(device_id={self.device_id}, device_name='{self.device_name}', department_id={self.department_id}, department_name={self.department_name},slide_ids={self.slide_ids}, slide_names={self.slide_names}, slide_urls={self.slide_urls})>"
 	
 	
 	@staticmethod
@@ -41,11 +42,14 @@ class Device:
 			return result, code
 		
 		#TODO 'result' is ALWAYS in an expected format
+		# TODO fix the codes
 
 		device_dict = {
 			'device_id': result['device_id'],
 			'device_name': result['device_name'],
 			'department_id': result['department_id'],
+			#'department_name': result['department']['department_name'],
+			'department_name': result.get('department').get('department_name') if result.get('department') else None, # type: ignore
 			'slide_ids': [assignment['assignment_id'] for assignment in result['assignments']], #type: ignore
 			'slide_names': [assignment['slide_name'] for assignment in result['assignments']], #type: ignore
 			'slide_urls': [assignment['slide_url'] for assignment in result['assignments']] #type: ignore
@@ -71,11 +75,12 @@ class Device:
 		device_id = data.get("device_id")
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")
+		department_name = data.get("department_name")
 		slide_ids = data.get("slide_ids", [])
 		slide_names = data.get("slide_names", [])
 		slide_urls = data.get("slide_urls", [])
 
-		return cls(device_name=device_name, device_id=device_id, department_id=department_id, slide_ids=slide_ids, slide_names=slide_names, slide_urls=slide_urls)
+		return cls(device_name=device_name, device_id=device_id, department_id=department_id, department_name=department_name, slide_ids=slide_ids, slide_names=slide_names, slide_urls=slide_urls)
 
 	def to_dict(self):
 		return {
@@ -116,6 +121,7 @@ class Device:
 		device_id = data.get("device_id")
 		device_name = data.get("device_name")
 		department_id = data.get("department_id")
+		department_name = data.get("department_name")
 		slide_ids = data.get("slide_ids", [])
 		slide_names = data.get("slide_names", [])
 		slide_urls = data.get("slide_urls", [])
@@ -124,6 +130,7 @@ class Device:
 			"device_id": device_id,
 			"device_name": device_name,
 			"department_id": department_id,
+			"department_name": department_name,
 			"slide_ids": slide_ids,
 			"slide_names": slide_names,
 			"slide_urls": slide_urls

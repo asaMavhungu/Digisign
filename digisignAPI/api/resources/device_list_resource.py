@@ -67,7 +67,7 @@ class DeviceListResource(Resource):
 
 		responce, code = device.create_database_entry()
 
-		responce['success'] = False
+		responce['success'] = False # type: ignore
 
 
 		# Couldnt create, abort
@@ -89,7 +89,7 @@ class DeviceListResource(Resource):
 		department = Department.from_dict(department_json)
 
 		print(device)
-		responce_for_assign, code = department.assign_devices([device.device_id])
+		responce_for_assign, code = department.assign_devices([device.device_id]) # type: ignore
 
 		print(responce, code)
 
