@@ -21,9 +21,6 @@ install: setup
 run: install
 	$(PYTHON) main.py
 
-# Run tests
-test: install
-	$(PYTHON) -m pytest -v
 
 # Clean up generated files and virtual environment
 clean:

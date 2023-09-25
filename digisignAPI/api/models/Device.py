@@ -1,6 +1,4 @@
 
-
-import database.Database_utils as db_client
 import database.sql_utils as sql_client
 
 
